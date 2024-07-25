@@ -12,7 +12,7 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-setup(name='hy_vent',
+setup(name='hyvent',
       version='0.1',
       description='Python package to analyse CTD Data of hydrothermal venting ',
 #      long_description=readme(),
@@ -20,11 +20,12 @@ setup(name='hy_vent',
       author='Jonathan Mette',
       author_email='j.mette@posteo.de',
       license='MIT',
-      packages=['hy_vent'],
+      packages=['hyvent'],
       install_requires=[
-          'os',
+          'numpy',
           'pandas',
-          'datetime'],
+          'datetime',
+          'seabird'],
       zip_safe=False)
 
 
