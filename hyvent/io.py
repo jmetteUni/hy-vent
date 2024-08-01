@@ -235,5 +235,26 @@ def read_he(he_path):
 
     return he_data, he_data_full
 
+def read_gebco(gebcopath): # hillshade_path
+    import xarray as xa
+
+    #gebcopath = '/home/jonathan/Dokumente/SHK Maren/PS137/PS137_AuroraVent_25m_bilinear_WGS84.nc'     # path for bathymetry files
+    #gebcopath_hillshade = '/home/jonathan/Dokumente/SHK Maren/PS137/PS137_AuroraVent_25m_bilinear_WGS84_hillshade.nc'
+
+    gebco = xa.open_dataset(gebcopath)
+
+    lonW = -6.45
+    lonE = -6.175
+    latS = 82.875
+    latN = 82.92
+    #res = '10m'
+
+    gebco = gebco.sel(lat=slice(latS,latN),lon=slice(lonW,lonE))
+
+    elev = gebco.variables['Band1'][:]
+    lats = gebco.variables['lat'][:]
+    lons = gebco.variables['lon'][:]
+
+    return(lats,lons,elev)
 
 
