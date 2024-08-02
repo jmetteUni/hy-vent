@@ -38,7 +38,7 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
     del profile_plot['PS137_049_01']        #ATWAICE calibration cast
     del profile_plot['PS137_052_01']        #calibration cast, only down to 1000m
     del profile_plot['PS137_053_01']        #aborted at 170m due to ice situation
-    del profile_plot['PS137_055_01']        # ???
+    #del profile_plot['PS137_055_01']        # ???
     del profile_plot['PS137_058_01']        #Lucky B
     del profile_plot['PS137_061_01']        #Lucky B
 
@@ -88,10 +88,10 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
     end_lon['PS137_054_01'] = parse('6W,11.935W')
     end_lat['PS137_054_01'] = parse('82N,53.149N')
 
-    # start_lon['PS137_055_01'] = parse('6W,16.121W')    #no towyo
-    # start_lat['PS137_055_01'] = parse('82N,54.062')
-    # end_lon['PS137_055_01'] = parse('6W,13.519W')
-    # end_lat['PS137_055_01'] = parse('82N,53.728N')
+    start_lon['PS137_055_01'] = parse('6W,16.121W')    #no towyo
+    start_lat['PS137_055_01'] = parse('82N,54.062')
+    end_lon['PS137_055_01'] = parse('6W,13.519W')
+    end_lat['PS137_055_01'] = parse('82N,53.728N')
 
     #%%  DNA and POC positions
     poc = {'PS137_026_01' :13,
