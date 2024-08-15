@@ -237,6 +237,7 @@ def read_he(he_path):
 
 def read_gebco(gebcopath): # hillshade_path
     import xarray as xa
+    import numpy as np
 
     #gebcopath = '/home/jonathan/Dokumente/SHK Maren/PS137/PS137_AuroraVent_25m_bilinear_WGS84.nc'     # path for bathymetry files
     #gebcopath_hillshade = '/home/jonathan/Dokumente/SHK Maren/PS137/PS137_AuroraVent_25m_bilinear_WGS84_hillshade.nc'
@@ -254,6 +255,7 @@ def read_gebco(gebcopath): # hillshade_path
     elev = gebco.variables['Band1'][:]
     lats = gebco.variables['lat'][:]
     lons = gebco.variables['lon'][:]
+    lons,lats = np.meshgrid(lons,lats)
 
     return(lats,lons,elev)
 
