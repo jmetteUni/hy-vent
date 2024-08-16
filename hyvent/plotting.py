@@ -11,7 +11,10 @@ def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
     import matplotlib.pyplot as plt
 
     label_sel = 'Samples between '+str(depth_min)+' - '+str(depth_max)+'m'
-    he_data = pd.concat(data.values(),ignore_index=True)
+    if type(data) == dict:
+        he_data = pd.concat(data.values(),ignore_index=True)
+    else:
+        he_data = data
 
     plt.figure()
     plt.hist(he_data['delta3He'],bins=bins,label='All samples')
@@ -31,7 +34,10 @@ def plot_hist_dorp(data,depth_max,depth_min,bins,ranges,path_save='None'):
     import matplotlib.pyplot as plt
 
     label_sel = 'Samples between '+str(depth_min)+' - '+str(depth_max)+'m'
-    dorp_data = pd.concat(data.values(),ignore_index=True)
+    if type(data) == dict:
+        dorp_data = pd.concat(data.values(),ignore_index=True)
+    else:
+        dorp_data = data
 
     plt.figure()
     plt.hist(dorp_data['dORP'],bins=bins,range=ranges,label='All samples',log=True)
@@ -52,7 +58,11 @@ def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
 
     label_title = 'Interpolated crossection for '+key
 
-    station = profile_data[key]
+    if type(profile_data) == dict:
+        station = profile_data[key]
+    else:
+        station = profile_data
+
     station = station[station['DEPTH']>depth]
     if station.empty:
         print('Station '+key+' has no values lower then '+str(depth))

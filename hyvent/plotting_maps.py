@@ -3,7 +3,7 @@
 """
 Created on Thu Jul 25 13:27:30 2024
 
-@author: jmette
+@author: jmette@uni-bremen.de
 """
 
 def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_save='None'):

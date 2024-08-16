@@ -25,7 +25,8 @@ setup(name='hyvent',
           'numpy',
           'pandas',
           'datetime',
-          'seabird'],
+          'seabird',
+          'matplotlib'],
       zip_safe=False)
 
 

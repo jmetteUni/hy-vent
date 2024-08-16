@@ -51,6 +51,10 @@ def read_from_csv(csv_path,datatype):        #reads in stations in individual cs
             if file.endswith("btl.csv"):
                file_list.append(file)
                file_list.sort()
+        if datatype == 'mapr':
+            if file.endswith("mapr.csv"):
+               file_list.append(file)
+               file_list.sort()
 
     cnv_data = dict()
     for file in file_list:
@@ -58,6 +62,8 @@ def read_from_csv(csv_path,datatype):        #reads in stations in individual cs
             cnv_data[file.rstrip('_cnv.csv')] = pd.read_csv(csv_path+file)       #,encoding='iso-8859-1' sometimes needed
         if file.endswith("btl.csv"):
             cnv_data[file.rstrip('_btl.csv')] = pd.read_csv(csv_path+file)       #,encoding='iso-8859-1' sometimes needed
+        if file.endswith("mapr.csv"):
+            cnv_data[file.rstrip('_mapr.csv')] = pd.read_csv(csv_path+file)       #,encoding='iso-8859-1' sometimes needed
         print('Read '+file+' sucessfully')
 
     return cnv_data
