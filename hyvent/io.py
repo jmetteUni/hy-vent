@@ -7,6 +7,24 @@ Created on Tue Apr 23 18:10:45 2024
 """
 
 def read_cnv(path):
+    """
+    Reads in data from SeaBird CTD processing software which ends with ".cnv"
+    to a dictionary with the filename as the key and a pandas dataframe per
+    station as the value. It exspects one file per station in the given
+    directory.
+
+    Parameters
+    ----------
+    path : string
+        Path to the directory where the data is stored in one station per file.
+
+    Returns
+    -------
+    cnv_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+
+    """
     import pandas as pd
     from seabird.cnv import fCNV
     import os
@@ -30,6 +48,32 @@ def read_cnv(path):
     return cnv_data
 
 def write_to_csv(cnv_data,out_path,datatype):    #writes all stations to individual csv sheets
+    """
+    Writes out data from a dictionary with the filename as the key and a pandas
+    dataframe per station as the value to csv files, where the key is the
+    filename and the dataframe is the csv files content
+
+
+    Parameters
+    ----------
+    cnv_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+
+    out_path : string
+        Path to the directory to write to.
+
+    datatype : string
+        String which describes the type of data. Can be "cnv" for full CTD
+        profiles, "btl" for SeaBird bottle file data or "mapr" for NOAA PMEL
+        MAPR data.
+
+    Returns
+    -------
+    None
+
+    """
+
     import pandas as pd
     for key in cnv_data:
         station = pd.DataFrame(cnv_data[key])
@@ -38,6 +82,30 @@ def write_to_csv(cnv_data,out_path,datatype):    #writes all stations to individ
         print('Wrote '+key+' to csv sucessfully')
 
 def read_from_csv(csv_path,datatype):        #reads in stations in individual csv sheets into a dictionary
+    """
+    Reads data from csv files to a dictionary with the filename as the key and
+    a pandas dataframe per station as the value. It exspects one file per
+    station in the given directory.
+
+
+    Parameters
+    ----------
+    csv_path : string
+        Path to the directory where the csv files are stored.
+
+    datatype : string
+        String which describes the type of data. Can be "cnv" for full CTD
+        profiles, "btl" for SeaBird bottle file data or "mapr" for NOAA PMEL
+        MAPR data.
+
+    Returns
+    -------
+    cnv_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+
+    """
+
     import pandas as pd
     import os
 
@@ -69,6 +137,22 @@ def read_from_csv(csv_path,datatype):        #reads in stations in individual cs
     return cnv_data
 
 def read_dshippos(dship_path):
+    """
+    Reads in tab separated file with data from "D-SHIP" portal. Expects 3 rows
+    of headers and 4 columns with date, time, latitude and longitude.
+
+    Parameters
+    ----------
+    dship_path : string
+        Path to the file.
+
+    Returns
+    -------
+    dship : pandas dataframe
+        Pandas Dataframe with date, time, latitude and longitude as columns.
+
+    """
+
     import pandas as pd
 
     dship = pd.read_fwf(dship_path,skiprows=3,names=['Date','Time','Dship_lat','Dship_lon'],encoding='iso-8859-1')
@@ -79,6 +163,20 @@ def read_dshippos(dship_path):
     return dship
 
 def posidata_PS137(posi_path):  #position data as a collection of csv sheets, posidonia, qgis
+    """
+    Reads in comma separated files with data from the Posidonia acoustic position tracker on RV Polarstern from the cruise PS137. Megrges all files in the "path" directory. Corrects data specific errors.
+
+    Parameters
+    ----------
+    posi_path : string
+        Path to the files.
+
+    Returns
+    -------
+    posi : pandas dataframe
+        Pandas Dataframe with datetime, Poalrstern latitude, Polarstern longitude, CTD latitude, CTD longitude and CTD depth as columns.
+    """
+
     import pandas as pd
     import os
     import datetime as dt
@@ -119,6 +217,19 @@ def posidata_PS137(posi_path):  #position data as a collection of csv sheets, po
     return(posi)
 
 def posidata_SO301(posi_path):  #position data as one csv sheet, Ranger output
+    """
+    Reads in comma separated files with data from the Sonardyne Ranger acoustic position tracker on RV Sonne from the cruise SO301 exported from the "D-Ship" portal. Megrges all files in the "path" directory.
+
+    Parameters
+    ----------
+    posi_path : string
+        Path to the files.
+
+    Returns
+    -------
+    posi : pandas dataframe
+        Pandas Dataframe with datetime, Poalrstern latitude, Polarstern longitude, CTD latitude, CTD longitude and CTD depth as columns.
+    """
     import pandas as pd
     from lat_lon_parser import parse
 
