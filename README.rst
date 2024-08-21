@@ -2,6 +2,10 @@ UNDER DEVELOPMENT Hy-Vent
 =========================
 
 A package wich aims to provide functions for analyzing CTD Data from hydrothermal vents.
+Data is in general handled as pandas dataframes, where data of one station is one dataframe. Several stations (that means dataframes) of the same type are stored in a dicitonary with th key being a unique station identifier containing the cruisename, the station number and the cast number.
+Example: "PS137_018_01" means cruise Polarstern 137, station 018 and cast 01. Station and cast number are exspected to have 3 or 2 digits respectively for now.
+
+
 Contains the following modules:
 
 io.py
