@@ -7,6 +7,35 @@ Created on Thu Jul 25 13:27:30 2024
 """
 
 def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_save='None'):
+    """
+    Plots CTD tow-yo tracks on to a 2D map together with bathymety and optional samples of tracer. Tracks are a combination of acoustic tracker position of the CTD if available (solid line), otherwise ship position (dashed line).
+
+    Some sections contain code, which makes this function specific for PS137 data for now.
+
+    Parameters
+    ----------
+    profile_data : dictionary
+        Dictionary of CTD profile data where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+    btl_data : dictionary
+        Dictionary of SeaBird bottle data where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+    lats : numpy ndarrays
+        Latitude coordinates of bathymetry.
+    lons : numpy ndarrays
+        Longitude coordinates of bathymetry.
+    elevs : numpy ndarrays
+        Elevation of bathymetry.
+    tracer_type : string, optional
+        Type of sample to plot on the map. Can be "dna" for DNA samples, "poc" for poc samples, "dna_poc" for both and "he" for helium samples The default is 'None'.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
 
     import cartopy.crs as ccrs
     from lat_lon_parser import parse

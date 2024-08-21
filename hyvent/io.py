@@ -169,7 +169,7 @@ def posidata_PS137(posi_path):  #position data as a collection of csv sheets, po
     Parameters
     ----------
     posi_path : string
-        Path to the files.
+        Path to the file.
 
     Returns
     -------
@@ -223,13 +223,14 @@ def posidata_SO301(posi_path):  #position data as one csv sheet, Ranger output
     Parameters
     ----------
     posi_path : string
-        Path to the files.
+        Path to the file.
 
     Returns
     -------
     posi : pandas dataframe
         Pandas Dataframe with datetime, Poalrstern latitude, Polarstern longitude, CTD latitude, CTD longitude and CTD depth as columns.
     """
+
     import pandas as pd
     from lat_lon_parser import parse
 
@@ -243,12 +244,34 @@ def posidata_SO301(posi_path):  #position data as one csv sheet, Ranger output
     return(posi)
 
 def read_btl(btl_path):
+    """
+    Reads in bottle data from SeaBird CTD processing software which ends with ".btl"
+    to a dictionary with the filename as the key and a pandas dataframe per
+    station as the value. It exspects one file per station in the given
+    directory.
+
+    Parameters
+    ----------
+    btl_path : string
+        Path to the directory where the data is stored in one station per file.
+
+    Returns
+    -------
+    btl_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+
+    Reference
+    ---------
+    Code provided by N. Fröhberg.
+    """
+
     import pandas as pd
     import os
 
     btl_data = dict()
 
-    file_list = []                  #get all filenames of the positiondata csv sheets
+    file_list = []                  #get all filenames of the btl files sheets
     for file in os.listdir(btl_path):
         if file.endswith(".btl"):
            file_list.append(file)
@@ -308,6 +331,24 @@ def read_btl(btl_path):
     return btl_data
 
 def read_mapr(mapr_path):
+    """
+    Reads in MAPR data from NOAA PMEL MAPR sensor excels sheets
+    to a dictionary with the filename as the key and a pandas dataframe per
+    station as the value. It exspects one file per sensor and station in the given
+    directory.
+
+    Parameters
+    ----------
+    mapr_path : string
+        Path to the directory where the data is stored in one sensor and station per file.
+
+    Returns
+    -------
+    mapr_data : dictionary
+        Dictionary where the keys are unique sensor and station identifiers and
+        values are data in pandas dataframes.
+    """
+
     import pandas as pd
 
 
@@ -337,6 +378,22 @@ def read_mapr(mapr_path):
     return mapr
 
 def read_he(he_path):
+    """
+    Reads in helium isotope data form excel sheets from the Bremen Helium Isotope Lab.
+
+    Parameters
+    ----------
+    he_path : string
+        Path to the file.
+
+    Returns
+    -------
+    he_data : pandas dataframe
+        Pandas dataframe with station, bottle number, Ne/He, delta3He and delta22Ne as columns.
+    he_data_full : pandas dataframe
+        Pandas dataframe with all quantities as columns.
+    """
+
     import pandas as pd
     import numpy as np
 
@@ -353,6 +410,22 @@ def read_he(he_path):
     return he_data, he_data_full
 
 def read_gebco(gebcopath): # hillshade_path
+    """
+    Reads in bathymetry from NetCDF file.
+
+    Parameters
+    ----------
+    gebcopath : string
+        Path to the file.
+
+    Returns
+    -------
+    lats,lons,elev : tuple of three numpy ndarrays
+        lats: latitude coordinates
+        lons: longitude coordinates
+        elevs: elevation
+    """
+
     import xarray as xa
     import numpy as np
 
