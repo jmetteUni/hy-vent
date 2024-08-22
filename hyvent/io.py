@@ -263,7 +263,7 @@ def read_btl(btl_path):
 
     Reference
     ---------
-    Code provided by N. Fröhberg.
+    Code provided by N. Froehberg.
     """
 
     import pandas as pd

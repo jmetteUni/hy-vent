@@ -230,7 +230,7 @@ def plot3Ddistr(profile_data,key,var,bathy,vent_loc,path_save='None'):
 
 def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
     """
-    Plots positions of a variable from one dataframe/station of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+    Plots positions of a variable from one dataframe/station of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry. If no CTD positions are found, ship positions are used instead.
 
     Parameters
     ----------
@@ -281,7 +281,7 @@ def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False
 
     if bathy != False:
         contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)
-        #contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
 
     vent = ax.scatter(vent_loc[0],vent_loc[1], marker='*', color='r', s=100)
     var_plot = ax.scatter(lon, lat,c=station[var],s=5)
@@ -301,7 +301,7 @@ def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False
 
 def plot2D_all_stations(profile_data,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
     """
-    Plots positions of a variable from all dataframes/stations of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+    Plots positions of a variable from all dataframes/stations of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry. If no CTD positions are found, ship positions are used instead.
 
     Parameters
     ----------
@@ -371,7 +371,7 @@ def plot2D_all_stations(profile_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
 def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
     """
-    Plots positions of a variable of bottle data from all dataframes/stations of a dictionary on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+    Plots positions of a variable of bottle data from all dataframes/stations of a dictionary on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry. If no CTD positions are found, ship positions are used instead.
 
     Parameters
     ----------
@@ -410,7 +410,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
     fig.set_tight_layout(True)
 
     if bathy != False:
-        contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.3)
+        #contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.3)
         contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.1)
 
     for key in btl_data:
@@ -428,6 +428,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
         var_plot = ax.scatter(lon, lat,c=station[var],s=5)
 
     vent = ax.scatter(vent_loc[0],vent_loc[1], marker='*', color='r', s=100)
+
 
     ax.set_title(label_title)
     fig.colorbar(var_plot, label=var)
