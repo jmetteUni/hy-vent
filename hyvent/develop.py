@@ -47,7 +47,7 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 #%%
 plot2D_all_stations(profile_data, 'dORP', vent_loc, 2000, 5000,bathy)
 
-plot2D_all_stations_he(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
+plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
 #%% merge profile and mapr data
 
 import pandas as pd

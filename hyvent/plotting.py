@@ -7,6 +7,27 @@ Created on Wed Aug 14 16:25:58 2024
 """
 
 def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
+    """
+    Plots histogram of helium isotope data.
+
+    Parameters
+    ----------
+    data : dictionary or pandas dataframe
+        dictionary of pandas dataframes with station, bottle number, Ne/He, delta3He and delta22Ne as columns or one pandas dataframe.
+    depth_max : int
+        Maximum depth of the samples to plot.
+    depth_min : int
+        Minimum depth of the samples to plot..
+    bins : int
+        Number of bins in the histogram.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import pandas as pd
     import matplotlib.pyplot as plt
 
@@ -30,6 +51,29 @@ def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
     plt.show()
 
 def plot_hist_dorp(data,depth_max,depth_min,bins,ranges,path_save='None'):
+    """
+    Plots histogram of dORP of CTD profile data.
+
+    Parameters
+    ----------
+    data : dictionary or pandas dataframe
+        dictionary of pandas dataframes or one pandas dataframe with CTD profile data.
+    depth_max : int
+        Maximum depth of the samples to plot.
+    depth_min : int
+        Minimum depth of the samples to plot..
+    bins : int
+        Number of bins in the histogram.
+    ranges : tuple of int
+        Upper and lower limit of bins in the histogram.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import pandas as pd
     import matplotlib.pyplot as plt
 
@@ -53,6 +97,34 @@ def plot_hist_dorp(data,depth_max,depth_min,bins,ranges,path_save='None'):
     plt.show()
 
 def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
+    """
+    Plots interpolated section of a selected variable from a dataframe/station of profile data along an x-variable. The dataframe is selected by a key in the dictionary.
+
+    Parameters
+    ----------
+    profile_data : dictionary
+        Dictionary of pandas dataframes or one pandas dataframe with CTD profile data.
+    key : string
+        Key of the dataframe/station to plot.
+    xvar : string
+        Key of dataframe column to use as x-coordinate.
+    yvar : string
+        Key of dataframe column to use as y-coordinate.
+    zvar : string
+        Key of dataframe column to use as z-coordinate.
+    depth : int
+        Upper depth limit of the plot.
+    levels : int
+        Number of individual contour lines.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
+
     from matplotlib import colors
     import matplotlib.pyplot as plt
 
@@ -90,8 +162,36 @@ def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
     plt.show()
 
 def plot3Ddistr(profile_data,key,var,bathy,vent_loc,path_save='None'):
+    """
+    Plots positions of a variable from one dataframe of a dictionary of profile data in 3D space with the data as color coding and the bathymetry as a 3D surface.
+
+    Parameters
+    ----------
+    profile_data : dictionary
+        Dictionary of pandas dataframes or one pandas dataframe with CTD profile data.
+    key : string
+        Key of the dataframe/station to plot.
+    var : string
+        Key of dataframe column to plot.
+    bathy : tuple of three int
+        Bathymetry data with longitude and latitude coordinates and elevation.
+    vent_loc : tuple of three float
+        Longitude, latitude and depth of a position of interest to mark in the plot.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import matplotlib.pyplot as plt
     from matplotlib import colors
+
+    if type(profile_data) == dict:
+        station = profile_data[key]
+    else:
+        station = profile_data
 
     label_title = '3D distribution for '+key
 
@@ -129,6 +229,35 @@ def plot3Ddistr(profile_data,key,var,bathy,vent_loc,path_save='None'):
     plt.show()
 
 def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
+    """
+    Plots positions of a variable from one dataframe/station of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+
+    Parameters
+    ----------
+    profile_data : dictionary
+        Dictionary of pandas dataframes with CTD profile data.
+    key : string
+        Key of the dataframe/station to plot.
+    var : string
+        Key of dataframe column to plot.
+    vent_loc : tuple of three float
+        Longitude, latitude and depth of a position of interest to mark in the plot.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+    depth_min : int
+        Minimum depth of samples to plot.
+    depth_max : int
+        Maximum dpeth of samples to plot.
+    bathy : tuple of three int, optional
+        Bathymetry data with longitude and latitude coordinates and elevation.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import matplotlib.pyplot as plt
 
     label_title = '2D Distribution for '+key+'\n'+'in '+str(depth_min)+' - '+str(depth_max)+' m'
@@ -152,7 +281,7 @@ def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False
 
     if bathy != False:
         contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)
-        contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        #contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
 
     vent = ax.scatter(vent_loc[0],vent_loc[1], marker='*', color='r', s=100)
     var_plot = ax.scatter(lon, lat,c=station[var],s=5)
@@ -171,6 +300,33 @@ def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False
     plt.show()
 
 def plot2D_all_stations(profile_data,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
+    """
+    Plots positions of a variable from all dataframes/stations of a dictionary of profile data on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+
+    Parameters
+    ----------
+    profile_data : dictionary
+        Dictionary of pandas dataframes with CTD profile data.
+    key : string
+        Key of the dataframe/station to plot.
+    var : string
+        Key of dataframe column to plot.
+    vent_loc : tuple of three float
+        Longitude, latitude and depth of a position of interest to mark in the plot.
+    depth_min : int
+        Minimum depth of samples to plot.
+    depth_max : int
+        Maximum dpeth of samples to plot.
+    bathy : tuple of three int, optional
+        Bathymetry data with longitude and latitude coordinates and elevation.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import matplotlib.pyplot as plt
 
     label_title = '2D Distribution in '+str(depth_min)+' - '+str(depth_max)+' m'
@@ -213,7 +369,34 @@ def plot2D_all_stations(profile_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     plt.show()
 
-def plot2D_all_stations_he(btl_data,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
+def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=False,path_save='None'):
+    """
+    Plots positions of a variable of bottle data from all dataframes/stations of a dictionary on a 2D map. Samples to plot can be selected by depth. Plot can be combined with bathymetry.
+
+    Parameters
+    ----------
+    btl_data : dictionary
+        Dictionary of pandas dataframes with CTD bottle data.
+    key : string
+        Key of the dataframe/station to plot.
+    var : string
+        Key of dataframe column to plot.
+    vent_loc : tuple of three float
+        Longitude, latitude and depth of a position of interest to mark in the plot.
+    depth_min : int
+        Minimum depth of samples to plot.
+    depth_max : int
+        Maximum dpeth of samples to plot.
+    bathy : tuple of three int, optional
+        Bathymetry data with longitude and latitude coordinates and elevation.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
     import matplotlib.pyplot as plt
 
     label_title = '2D Distribution in '+str(depth_min)+' - '+str(depth_max)+' m'
