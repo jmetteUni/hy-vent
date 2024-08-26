@@ -37,7 +37,6 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
 
     """
 
-    import cartopy.crs as ccrs
     from lat_lon_parser import parse
     import numpy as np
     import matplotlib.pyplot as plt

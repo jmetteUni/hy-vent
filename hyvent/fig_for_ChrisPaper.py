@@ -35,4 +35,5 @@ plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='he',path_save='/
 #%% He samples
 
 plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 0, 6000,bathy)
+plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2800, 6000,bathy)
 

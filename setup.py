@@ -26,7 +26,8 @@ setup(name='hyvent',
           'pandas',
           'datetime',
           'seabird',
-          'matplotlib'],
+          'matplotlib',
+          'lat_lon_parser'],
       zip_safe=False)
 
 
