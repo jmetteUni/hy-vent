@@ -41,10 +41,10 @@ fig_for_ChrisPaper.py
 Code for creating figures for a publication.
 
 Dependencies for this code are the following:
-* numpy,
-* pandas,
-* datetime,
-* seabird,
-* matplotlib,
-* lat_lon_parser,
-* os
+- numpy,
+- pandas,
+- datetime,
+- seabird,
+- matplotlib,
+- lat_lon_parser,
+- os
