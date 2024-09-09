@@ -36,10 +36,6 @@ develop.py
 ----------
 Code, which is under heavy development. Working functions will be transferred to other modules.
 
-fig_for_ChrisPaper.py
----------------------
-Code for creating figures for a publication.
-
 Dependencies for this code are the following:
 - numpy,
 - pandas,

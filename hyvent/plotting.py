@@ -411,7 +411,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     if bathy != False:
         #contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.3)
-        contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.1)
+        contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.5)
 
     for key in btl_data:
 
