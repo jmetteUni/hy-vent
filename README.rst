@@ -44,3 +44,4 @@ Dependencies for this code are the following:
 - matplotlib,
 - lat_lon_parser,
 - os
+- gsw

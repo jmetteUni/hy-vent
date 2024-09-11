@@ -86,14 +86,14 @@ def qc_IQR(profile, var_to_qc, threshold, boxplots=False):        #qc on no of v
 
     Returns
     -------
-    profile: pandas series or dataframe
+    profile: pandas series
         Returns the data with outliers as NaN
 
     """
 
     import matplotlib.pyplot as plt
 
-    df = profile[var_to_qc]       #select variables which should be qc
+    df = profile
 
     df_qc = df.copy()
     # Calculate 25% percentile and 75% percentile
