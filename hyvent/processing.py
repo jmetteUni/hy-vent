@@ -21,8 +21,8 @@ def corr_mapr_depth(data,lat):
 
     Returns
     -------
-    data : pandas dataframe
-        Data of one station of one MAPR as a pandas dataframe with one new column containining the corrected depth.
+    depth_corr : pandas series
+        Column containining the corrected depth.
 
     """
 
@@ -36,4 +36,6 @@ def corr_mapr_depth(data,lat):
     #print('Mean deck pressure: '+str(p_deck_mean)+' dB')
     data['Depth_corr(m)'] = -data.apply(lambda x: gsw.conversions.z_from_p(x['Press(dB)']-p_deck_mean,lat), axis=1)         #calculates the corrected depth
 
-    return data
+    depth_corr = data['Depth_corr(m)']    #select only the corrected depth column
+
+    return depth_corr

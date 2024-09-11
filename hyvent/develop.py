@@ -82,43 +82,6 @@ plt.plot(sn74_036['CTD_lat'],sn74_036['DEPTH'])
 plt.plot(sn73_036['CTD_lat'],sn73_036['DEPTH'])
 plt.plot(sn72_036['CTD_lat'],sn72_036['DEPTH'])
 
-#%% processing mapr data
-mapr_path = '/home/jonathan/Dokumente/SHK Maren/PS137/Workbook/PS137_MAPRWorkbook_2003.xls'
-posi_path = '/home/jonathan/Dokumente/SHK Maren/PS137/Posidonia Data'
-dship_path = '/home/jonathan/Dokumente/SHK Maren/PS137/Dship Data/PS137_ShipPos.dat'
-
-from hyvent.io import (read_mapr,
-                       read_dshippos,
-                       posidata_PS137)
-import pandas as pd
-
-mapr_data = read_mapr(mapr_path)
-
-dship = read_dshippos(dship_path)   #read dship position
-posidata = posidata_PS137(posi_path)    #read posidonia
-for key in mapr_data:
-    mapr_data[key] = pd.merge(mapr_data[key],dship, on=['datetime'], how='left')
-    mapr_data[key] = pd.merge(mapr_data[key],posidata, on=['datetime'],how='left')
-print('Merged with Dship position and posidonia data')
-
-for key in mapr_data:
-    mapr_data[key] = mapr_data[key][mapr_data[key]['Press(counts)']!=0]     #clear internal readings
-    mapr_data[key] = mapr_data[key][mapr_data[key]['Press(counts)']!=8224]
-    mapr_data[key]['dORP'] = mapr_data[key]['ORP(mv)'].diff(periods=6)/30       #calc dORP
-    mapr_data[key] = corr_mapr_depth(mapr_data[key],82)         #correct mapr depth
-
-# -> despkike turbidity
-
-#write_to_csv(mapr_data, mapr_out, 'mapr')
-
-#%%
-from scipy.signal import savgol_filter
-
-mapr_test = mapr_data['PS137_CTD26-1_73']
-mapr_test = mapr_test[mapr_test['Depth_corr(m)']>40]
-turb = mapr_test['Neph(volts)']
-
-#%%
 
 
 
