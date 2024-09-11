@@ -105,9 +105,35 @@ for key in mapr_data:
     mapr_data[key] = mapr_data[key][mapr_data[key]['Press(counts)']!=0]     #clear internal readings
     mapr_data[key] = mapr_data[key][mapr_data[key]['Press(counts)']!=8224]
     mapr_data[key]['dORP'] = mapr_data[key]['ORP(mv)'].diff(periods=6)/30       #calc dORP
+    mapr_data[key] = corr_mapr_depth(mapr_data[key],82)         #correct mapr depth
 
-# -> depth correction
 # -> despkike turbidity
 
 #write_to_csv(mapr_data, mapr_out, 'mapr')
+
+#%%
+from scipy.signal import savgol_filter
+
+mapr_test = mapr_data['PS137_CTD26-1_73']
+mapr_test = mapr_test[mapr_test['Depth_corr(m)']>40]
+turb = mapr_test['Neph(volts)']
+turb_smooth = savgol_filter(turb, 20, 4)
+
+#%%
+from hyvent.quality_control import qc_IQR
+
+mapr_qc = qc_IQR(mapr_test, ['Neph(volts)'], 1.5,boxplots=True)
+
+#%%
+import matplotlib.pyplot as plt
+plt.figure()
+plt.scatter(mapr_test['Depth_corr(m)'],turb,marker='+')
+plt.scatter(mapr_test['Depth_corr(m)'],turb_smooth,marker='+')
+
+#%%
+plt.plot(turb)
+plt.plot(mapr_qc['Neph(volts)'],linewidth=0.5)
+plt.plot(turb_smooth)
+
+
 

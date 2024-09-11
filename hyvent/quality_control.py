@@ -3,10 +3,30 @@
 """
 Created on Wed Aug 14 15:03:01 2024
 
-@author: jonathan
+@author: jmette@uni-bremen.de
 """
 
-def qc_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc on no of variables in a profile with the IQR method, originally designed for posidonia latlon data
+def qc_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc on no of variables in a profile with the IQR method, originally designed for posidonia latlon data #threshold example =1.5
+    """
+    This function removes outliers based on the interquartile ranges method on selected variables in a dataframe. Optional, box plots are produced for controlling the outlier detection. If the selected variabels are acoustic tracker positions names "CTD_lat" or "CTD_lon", the corresponing coordinate for an outlier is also removed for consistency. Right now, it is recommended, to use this function for latitudes and longitudes OR for other variables but not to mix them.
+
+    Parameters
+    ----------
+    profile : pandas dataframe
+        Data wich should be quality conttrolled.
+    vars_to_qc : list of strings
+        List of variables were outliers should be removed. If one of the is called "CTD_lat" or "CTD_lon" the corresponding coordinate to the outlier is also removed.
+    threshold : int or float
+        Threshold of the outlier removal, which defines the upper and lower bounds.
+    boxplots : boolian, optional
+        Boolian which controlles if boxplots are produced or not. The default is False.
+
+    Returns
+    -------
+    profile: pandas dataframe
+        Returns the data with outliers as ?????
+
+    """
 
     import matplotlib.pyplot as plt
 
@@ -28,11 +48,13 @@ def qc_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc on no of 
     if boxplots == True:        #boxplot of qc variables
         for var in vars_to_qc:
             plt.figure()
+            df[var] = df[var].astype(float)   #convert to float for boxplot function
             df.boxplot(column=var) #,label='w/o qc')
             plt.title('w/o qc')
             plt.show()
 
             plt.figure()
+            df_qc[var] = df_qc[var].astype(float)
             df_qc.boxplot(column=var) #,label='with qc, '+str(threshold))
             plt.title('with qc, '+str(threshold))
             plt.show()
