@@ -440,7 +440,56 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     plt.show()
 
+def depthplot(data,background,xvar,yvar,depth_min,path_save='None'):
+    """
+    This function plots a variable of one or multiple CTD stations against depth. Additionally a special station called background is plotted separetely.
 
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of the CTD station or multiple stations with variable as columns. One column has to be the station designation.
+    background : pandas dataframe
+        Dataframe with the data of the station which should be plotted separately.
+    xvar : string
+        Variable to plot as x-variable. Must be a column key in data and background. If xvar is "delta3He" it is plotted as a scatterplot, else as a lineplot.
+    yvar : string
+        Variable to plot as y-variable. Must be a column key in data and background. Should be a type of depth or pressure coordinate and is plotted inverted.
+    depth_min : int
+        Minimal cutoff depth to plot.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
+    from misc import get_var
+    import matplotlib.pyplot as plt
+
+    xlabel, xcolor = get_var(xvar)
+
+    data = data[data[yvar]>depth_min]
+    background = background[background[yvar]>depth_min]
+
+    data_list = [d for _, d in data.groupby(['Station'])]
+    plt.figure(figsize=(6,6))
+    if xvar == 'delta3He':
+        for station in data_list:
+            plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
+        plt.scatter(background[xvar],background[yvar],color='black')
+    else:
+        for station in data_list:
+            plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
+        plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
+    plt.gca().invert_yaxis()
+    plt.ylabel(get_var(yvar)[0])
+    plt.xlabel(get_var(xvar)[0])
+
+    if path_save != 'None':
+        plt.savefig(path_save, dpi=300)
+
+    plt.show()
 
 
 
