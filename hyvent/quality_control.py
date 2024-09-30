@@ -13,7 +13,7 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc o
     Parameters
     ----------
     profile : pandas dataframe
-        Data wich should be quality conttrolled.
+        Data wich should be quality controlled.
     vars_to_qc : list of strings
         List of variables were outliers should be removed. If one of the is called "CTD_lat" or "CTD_lon" the corresponding coordinate to the outlier is also removed.
     threshold : int or float
