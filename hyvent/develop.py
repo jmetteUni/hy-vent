@@ -82,6 +82,8 @@ plt.plot(sn74_036['CTD_lat'],sn74_036['DEPTH'])
 plt.plot(sn73_036['CTD_lat'],sn73_036['DEPTH'])
 plt.plot(sn72_036['CTD_lat'],sn72_036['DEPTH'])
 
-
+#%%
+from hyvent.misc import get_var
+get_var('dORPs')
 
 

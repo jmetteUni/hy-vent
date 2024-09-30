@@ -464,7 +464,7 @@ def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
     None.
 
     """
-    from misc import get_var
+    from hyvent.misc import get_var
     import matplotlib.pyplot as plt
 
     xlabel, xcolor = get_var(xvar)
@@ -511,7 +511,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     None.
 
     """
-    from misc import get_var
+    from hyvent.misc import get_var
     import pandas as pd
     import matplotlib.pyplot as plt
 
