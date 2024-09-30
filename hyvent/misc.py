@@ -74,3 +74,58 @@ def keys_to_data(data,datatype):
             data[key]['Operation'] = operation
 
     return data
+
+def get_var(var):
+    """
+    Returns meta data such as plot color and axis label for a given variable.
+
+    Parameters
+    ----------
+    var : string
+        Variable, for which meta data should be returned. Must be defined in the function.
+
+    Returns
+    -------
+    label : string
+        Axis label for the variable.
+    color : string
+        Color to be used for plotting the vriable.
+    """
+    try:
+        if var == 'potemperature':
+            color = 'red'
+            label = '$\Theta$ in $^{\circ}$C'
+        if var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
+            color = 'blue'
+            label = 'Turbidity in NTU'
+        if var == 'dORP':
+            color = 'green'
+            label = '$dE/dt$ in mV/sec'
+        if var == 'upoly0':
+            color = 'green'
+            label = '$E$ in mV'
+        if var == 'PSAL':
+            color = 'cyan'
+            label = 'Practical Salinity in 1'
+        if var == 'Sigma0':
+            color = 'purple'
+            label = '$\sigma_0$ in kg/m$^3$'
+        if var == 'Sigma3':
+            color = 'purple'
+            label = r'$\sigma_{3000}$ in kg/m$^3$'
+        if var == 'Rho':
+            color = 'purple'
+            label = '$\rho$ in kg/m$^3$'
+        if var == 'delta_podensity':
+            color = 'purple'
+            label = 'Potential Density Anomaly in kg/m$^3$'
+        if var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
+            color = 'black'
+            label = 'Depth in m'
+        if var == 'delta3He':
+            color = 'orange'
+            label = '$\delta^3$He in %'
+    except:
+        print('Metadat for variable not defined yet.')
+
+    return label,color
