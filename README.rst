@@ -16,6 +16,14 @@ misc.py
 -------
 Miscellaneous functions.
 
+processing.py
+-------------
+Functions for calculations based on the data.
+
+quality_control.py
+------------------
+Functions for quality control.
+
 plotting.py
 -----------
 Basic plot functions.
