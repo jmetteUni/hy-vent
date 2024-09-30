@@ -440,7 +440,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     plt.show()
 
-def depthplot(data,background,xvar,yvar,depth_min,path_save='None'):
+def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
     """
     This function plots a variable of one or multiple CTD stations against depth. Additionally a special station called background is plotted separetely.
 
@@ -491,8 +491,82 @@ def depthplot(data,background,xvar,yvar,depth_min,path_save='None'):
 
     plt.show()
 
+def time_plot(data,station,depth_min,path_save='None'):
+    """
+    This function plots four quantities (dpeht, potential temperature, dORP, Sigma3) of one CTD station against time.
 
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of the CTD station or multiple stations with variable as columns as columns. One column has to be the station designation.
+    station : string
+        Indentifier of the station, which should be plotted. Needs to be a column value of all rows of this station in data.
+    depth_min : int
+        Minimal cutoff depth to plot.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
 
+    Returns
+    -------
+    None.
+
+    """
+    from misc import get_var
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    data = data[data['DEPTH']>depth_min]
+
+    station = data[data['Station']==station]
+    station['datetime'] = pd.to_datetime(station['datetime'])
+
+    fig, ax = plt.subplots()
+    fig.set_tight_layout(True)
+    fig.set_figwidth(12)
+    fig.set_figheight(5)
+
+    var = 'DEPTH'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    depth, = ax.plot(station['datetime'], station[var], color = color, label = label)
+    ax.set_ylabel(label)
+    ax.yaxis.label.set_color(color)
+
+    twin1 = ax.twinx()
+    var = 'potemperature'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    temp, = twin1.plot(station['datetime'], station[var], color = color, label = label)
+    twin1.set_ylabel(label)
+    twin1.yaxis.label.set_color(color)
+
+    twin2 = ax.twinx()
+    twin2.spines.right.set_position(("axes", 1.12))
+    var = 'dORP'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    orp, = twin2.plot(station['datetime'], station[var], color = color, label = label)
+    twin2.set_ylabel(label)
+    twin2.yaxis.label.set_color(color)
+
+    twin3 = ax.twinx()
+    twin3.spines.right.set_position(("axes", 1.25))
+    var = 'Sigma3'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    dens, = twin3.plot(station['datetime'], station[var],color = color, label = label)
+    twin3.set_ylabel(label)
+    twin3.yaxis.label.set_color(color)
+
+    ax.invert_yaxis()
+
+    ax.set_xlabel('Time')
+    #plt.legend(handles=[press,neph,temp,orp,trans],loc='lower right')
+
+    if path_save != 'None':
+        plt.savefig(path_save, dpi=300)
+
+    plt.show()
 
 
 
