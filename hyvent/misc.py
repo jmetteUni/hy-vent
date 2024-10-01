@@ -122,6 +122,9 @@ def get_var(var):
     elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
         color = 'black'
         label = 'Depth in m'
+    elif var == 'PRES':
+        color = 'black'
+        label = 'Pressure in dbar'
     elif var == 'delta3He':
         color = 'orange'
         label = '$\delta^3$He in %'
