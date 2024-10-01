@@ -110,7 +110,7 @@ def get_var(var):
     elif var == 'upoly0':
         color = 'green'
         label = '$E$ in mV'
-    elif var == 'PSAL':
+    elif var == 'PSAL' or var == 'PSAL_mean':
         color = 'cyan'
         label = 'Practical Salinity in 1'
     elif var == 'SA':
