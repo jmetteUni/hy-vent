@@ -95,6 +95,9 @@ def get_var(var):
     if var == 'potemperature':
         color = 'red'
         label = '$\Theta$ in $^{\circ}$C'
+    if var == 'CT':
+        color = 'red'
+        label = 'Conservative Temperature in $^{\circ}$C'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
@@ -107,6 +110,9 @@ def get_var(var):
     elif var == 'PSAL':
         color = 'cyan'
         label = 'Practical Salinity in 1'
+    elif var == 'SA':
+        color = 'cyan'
+        label = 'Absolute Salinity in ?'
     elif var == 'Sigma0':
         color = 'purple'
         label = '$\sigma_0$ in kg/m$^3$'
