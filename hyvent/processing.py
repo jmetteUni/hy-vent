@@ -74,8 +74,9 @@ def calc_mean_profile(data, var, station_list):
         profile.dropna(inplace=True)
         all_profiles = pd.merge_asof(all_profiles,profile,on='DEPTH',direction='nearest')       # for every station merge variable by nearest depth value -> binning
     del all_profiles['DEPTH']
-    all_profiles['Mean'] = all_profiles.mean(axis=1)    #calculate mean variable value
+    mean_name = str(var)+'_mean'
+    all_profiles[mean_name] = all_profiles.mean(axis=1)    #calculate mean variable value
     all_profiles['DEPTH'] = depth_vec
-    mean_profile = all_profiles[['DEPTH','Mean']]
+    mean_profile = all_profiles[['DEPTH',mean_name]]
 
     return mean_profile
