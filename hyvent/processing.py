@@ -80,3 +80,44 @@ def calc_mean_profile(data, var, station_list):
     mean_profile = all_profiles[['DEPTH',mean_name]]
 
     return mean_profile
+
+def derive_mapr(data, data_for_mean, station_list):
+    """
+    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations).
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data without salinity values of one or multiple CTD stations or MAPR operations with variables as columns.
+    data_for_mean : pandas dataframe
+        Dataframe with the data with salinity values of one or multiple CTD stations with variables as columns. One column has to be the station designation. The salinity variable is assumed to be called "PSAL" and be in Practical Salinity units.
+    station_list : list of strings
+        List of station designations, over which the mean for salinity should be calculated.
+
+    Returns
+    -------
+    data_der : pandas dataframe
+        Dataframe with the original data and the derived properties.
+
+    """
+    from hyvent.processing import calc_mean_profile
+    import pandas as pd
+    import gsw
+
+    var = 'PSAL'
+
+    mean_profile = calc_mean_profile(data_for_mean, var, station_list)       #calculates a mean profile of PSAL from the list of stations given
+
+    data.sort_values(by='DEPTH',ascending=True,inplace=True)
+    data_der = pd.merge_asof(data, mean_profile, on='DEPTH', direction='nearest',tolerance=10)     #merges mean PSAL profile with data based on nearest dpeth value with maximum tolerance of 10m
+
+    data_der['SA'] = gsw.conversions.SA_from_SP(data_der['PSAL_mean'], data_der['PRES'], data_der['Dship_lon'], data_der['Dship_lat'])     #calculates derived parameters
+    data_der['potemperature'] = gsw.conversions.pt0_from_t(data_der['SA'],data_der['TEMP'],data_der['PRES'])
+    data_der['CT'] = gsw.conversions.CT_from_pt(data_der['SA'], data_der['potemperature'])
+    data_der['Rho'] = gsw.density.rho(data_der['SA'],data_der['CT'],data_der['PRES'])
+    data_der['Sigma3'] = gsw.density.sigma3(data_der['SA'],data_der['CT'])
+
+    data_der.sort_values(by='datetime',ascending=True,inplace=True)
+    del data_der['PSAL_mean']
+
+    return data_der
