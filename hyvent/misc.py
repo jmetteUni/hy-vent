@@ -98,6 +98,9 @@ def get_var(var):
     if var == 'CT':
         color = 'red'
         label = 'Conservative Temperature in $^{\circ}$C'
+    if var == 'TEMP':
+        color = 'red'
+        label = 'Temperature in $^{\circ}$C'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
