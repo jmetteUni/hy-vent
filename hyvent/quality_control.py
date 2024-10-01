@@ -6,7 +6,7 @@ Created on Wed Aug 14 15:03:01 2024
 @author: jmette@uni-bremen.de
 """
 
-def qc_lat_lon_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc on no of lat lon in a profile with the IQR method #threshold example =1.5
+def qc_lat_lon_IQR(profile, vars_to_qc, threshold=1.5, boxplots=False):        #qc on no of lat lon in a profile with the IQR method #threshold example =1.5
     """
     This function removes outliers based on the interquartile ranges method on selected lat lon coordinates in a dataframe. Optional, box plots are produced for controlling the outlier detection. If the selected variabels are acoustic tracker positions names "CTD_lat" or "CTD_lon", the corresponing coordinate for an outlier is also removed for consistency.
 
@@ -16,8 +16,8 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc o
         Data wich should be quality controlled.
     vars_to_qc : list of strings
         List of variables were outliers should be removed. If one of the is called "CTD_lat" or "CTD_lon" the corresponding coordinate to the outlier is also removed.
-    threshold : int or float
-        Threshold of the outlier removal, which defines the upper and lower bounds.
+    threshold : int or float, optional
+        Threshold of the outlier removal, which defines the upper and lower bounds. Default is 1.5.
     boxplots : boolian, optional
         Boolian which controlles if boxplots are produced or not. The default is False.
 
@@ -69,7 +69,7 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold, boxplots=False):        #qc o
 
 
 
-def qc_IQR(profile, var_to_qc, threshold, boxplots=False):        #qc on no of variables in a profile with the IQR method, originally designed for posidonia latlon data #threshold example =1.5
+def qc_IQR(profile, var_to_qc, threshold=1.5, boxplots=False):        #qc on no of variables in a profile with the IQR method, originally designed for posidonia latlon data #threshold example =1.5
     """
     This function removes outliers based on the interquartile ranges method on selected variables in a dataframe. Optional, box plots are produced for controlling the outlier detection.
 
@@ -79,8 +79,8 @@ def qc_IQR(profile, var_to_qc, threshold, boxplots=False):        #qc on no of v
         Data wich should be quality conttrolled.
     vars_to_qc : list of strings
         List of variables were outliers should be removed. If one of the is called "CTD_lat" or "CTD_lon" the corresponding coordinate to the outlier is also removed.
-    threshold : int or float
-        Threshold of the outlier removal, which defines the upper and lower bounds.
+    threshold : int or float, optional
+        Threshold of the outlier removal, which defines the upper and lower bounds. Default is 1.5.
     boxplots : boolian, optional
         Boolian which controlles if boxplots are produced or not. The default is False.
 
