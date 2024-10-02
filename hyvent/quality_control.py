@@ -124,3 +124,75 @@ def qc_IQR(profile, var_to_qc, threshold=1.5, boxplots=False):        #qc on no 
 
     return df_qc          #returns the profile with the original vars overwritten by the qc vars
 
+def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
+    """
+    This functions cuts the beginning and end of CTD or MAPR stations of a dataset based on the first and the last occurence of consecutive values below a pressure limit. Plots to control the result cna be printed optionally.
+
+    Parameters
+    ----------
+    data : pandas dataframe or dictionary
+        Data which should be cutted. Can be one station as a dataframe or multiple dataframes as values in adicitonary. The pressure column is exspected to be called "Press(dB".
+    pres_limit : int, optional
+        Consecutive values which mark the start and end of a deployment have to be below this limit. The default is 10dbar.
+    window_limit : int, optional
+        The number of consecutive values which mark the start and end of a deployment. The default is 10.
+    plot : boolean, optional
+        Controls if a plot with the original pressure data and the cutted pressure data is printed. The default is False.
+
+    Returns
+    -------
+    data : pandas dataframe or dictionary
+        Dataset with the cutted data. Datatype will be the same as the input.
+
+    """
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
+    if isinstance(data,pd.DataFrame):
+        station = data.copy(deep=True)
+        # define the condition
+        condition = station['Press(dB)'] >= pres_limit
+
+        # create a rolling window of 10 values
+        rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
+
+        # get the indices of the first row of each group of 10 consecutive values that meet the condition
+        indices = rolling_condition[rolling_condition == 1].index
+        station_part = station.iloc[indices[0]:indices[-1]+window_limit]
+
+        if plot == True:
+            plt.figure()
+            plt.plot(station['Press(dB)'])
+            plt.plot(station_part['Press(dB)'])
+            plt.ylabel('Pressure in dbar')
+            plt.show()
+
+        data = station_part
+
+    elif isinstance(data,dict):
+        for key in data:
+            station = data[key].copy(deep=True)
+            # define the condition
+            condition = station['Press(dB)'] >= pres_limit
+
+            # create a rolling window of 10 values
+            rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
+
+            # get the indices of the first row of each group of 10 consecutive values that meet the condition
+            indices = rolling_condition[rolling_condition == 1].index
+            station_part = station.iloc[indices[0]:indices[-1]+10]
+
+            if plot == True:
+                plt.figure()
+                plt.plot(station['Press(dB)'])
+                plt.plot(station_part['Press(dB)'])
+                plt.ylabel('Pressure in dbar')
+                plt.title(key)
+                plt.show()
+
+            data[key] = station_part
+
+    else:
+        print('Could not cut dataset, must be pd.DataFrame or dict.')
+
+    return data
