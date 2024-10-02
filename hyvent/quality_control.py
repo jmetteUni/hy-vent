@@ -32,7 +32,7 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold=1.5, boxplots=False):        #
 
     df = profile[vars_to_qc]       #select variables which should be qc
 
-    df_qc = df.copy()
+    df_qc = df.copy(deep=True)
     # Calculate 25% percentile and 75% percentile
     for var in vars_to_qc:
         Q1 = df[var].quantile(0.25)
@@ -95,7 +95,7 @@ def qc_IQR(profile, var_to_qc, threshold=1.5, boxplots=False):        #qc on no 
 
     df = profile
 
-    df_qc = df.copy()
+    df_qc = df.copy(deep=True)
     # Calculate 25% percentile and 75% percentile
     Q1 = df[var_to_qc].quantile(0.25)
     Q3 = df[var_to_qc].quantile(0.75)

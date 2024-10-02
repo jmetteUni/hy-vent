@@ -32,7 +32,7 @@ def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
     import matplotlib.pyplot as plt
 
     label_sel = 'Samples between '+str(depth_min)+' - '+str(depth_max)+'m'
-    if type(data) == dict:
+    if isinstance(data,dict):
         he_data = pd.concat(data.values(),ignore_index=True)
     else:
         he_data = data
@@ -78,7 +78,7 @@ def plot_hist_dorp(data,depth_max,depth_min,bins,ranges,path_save='None'):
     import matplotlib.pyplot as plt
 
     label_sel = 'Samples between '+str(depth_min)+' - '+str(depth_max)+'m'
-    if type(data) == dict:
+    if isinstance(data,dict):
         dorp_data = pd.concat(data.values(),ignore_index=True)
     else:
         dorp_data = data
@@ -130,7 +130,7 @@ def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
 
     label_title = 'Interpolated crossection for '+key
 
-    if type(profile_data) == dict:
+    if isinstance(profile_data,dict):
         station = profile_data[key]
     else:
         station = profile_data
@@ -188,7 +188,7 @@ def plot3Ddistr(profile_data,key,var,bathy,vent_loc,path_save='None'):
     import matplotlib.pyplot as plt
     from matplotlib import colors
 
-    if type(profile_data) == dict:
+    if isinstance(profile_data,dict):
         station = profile_data[key]
     else:
         station = profile_data
