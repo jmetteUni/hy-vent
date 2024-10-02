@@ -121,3 +121,41 @@ def derive_mapr(data, data_for_mean, station_list):
     #del data_der['PSAL_mean']
 
     return data_der
+
+def derive_CTD(data):
+    """
+    This function calculates the derived properties absolute salinity, conservative temperature, density and density anomaly of CTD data with the Gibbs Seawater Toolbox and appends them as columns.
+
+    Parameters
+    ----------
+    data : pandas dataframe or dictionary
+        Dataset as one dataframe or a dicitonary with dataframes as values. Must contain practical salinity ("PSAL"), pressure ("PRES"), longitude ("LONGITUDE"), latitude ("LATITUDE") and potential temperature ("potemperature")
+
+    Returns
+    -------
+    data : pandas dataframe or dictionary
+        Data with the derived properties as additonal columns.
+
+    """
+    import gsw
+    import pandas as pd
+
+    if isinstance(data,pd.DataFrame):
+
+        data['SA'] = gsw.conversions.SA_from_SP(data['PSAL'], data['PRES'], data['LONGITUDE'], data['LATITUDE'])
+        data['CT'] = gsw.conversions.CT_from_pt(data['SA'], data['potemperature'])
+        data['Rho'] = gsw.density.rho(data['SA'],data['CT'],data['PRES'])
+        data['Sigma3'] = gsw.density.sigma3(data['SA'],data['CT'])
+
+    elif isinstance(data,dict):
+
+        for key in data:
+            data[key]['SA'] = gsw.conversions.SA_from_SP(data[key]['PSAL'], data[key]['PRES'], data[key]['LONGITUDE'], data[key]['LATITUDE'])
+            data[key]['CT'] = gsw.conversions.CT_from_pt(data[key]['SA'], data[key]['potemperature'])
+            data[key]['Rho'] = gsw.density.rho(data[key]['SA'],data[key]['CT'],data[key]['PRES'])
+            data[key]['Sigma3'] = gsw.density.sigma3(data[key]['SA'],data[key]['CT'])
+
+    else:
+        print('Could not derive properties, must be pd.DataFrame or dict.')
+
+    return data
