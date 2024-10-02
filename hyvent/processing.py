@@ -9,7 +9,7 @@ Created on Wed Sep 11 12:52:37 2024
 def corr_mapr_depth(data,lat):
     """
 
-    Calculates a corrected depth based on the 200 first pressure values larger then 5 dB which are assumed as measured before deploying. The new, corrected depth is calculated with Gibbs Seawater Toolbox (gsw.conversions.z_from_p()) with the pressure corrected by the mean of the pre-deployment values and written to the dataframe as a new column.
+    Calculates a corrected depth based on the 200 first pressure values larger then 5 dbar which are assumed as measured before deploying. The new, corrected depth is calculated with Gibbs Seawater Toolbox (gsw.conversions.z_from_p()) with the pressure corrected by the mean of the pre-deployment values and written to the dataframe as a new column.
 
 
     Parameters
