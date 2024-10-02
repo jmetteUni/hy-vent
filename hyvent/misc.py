@@ -95,10 +95,10 @@ def get_var(var):
     if var == 'potemperature':
         color = 'red'
         label = '$\Theta$ in $^{\circ}$C'
-    if var == 'CT':
+    elif var == 'CT':
         color = 'red'
         label = 'Conservative Temperature in $^{\circ}$C'
-    if var == 'TEMP':
+    elif var == 'TEMP':
         color = 'red'
         label = 'Temperature in $^{\circ}$C'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
@@ -138,6 +138,6 @@ def get_var(var):
         color = 'orange'
         label = '$\delta^3$He in %'
     else:
-        print('Properties for variable not defined yet.')
+        print('Properties for variable '+var+' not defined yet.')
 
     return label,color
