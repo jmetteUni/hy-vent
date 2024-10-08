@@ -410,7 +410,6 @@ def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
         plt.scatter(background[xvar],background[yvar],color='black')
     else:
         for station in data_list:
-            station.sort_values(by='datetime',ascending=True,inplace=True)
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
             #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
 
