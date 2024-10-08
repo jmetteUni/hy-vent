@@ -467,7 +467,7 @@ def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
     from hyvent.misc import get_var
     import matplotlib.pyplot as plt
 
-    xlabel, xcolor = get_var(xvar)
+    xlabel, xcolor, cmap = get_var(xvar)
 
     data = data[data[yvar]>depth_min]
     background = background[background[yvar]>depth_min]

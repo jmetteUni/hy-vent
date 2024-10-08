@@ -95,49 +95,64 @@ def get_var(var):
     if var == 'potemperature':
         color = 'red'
         label = '$\Theta$ in $^{\circ}$C'
+        cmap = 'Reds_r'
     elif var == 'CT':
         color = 'red'
         label = 'Conservative Temperature in $^{\circ}$C'
+        cmap = 'Reds_r'
     elif var == 'TEMP':
         color = 'red'
         label = 'Temperature in $^{\circ}$C'
+        cmap = 'Reds_r'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
+        cmap = 'Blues_r'
     elif var == 'dORP':
         color = 'green'
         label = '$dE/dt$ in mV/sec'
+        cmap = 'Greens_r'
     elif var == 'upoly0':
         color = 'green'
         label = '$E$ in mV'
+        cmap = 'Greens_r'
     elif var == 'PSAL' or var == 'PSAL_mean':
         color = 'cyan'
         label = 'Practical Salinity in 1'
+        cmap = 'None'
     elif var == 'SA':
         color = 'cyan'
         label = 'Absolute Salinity in ?'
+        cmap = 'None'
     elif var == 'Sigma0':
         color = 'purple'
         label = '$\sigma_0$ in kg/m$^3$'
+        cmap = 'Purples_r'
     elif var == 'Sigma3':
         color = 'purple'
         label = r'$\sigma_{3000}$ in kg/m$^3$'
+        cmap = 'Purples_r'
     elif var == 'Rho':
         color = 'purple'
         label = '$\rho$ in kg/m$^3$'
+        cmap = 'Purples_r'
     elif var == 'delta_podensity':
         color = 'purple'
         label = 'Potential Density Anomaly in kg/m$^3$'
+        cmap = 'Purples_r'
     elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
         color = 'black'
         label = 'Depth in m'
+        cmap = 'None'
     elif var == 'PRES':
         color = 'black'
         label = 'Pressure in dbar'
+        cmap = 'None'
     elif var == 'delta3He':
         color = 'orange'
         label = '$\delta^3$He in %'
+        cmap = 'Oranges_r'
     else:
         print('Properties for variable '+var+' not defined yet.')
 
-    return label,color
+    return label,color,cmap
