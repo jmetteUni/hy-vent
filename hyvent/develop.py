@@ -48,19 +48,6 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot2D_all_stations(profile_data, 'dORP', vent_loc, 2000, 5000,bathy)
 
 plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
-#%% merge profile and mapr data
-
-import pandas as pd
-
-all_profile = pd.concat(profile_data.values(),ignore_index=True)
-all_mapr = pd.concat(mapr_data.values(),ignore_index=True)
-all_mapr = all_mapr.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth(m)':'DEPTH'})
-mapr_for_merge = all_mapr[['datetime','PRES','TEMP','DEPTH','Neph(volts)','Dship_lon','Dship_lat','CTD_lon','CTD_lat','dORP','Cruise','Station','SN','Operation']]
-mapr_for_merge = mapr_for_merge[mapr_for_merge['Operation']=='CTD']
-profile_mapr = pd.concat((all_profile,mapr_for_merge),axis=0)
-profile_mapr.sort_values(by='datetime',ascending=True,inplace=True)
-
-#profile_mapr = profile_mapr.groupby('Station')[['dORP']].apply(lambda g: g.values.tolist()).to_dict()
 
 #%%
 import matplotlib.pyplot as plt

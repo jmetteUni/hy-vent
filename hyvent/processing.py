@@ -118,7 +118,7 @@ def derive_mapr(data, data_for_mean, station_list):
     data_der['Sigma3'] = gsw.density.sigma3(data_der['SA'],data_der['CT'])
 
     data_der.sort_values(by='datetime',ascending=True,inplace=True)
-    #del data_der['PSAL_mean']
+    del data_der['PSAL_mean']
 
     return data_der
 
