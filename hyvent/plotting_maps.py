@@ -225,7 +225,140 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
 
     plt.show()
 
-#%%% lambert projections tests
+def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='None',path_save='None'):
+    """
+    This function plots a variable in x-y-coordinates with colorcoding. It can be filtered by a depth range and only every n-th point or line segments can be plotted for better visibility. Bathymetry lines can be plotted additonally.
+
+    Parameters
+    ----------
+    data : andas dataframe
+        Dataframe with the data of the CTD station or multiple stations with variable as columns as columns. One column has to be the station designation.
+    var : string
+        Variable to plot. Must be a key for a column in data and is only plotted for values with coordinates in the columns "CTD_lon"/"CTD_lat" or "Dship_lon"/"Dship_lat".
+    min_dep : int
+        Minimum depth below which datapoints should be plotted.
+    max_dep :  int
+        Maximum depth above which datapoints should be plotted.
+    nth_point : int
+        Every n-th point is plotted, for example nth_point=1 for every measurement. nth_point=0 activates the plotting of line segments.
+    vent_loc : tuple, optional
+        Longitude and latitude of a point of interest, plotted as a red star. Default is 'None"'
+    bathy : tuple, optional
+        Tuple of longitude, latitude and elevation of bathymetry data. The default is 'None'.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
+    import warnings
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from matplotlib.collections import LineCollection
+    from hyvent.misc import get_var
+
+    def colored_line(x, y, c, ax, **lc_kwargs):
+        """
+        Plot a line with a color specified along the line by a third value.
+
+        It does this by creating a collection of line segments. Each line segment is
+        made up of two straight lines each connecting the current (x, y) point to the
+        midpoints of the lines connecting the current point with its two neighbors.
+        This creates a smooth line with no gaps between the line segments.
+        Function by https://matplotlib.org/stable/gallery/lines_bars_and_markers/multicolored_line.html#sphx-glr-gallery-lines-bars-and-markers-multicolored-line-py
+
+        Parameters
+        ----------
+        x, y : array-like
+            The horizontal and vertical coordinates of the data points.
+        c : array-like
+            The color values, which should be the same size as x and y.
+        ax : Axes
+            Axis object on which to plot the colored line.
+        **lc_kwargs
+            Any additional arguments to pass to matplotlib.collections.LineCollection
+            constructor. This should not include the array keyword argument because
+            that is set to the color argument. If provided, it will be overridden.
+
+        Returns
+        -------
+        matplotlib.collections.LineCollection
+            The generated line collection representing the colored line.
+        """
+        if "array" in lc_kwargs:
+            warnings.warn('The provided "array" keyword argument will be overridden')
+
+        # Default the capstyle to butt so that the line segments smoothly line up
+        default_kwargs = {"capstyle": "butt"}
+        default_kwargs.update(lc_kwargs)
+
+        # Compute the midpoints of the line segments. Include the first and last points
+        # twice so we don't need any special syntax later to handle them.
+        x = np.asarray(x)
+        y = np.asarray(y)
+        x_midpts = np.hstack((x[0], 0.5 * (x[1:] + x[:-1]), x[-1]))
+        y_midpts = np.hstack((y[0], 0.5 * (y[1:] + y[:-1]), y[-1]))
+
+        # Determine the start, middle, and end coordinate pair of each line segment.
+        # Use the reshape to add an extra dimension so each pair of points is in its
+        # own list. Then concatenate them to create:
+        # [
+        #   [(x1_start, y1_start), (x1_mid, y1_mid), (x1_end, y1_end)],
+        #   [(x2_start, y2_start), (x2_mid, y2_mid), (x2_end, y2_end)],
+        #   ...
+        # ]
+        coord_start = np.column_stack((x_midpts[:-1], y_midpts[:-1]))[:, np.newaxis, :]
+        coord_mid = np.column_stack((x, y))[:, np.newaxis, :]
+        coord_end = np.column_stack((x_midpts[1:], y_midpts[1:]))[:, np.newaxis, :]
+        segments = np.concatenate((coord_start, coord_mid, coord_end), axis=1)
+
+        lc = LineCollection(segments, **default_kwargs)
+        lc.set_array(c)  # set the colors of each segment
+
+        return ax.add_collection(lc)
+
+    #get properties for variable
+    label, color, cmap = get_var(var)
+
+    fig, ax = plt.subplots()
+
+    #plot bathymetry
+    if bathy != 'None':
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=23 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
+
+    #plot vent
+    if vent_loc != 'None':
+        ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
+
+    #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
+    data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by exspected plume depth
+    if var == 'dORP':       #ommit positve dORP values, as only negativ ones are of interest
+        data_nb = data_nb[data_nb[var]<=0]
+
+    if nth_point == 0:      #plot line segments
+        data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
+        for profile in data_list:
+            lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+            lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+            lines = colored_line(lon,lat,profile[var],ax,linewidth=2,cmap=cmap)
+        fig.colorbar(lines)
+    else:       #plot single dots
+        data_nb = data_nb.iloc[::nth_point,:]        #plot only every n-th point for better visibility
+        lat = data_nb['CTD_lat'].fillna(data_nb['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+        lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
+        var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0.2)
+        fig.colorbar(var,label=label)
+
+    if path_save != 'None':
+        plt.savefig(path_save, dpi=300)
+
+    plt.show()
+
+
+#%% lambert projections tests
 # def plot_largemap_lambert(vent_loc,vent_label):
 
 #     import cartopy.crs as ccrs
