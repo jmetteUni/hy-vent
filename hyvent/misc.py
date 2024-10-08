@@ -95,19 +95,19 @@ def get_var(var):
     if var == 'potemperature':
         color = 'red'
         label = '$\Theta$ in $^{\circ}$C'
-        cmap = 'Reds_r'
+        cmap = 'Reds'
     elif var == 'CT':
         color = 'red'
         label = 'Conservative Temperature in $^{\circ}$C'
-        cmap = 'Reds_r'
+        cmap = 'Reds'
     elif var == 'TEMP':
         color = 'red'
         label = 'Temperature in $^{\circ}$C'
-        cmap = 'Reds_r'
+        cmap = 'Reds'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
-        cmap = 'Blues_r'
+        cmap = 'Blues'
     elif var == 'dORP':
         color = 'green'
         label = '$dE/dt$ in mV/sec'

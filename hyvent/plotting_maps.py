@@ -225,58 +225,59 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
 
     plt.show()
 
-def plot_largemap_lambert(vent_loc,vent_label):
+#%%% lambert projections tests
+# def plot_largemap_lambert(vent_loc,vent_label):
 
-    import cartopy.crs as ccrs
-    import matplotlib.pyplot as plt
-    import matplotlib.path as mpath
-    import xarray as xa
+#     import cartopy.crs as ccrs
+#     import matplotlib.pyplot as plt
+#     import matplotlib.path as mpath
+#     import xarray as xa
 
-    bathy_path = '/home/jonathan/Dokumente/model/inputs/Gridbuilder/Bathymetry/GEBCO_17_Apr_2024_b985334cc502/gebco_2023_n88.4619_s77.6514_w-24.1699_e13.1836.nc'
-    bathy = xa.open_dataset(bathy_path)
+#     bathy_path = '/home/jonathan/Dokumente/model/inputs/Gridbuilder/Bathymetry/GEBCO_17_Apr_2024_b985334cc502/gebco_2023_n88.4619_s77.6514_w-24.1699_e13.1836.nc'
+#     bathy = xa.open_dataset(bathy_path)
 
-    ax = plt.axes(projection=ccrs.LambertConformal(0))#central_longitude=vent_loc[1],central_latitude=vent_loc[0]))
-    #ax.set_extent([0,360,60,90], crs=ccrs.PlateCarree())     #W,E, S, N
-    ax.coastlines()
+#     ax = plt.axes(projection=ccrs.LambertConformal(0))#central_longitude=vent_loc[1],central_latitude=vent_loc[0]))
+#     #ax.set_extent([0,360,60,90], crs=ccrs.PlateCarree())     #W,E, S, N
+#     ax.coastlines()
 
-    # Lon and Lat Boundaries
-    xlim = [-40, 40]
-    ylim = [60, 90]
-    lower_space = 20 # this needs to be manually increased if the lower arched is cut off by changing lon and lat lims
+#     # Lon and Lat Boundaries
+#     xlim = [-40, 40]
+#     ylim = [60, 90]
+#     lower_space = 20 # this needs to be manually increased if the lower arched is cut off by changing lon and lat lims
 
-    rect = mpath.Path([[xlim[0], ylim[0]],
-                       [xlim[1], ylim[0]],
-                       [xlim[1], ylim[1]],
-                       [xlim[0], ylim[1]],
-                       [xlim[0], ylim[0]],
-                       ]).interpolated(20)
+#     rect = mpath.Path([[xlim[0], ylim[0]],
+#                        [xlim[1], ylim[0]],
+#                        [xlim[1], ylim[1]],
+#                        [xlim[0], ylim[1]],
+#                        [xlim[0], ylim[0]],
+#                        ]).interpolated(20)
 
-    proj_to_data = ccrs.PlateCarree()._as_mpl_transform(ax) - ax.transData
-    rect_in_target = proj_to_data.transform_path(rect)
+#     proj_to_data = ccrs.PlateCarree()._as_mpl_transform(ax) - ax.transData
+#     rect_in_target = proj_to_data.transform_path(rect)
 
-    ax.set_boundary(rect_in_target)
-    ax.set_extent([xlim[0], xlim[1], ylim[0] - lower_space, ylim[1]])
+#     ax.set_boundary(rect_in_target)
+#     ax.set_extent([xlim[0], xlim[1], ylim[0] - lower_space, ylim[1]])
 
-    #plot vent location
-    data_projection = ccrs.PlateCarree()
-    ax.plot(vent_loc[0], vent_loc[1], marker='*', color='tab:red', transform=data_projection)
-    ax.contourf(lons, lats, data, transform=data_projection)
+#     #plot vent location
+#     data_projection = ccrs.PlateCarree()
+#     ax.plot(vent_loc[0], vent_loc[1], marker='*', color='tab:red', transform=data_projection)
+#     ax.contourf(lons, lats, data, transform=data_projection)
 
-    plt.show()
+#     plt.show()
 
-def plot_largemap_stereo(vent_loc,vent_label):
+# def plot_largemap_stereo(vent_loc,vent_label):
 
-    import cartopy.crs as ccrs
-    import matplotlib.pyplot as plt
-    import matplotlib.path as mpath
+#     import cartopy.crs as ccrs
+#     import matplotlib.pyplot as plt
+#     import matplotlib.path as mpath
 
-    ax = plt.axes(projection=ccrs.NorthPolarStereo(central_longitude=vent_loc[1]))
-    #ax.set_extent([0,360,60,90], crs=ccrs.NorthPolarStereo())     #W,E, S, N
-    ax.set_ylim(bottom=60)
-    ax.coastlines()
+#     ax = plt.axes(projection=ccrs.NorthPolarStereo(central_longitude=vent_loc[1]))
+#     #ax.set_extent([0,360,60,90], crs=ccrs.NorthPolarStereo())     #W,E, S, N
+#     ax.set_ylim(bottom=60)
+#     ax.coastlines()
 
-    #plt.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label=vent_label)
+#     #plt.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label=vent_label)
 
-    plt.show()
+#     plt.show()
 
 
