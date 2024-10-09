@@ -85,6 +85,6 @@ max_dep = 5000
 var = 'potemperature'
 control_plot = True
 
-data_test = substract_bg(data, bg, var, min_dep, max_dep)
+data_test = subtract_bg(data, bg, var, min_dep, max_dep)
 
 

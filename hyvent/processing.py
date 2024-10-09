@@ -160,7 +160,7 @@ def derive_CTD(data):
 
     return data
 
-def substract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
+def subtract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
     """
     This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.
 
