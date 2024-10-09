@@ -63,44 +63,19 @@ btl_explo = btl_data[mapr_data['Station']=='049_01']
 profile_data = profile_data[profile_data['Station'].isin(aurora_stations)]
 btl_data = btl_data[btl_data['Station'].isin(aurora_stations)]
 mapr_data = mapr_data[mapr_data['Station'].isin(aurora_stations)]
-#%%
-plot_largemap_lambert(vent_loc,'Aurora Vent Site')
-plot_largemap_stereo(vent_loc,'Aurora Vent Site')
 
-#%% histogramms
+#%% histogramms & 2D plots & sections
 plot_hist_he(btl_data, lower_depth=3700, upper_depth=3000, bins=30)
 plot_hist_dorp(profile_data, lower_depth=3700, upper_depth=3000, bins=100, ranges=(-0.2,0.2))
 
-#%%
-
-plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
-#%%
 plot2D_all_stations(profile_data, 'dORP', vent_loc, 2000, 5000,bathy)
 
 plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
-
-#%%
-import matplotlib.pyplot as plt
+plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-
 #%%
-
-sta036 = profile_mapr[profile_mapr['Station']=='036_01']
-ctd036 = sta036[sta036['SN']=='SBE9']
-sn74_036 = sta036[sta036['SN']=='74']
-sn72_036 = sta036[sta036['SN']=='72']
-sn73_036 = sta036[sta036['SN']=='73']
-#%%
-plt.plot(ctd036['CTD_lat'],ctd036['DEPTH'])
-plt.plot(sn74_036['CTD_lat'],sn74_036['DEPTH'])
-plt.plot(sn73_036['CTD_lat'],sn73_036['DEPTH'])
-plt.plot(sn72_036['CTD_lat'],sn72_036['DEPTH'])
-
-#%%
-from hyvent.misc import get_var
-get_var('dORPs')
 
 
