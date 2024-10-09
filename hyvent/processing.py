@@ -64,7 +64,7 @@ def calc_mean_profile(data, var, station_list):
 
     min_depth = data['DEPTH'].min()
     max_depth = data['DEPTH'].max()
-    depth_vec = np.arange(min_depth,max_depth,1)        #create depth vector with step 1m, where variabel is binned to
+    depth_vec = np.arange(min_depth,max_depth,1)        #create depth vector with step 1m, where variable is binned to
     all_profiles = pd.DataFrame(depth_vec,columns=['DEPTH'])
     for station in station_list:
         profile = data[data['Station']==station][['DEPTH',var]]
@@ -109,7 +109,7 @@ def derive_mapr(data, data_for_mean, station_list):
     mean_profile = calc_mean_profile(data_for_mean, var, station_list)       #calculates a mean profile of PSAL from the list of stations given
 
     data.sort_values(by='DEPTH',ascending=True,inplace=True)
-    data_der = pd.merge_asof(data, mean_profile, on='DEPTH', direction='nearest',tolerance=10)     #merges mean PSAL profile with data based on nearest dpeth value with maximum tolerance of 10m
+    data_der = pd.merge_asof(data, mean_profile, on='DEPTH', direction='nearest',tolerance=10)     #merges mean PSAL profile with data based on nearest depth value with maximum tolerance of 10m
 
     data_der['SA'] = gsw.conversions.SA_from_SP(data_der['PSAL_mean'], data_der['PRES'], data_der['Dship_lon'], data_der['Dship_lat'])     #calculates derived parameters
     data_der['potemperature'] = gsw.conversions.pt0_from_t(data_der['SA'],data_der['TEMP'],data_der['PRES'])
@@ -129,7 +129,7 @@ def derive_CTD(data):
     Parameters
     ----------
     data : pandas dataframe or dictionary
-        Dataset as one dataframe or a dicitonary with dataframes as values. Must contain practical salinity ("PSAL"), pressure ("PRES"), longitude ("LONGITUDE"), latitude ("LATITUDE") and potential temperature ("potemperature")
+        Dataset as one dataframe or a dictonary with dataframes as values. Must contain practical salinity ("PSAL"), pressure ("PRES"), longitude ("LONGITUDE"), latitude ("LATITUDE") and potential temperature ("potemperature")
 
     Returns
     -------
@@ -157,5 +157,77 @@ def derive_CTD(data):
 
     else:
         print('Could not derive properties, must be pd.DataFrame or dict.')
+
+    return data
+
+def substract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
+    """
+    This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataset of one or several profiles.
+    bg : pandas dataframe
+        Dataset which should be used as background.
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Minimum depth, above which the calculated deviation is replaced with NaN
+    max_dep : int
+        Maximum depth, below which the calculated deviation is replaced with NaN
+    control_plot : boolean, optional
+        Boolian which controlles if boxplots are produced or not. The default is False.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataset like the input but with the calculated deviation as an additional column.
+
+    """
+
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import pandas as pd
+
+    #deep copy neccessary? -> check
+
+    #selects first downcast of background, prepares background for merge
+    bg = bg.reset_index(drop=True)
+    i_deepest = bg['DEPTH'].idxmax()
+    bg = bg.iloc[:i_deepest]
+    bg = bg[['Rho',var]]
+    bg = bg.dropna(subset=['Rho'])
+    bg = bg.sort_values(by='Rho')
+
+    #prepares data for merge
+    data = data.reset_index(drop=True)
+    data['datetime'] = pd.to_datetime(data['datetime'])
+    merge = data[['datetime','DEPTH','Rho','Station','SN',var]]
+    merge = merge.dropna(subset=['Rho'])
+    merge = merge.sort_values(by='Rho')
+
+    #merges data and background on density "Rho" with a tolerance and calculates delta of the variable
+    merge = pd.merge_asof(merge, bg, on='Rho',tolerance=0.01,direction='nearest')
+    merge['Delta_'+var] = merge[var+'_x'] - merge[var+'_y']
+    if merge['Delta_'+var].isna().any() == True:
+        print('Delta_'+var+' was not calculated for all values, because there no equal background density value was found inside the tolerance limit.')
+    merge = merge.sort_values(by='datetime')
+
+    for column in ['Delta_'+var,var+'_x',var+'_y']:
+        merge[column] = merge[column].where((merge['DEPTH']>=min_dep) & (merge['DEPTH']<=max_dep))
+
+    if control_plot == True:
+        merge_list = [d for _, d in merge.groupby(['Station','SN'])]
+        for station in merge_list:
+            plt.figure()
+            plt.plot(station['datetime'],station[var+'_x'])
+            plt.plot(station['datetime'],station[var+'_y'])
+            #plt.plot(station['datetime'],station['Delta_'+var)         #can be used to plot Delta
+            plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
+            plt.show()
+
+    merge = merge[['Delta_'+var]]
+    data = data.join(merge)
 
     return data

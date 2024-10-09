@@ -12,7 +12,7 @@ from hyvent.io import (read_from_csv,
 from hyvent.plotting_maps import *
 from hyvent.plotting import *
 from hyvent.misc import keys_to_data
-from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD
+from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD, substract_bg
 
 import pandas as pd
 import gsw
@@ -76,6 +76,15 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-#%%
+#%% substract background
+data = profile_data.copy(deep=True)
+bg = profile_background.copy(deep=True)
+
+min_dep = 200
+max_dep = 5000
+var = 'potemperature'
+control_plot = True
+
+data_test = substract_bg(data, bg, var, min_dep, max_dep)
 
 
