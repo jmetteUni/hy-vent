@@ -112,6 +112,10 @@ def get_var(var):
         color = 'blue'
         label = 'Turbidity in NTU'
         cmap = 'Blues'
+    elif var == 'Delta_Neph(volts)' or var == 'Delta_Neph_outl(volts)' or var == 'Delta_Neph_smoo(volts)':
+        color = 'blue'
+        label = '$\Delta$ Turbidity in NTU'
+        cmap = 'Blues'
     elif var == 'dORP':
         color = 'green'
         label = '$dE/dt$ in mV/sec'
