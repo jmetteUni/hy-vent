@@ -104,6 +104,10 @@ def get_var(var):
         color = 'red'
         label = 'Temperature in $^{\circ}$C'
         cmap = 'Reds'
+    elif var == 'Delta_potemperature':
+        color = 'red'
+        label = '\Delta\theta in $^{\circ}$C'
+        cmap = 'Reds'
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
