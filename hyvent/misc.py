@@ -136,6 +136,10 @@ def get_var(var):
         color = 'purple'
         label = r'$\sigma_{3000}$ in kg/m$^3$'
         cmap = 'Purples_r'
+    elif var == 'Delta_Sigma3':
+        color = 'purple'
+        label = r'$\Delta$$\sigma_{3000}$ in kg/m$^3$'
+        cmap = 'Purples_r'
     elif var == 'Rho':
         color = 'purple'
         label = '$\rho$ in kg/m$^3$'
