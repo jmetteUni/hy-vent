@@ -370,7 +370,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     plt.show()
 
-def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
+def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     """
     This function plots a variable of one or multiple CTD stations against depth. Additionally a special station called background is plotted separetely.
 
@@ -400,20 +400,22 @@ def depth_plot(data,background,xvar,yvar,depth_min,path_save='None'):
     xlabel, xcolor, cmap = get_var(xvar)
 
     data = data[data[yvar]>depth_min]
-    background = background[background[yvar]>depth_min]
+    if background != 'None':
+        background = background[background[yvar]>depth_min]
 
     data_list = [d for _, d in data.groupby(['Station','SN'])]
     plt.figure(figsize=(6,6))
     if xvar == 'delta3He':
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
-        plt.scatter(background[xvar],background[yvar],color='black')
+        if background != 'None':
+            plt.scatter(background[xvar],background[yvar],color='black')
     else:
         for station in data_list:
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
             #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
-
-        plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
+        if background != 'None':
+            plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
