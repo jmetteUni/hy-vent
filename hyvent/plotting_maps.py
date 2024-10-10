@@ -333,10 +333,14 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     if vent_loc != 'None':
         ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
 
+    if var == 'dORP':       #ommit positve dORP values, as only negativ ones are of interest
+        data = data[data[var]<=0]
+    if var == 'delta3He':       #for delta3He, data is bottle data, therefore rename depth column
+        data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
+
     #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
     data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by exspected plume depth
-    if var == 'dORP':       #ommit positve dORP values, as only negativ ones are of interest
-        data_nb = data_nb[data_nb[var]<=0]
+
 
     if nth_point == 0:      #plot line segments
         data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
