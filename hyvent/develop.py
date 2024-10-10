@@ -12,7 +12,7 @@ from hyvent.io import (read_from_csv,
 from hyvent.plotting_maps import *
 from hyvent.plotting import *
 from hyvent.misc import keys_to_data
-from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD, substract_bg
+from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD, subtract_bg
 
 import pandas as pd
 import gsw
@@ -77,37 +77,29 @@ plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
 #%%
+data = profile_data.copy(deep=True)
+var_list = ['CTD_lon','CTD_lat']
+window_size = 7
+order = 3
 
-def plot_track(profile_data, vent_loc=vent_loc, bathy=bathy):
+from scipy.signal import savgol_filter
+from scipy.interpolate import UnivariateSpline
 
-    fig, ax = plt.subplots()
+data_list = [d for _, d in data.groupby(['Station','SN'])]
+for profile in data_list:
+    for var in var_list:
+        new_col = 'Fit_'+str(var)
+        profile[new_col] = savgol_filter(profile[var], window_size, order)
+    plt.plot(profile['CTD_lon'],profile['CTD_lat'],marker='x')
+    plt.plot(profile['Fit_CTD_lon'],profile['Fit_CTD_lat'])
 
-    #plot bathymetry
-    if bathy != 'None':
-        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=23 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-        #ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')       #use this line to plot with lables instead colorbar
-        contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)         #use this two lines to plot with colorbar instead labels
-        plt.colorbar(contours,label='Depth in m')
 
 
-    #plot vent
-    if vent_loc != 'None':
-        ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
+#plot_track(profile_data, vent_loc=vent_loc, bathy=bathy)
 
-    #plot tracks
-    data_list = [d for _, d in profile_data.groupby(['Station','SN'])]
-    for profile in data_list:
-        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
-        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
-        #lat = profile['Dship_lat']
-        #lon = profile['Dship_lon']
-        ax.plot(lon,lat,color='black',linewidth='0.8')
 
-        #plot labels & marker
-        ax.scatter(lon.iloc[0],lat.iloc[0],marker='v',color='black')
-        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0].rstrip('_01').lstrip('0'))
-        ax.scatter(lon.iloc[-1],lat.iloc[-1],marker='^',color='black')
 
-    plt.show()
+
+
 
 

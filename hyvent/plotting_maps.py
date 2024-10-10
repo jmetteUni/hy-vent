@@ -246,8 +246,8 @@ def plot_track(profile_data, vent_loc='None', bathy='None'):
     #plot tracks
     data_list = [d for _, d in profile_data.groupby(['Station','SN'])]
     for profile in data_list:
-        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
-        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+        lat = profile['CTD_lat']#.fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+        lon = profile['CTD_lon']#.fillna(profile['Dship_lon'])
         #lat = profile['Dship_lat']
         #lon = profile['Dship_lon']
         ax.plot(lon,lat,color='black',linewidth='0.8')

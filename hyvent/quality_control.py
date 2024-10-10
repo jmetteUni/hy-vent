@@ -59,7 +59,7 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold=1.5, boxplots=False):        #
             plt.title('with qc, '+str(threshold))
             plt.show()
 
-    if ('CTD_lat' in vars_to_qc) or ('CTD_lon' in vars_to_qc):      #if var_to_qc contains posi lon lat data, drop all rows with some nan, to only get valif lon-lat combinations
+    if ('CTD_lat' in vars_to_qc) or ('CTD_lon' in vars_to_qc):      #if var_to_qc contains posi lon lat data, drop all rows with some nan, to only get valid lon-lat combinations
         df_qc.dropna(inplace=True)
 
     for var in vars_to_qc:         #writes qc vars back into profile

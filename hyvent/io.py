@@ -448,5 +448,3 @@ def read_gebco(gebcopath): # hillshade_path
     lons,lats = np.meshgrid(lons,lats)
 
     return(lats,lons,elev)
-
-
