@@ -151,7 +151,7 @@ def get_var(var):
     elif var == 'delta3He':
         color = 'orange'
         label = '$\delta^3$He in %'
-        cmap = 'Oranges_r'
+        cmap = 'Oranges'
     else:
         print('Properties for variable '+var+' not defined yet.')
 
