@@ -76,15 +76,38 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-#%% substract background
-data = profile_data.copy(deep=True)
-bg = profile_background.copy(deep=True)
+#%%
 
-min_dep = 200
-max_dep = 5000
-var = 'potemperature'
-control_plot = True
+def plot_track(profile_data, vent_loc=vent_loc, bathy=bathy):
 
-data_test = subtract_bg(data, bg, var, min_dep, max_dep)
+    fig, ax = plt.subplots()
+
+    #plot bathymetry
+    if bathy != 'None':
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=23 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        #ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')       #use this line to plot with lables instead colorbar
+        contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)         #use this two lines to plot with colorbar instead labels
+        plt.colorbar(contours,label='Depth in m')
+
+
+    #plot vent
+    if vent_loc != 'None':
+        ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
+
+    #plot tracks
+    data_list = [d for _, d in profile_data.groupby(['Station','SN'])]
+    for profile in data_list:
+        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+        #lat = profile['Dship_lat']
+        #lon = profile['Dship_lon']
+        ax.plot(lon,lat,color='black',linewidth='0.8')
+
+        #plot labels & marker
+        ax.scatter(lon.iloc[0],lat.iloc[0],marker='v',color='black')
+        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0].rstrip('_01').lstrip('0'))
+        ax.scatter(lon.iloc[-1],lat.iloc[-1],marker='^',color='black')
+
+    plt.show()
 
 

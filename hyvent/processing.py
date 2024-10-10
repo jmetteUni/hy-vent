@@ -177,7 +177,7 @@ def subtract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
     max_dep : int
         Maximum depth, below which the calculated deviation is replaced with NaN
     control_plot : boolean, optional
-        Boolian which controlles if boxplots are produced or not. The default is False.
+        Boolian which controlles if control plots are produced or not. The default is False.
 
     Returns
     -------

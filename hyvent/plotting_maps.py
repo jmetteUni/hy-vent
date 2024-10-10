@@ -6,7 +6,7 @@ Created on Thu Jul 25 13:27:30 2024
 @author: jmette@uni-bremen.de
 """
 
-def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_save='None'):
+def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'):
     """
     Plots CTD tow-yo tracks on to a 2D map together with bathymety and optional samples of tracer. Tracks are a combination of acoustic tracker position of the CTD if available (solid line), otherwise ship position (dashed line).
 
@@ -42,13 +42,13 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
     import matplotlib.pyplot as plt
 
     #use Arial from custom path
-    import matplotlib.font_manager
+    # import matplotlib.font_manager
 
-    font_dir = ['/home/jonathan/Downloads/arial_font/']
-    for font in matplotlib.font_manager.findSystemFonts(font_dir):
-        matplotlib.font_manager.fontManager.addfont(font)
+    # font_dir = ['/home/jonathan/Downloads/arial_font/']
+    # for font in matplotlib.font_manager.findSystemFonts(font_dir):
+    #     matplotlib.font_manager.fontManager.addfont(font)
 
-    plt.rcParams['font.family'] = 'Arial'#'sans-serif'
+    # plt.rcParams['font.family'] = 'Arial'#'sans-serif'
     #plt.rcParams.update({'font.size': 10})
 
     #%% subset profile data for plots
@@ -165,6 +165,7 @@ def plot_map(profile_data, btl_data, lats, lons, elev, tracer_type='None', path_
     colors = plt.rcParams["axes.prop_cycle"]()
     fig.set_tight_layout(True)
 
+    lons, lats, elev = bathy
     contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)
     contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
     plt.colorbar(contours,label='Depth in m')
