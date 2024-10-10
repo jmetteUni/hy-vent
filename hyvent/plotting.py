@@ -396,11 +396,12 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     """
     from hyvent.misc import get_var
     import matplotlib.pyplot as plt
+    import pandas as pd
 
     xlabel, xcolor, cmap = get_var(xvar)
 
     data = data[data[yvar]>depth_min]
-    if background != 'None':
+    if isinstance(background,pd.DataFrame):
         background = background[background[yvar]>depth_min]
 
     data_list = [d for _, d in data.groupby(['Station','SN'])]
@@ -408,13 +409,13 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     if xvar == 'delta3He':
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
-        if background != 'None':
+        if isinstance(background,pd.DataFrame):
             plt.scatter(background[xvar],background[yvar],color='black')
     else:
         for station in data_list:
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
             #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
-        if background != 'None':
+        if isinstance(background,pd.DataFrame):
             plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
