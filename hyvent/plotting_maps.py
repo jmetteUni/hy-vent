@@ -265,7 +265,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
 
     Parameters
     ----------
-    data : andas dataframe
+    data : pandas dataframe
         Dataframe with the data of the CTD station or multiple stations with variable as columns as columns. One column has to be the station designation.
     var : string
         Variable to plot. Must be a key for a column in data and is only plotted for values with coordinates in the columns "CTD_lon"/"CTD_lat" or "Dship_lon"/"Dship_lat".
@@ -358,17 +358,14 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
 
     fig, ax = plt.subplots()
 
-    #plot bathymetry
-    if bathy != 'None':
-        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=23 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
-
     #plot vent
     if vent_loc != 'None':
         ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
 
     if var == 'dORP':       #ommit positve dORP values, as only negativ ones are of interest
         data = data[data[var]<=0]
+    if var == 'Delta_potemperature':    #ommit negative delta theta values, as only positiv ones are of interest
+        data = data[data[var]>=0]
     if var == 'delta3He':       #for delta3He, data is bottle data, therefore rename depth column
         data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
 
@@ -387,8 +384,21 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
         data_nb = data_nb.iloc[::nth_point,:]        #plot only every n-th point for better visibility
         lat = data_nb['CTD_lat'].fillna(data_nb['Dship_lat'])       #fill gaps in acoustic position with Dship positions
         lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
-        var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0.2)
+        var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
         fig.colorbar(var,label=label)
+
+    lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
+    lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
+
+    #plot bathymetry
+
+    if bathy != 'None':
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
+
+
+    ax.set_xlim(lon_limits)
+    ax.set_ylim(lat_limits)
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
