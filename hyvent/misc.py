@@ -188,3 +188,5 @@ def get_var(var):
         print('Properties for variable '+var+' not defined yet.')
 
     return label,color,cmap
+
+

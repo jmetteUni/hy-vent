@@ -238,7 +238,6 @@ def plot_track(profile_data, vent_loc='None', bathy='None'):
         contours = plt.contourf(bathy[0],bathy[1],bathy[2],levels=40,alpha=0.7)         #use this two lines to plot with colorbar instead labels
         plt.colorbar(contours,label='Depth in m')
 
-
     #plot vent
     if vent_loc != 'None':
         ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
@@ -356,7 +355,12 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     #get properties for variable
     label, color, cmap = get_var(var)
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(8,6))
+
+    #plot bathymetry
+    if bathy != 'None':
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
 
     #plot vent
     if vent_loc != 'None':
@@ -389,13 +393,6 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
 
     lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
     lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
-
-    #plot bathymetry
-
-    if bathy != 'None':
-        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
-
 
     ax.set_xlim(lon_limits)
     ax.set_ylim(lat_limits)

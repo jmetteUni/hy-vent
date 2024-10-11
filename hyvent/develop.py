@@ -5,6 +5,10 @@ Created on Fri Jul 26 10:59:34 2024
 
 @author: jonathan
 """
+import os
+working_dir = '/home/jonathan/Dokumente/Masterarbeit/python/hy-vent/'
+os.chdir(working_dir)
+
 from lat_lon_parser import parse
 
 from hyvent.io import (read_from_csv,
@@ -33,8 +37,7 @@ aurora_stations = ['022_01', '026_01', '028_01', '033_01', '036_01', '041_01', '
 btl_data = read_from_csv(btl_path, 'btl')
 profile_data = read_from_csv(cnv_path, 'cnv')
 mapr_data = read_from_csv(mapr_path, 'mapr')
-lats, lons, elev = read_gebco(gebcopath)
-bathy = (lons,lats,elev)
+bathy = read_gebco(gebcopath)
 
 profile_data = keys_to_data(profile_data, 'cnv')
 btl_data = keys_to_data(btl_data, 'btl')
@@ -96,6 +99,10 @@ for profile in data_list:
 
 
 #plot_track(profile_data, vent_loc=vent_loc, bathy=bathy)
+
+
+#%% slize bathy
+
 
 
 

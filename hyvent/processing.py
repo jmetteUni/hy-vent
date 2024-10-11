@@ -187,10 +187,7 @@ def subtract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
     """
 
     import matplotlib.pyplot as plt
-    import numpy as np
     import pandas as pd
-
-    #deep copy neccessary? -> check
 
     #selects first downcast of background, prepares background for merge
     bg = bg.reset_index(drop=True)
