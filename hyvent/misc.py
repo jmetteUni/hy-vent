@@ -89,9 +89,20 @@ def get_var(var):
     label : string
         Axis label for the variable.
     color : string
-        Color to be used for plotting the vriable.
+        Color to be used for plotting the variable.
     """
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import numpy as np
 
+    def truncate_colormap(cmap, minval=0, maxval=0.8, n=100):
+        cmap = plt.get_cmap(cmap)
+        new_cmap = colors.LinearSegmentedColormap.from_list(
+            'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
+            cmap(np.linspace(minval, maxval, n)))
+        return new_cmap
+
+#temperature
     if var == 'potemperature':
         color = 'red'
         label = '$\Theta$ in $^{\circ}$C'
@@ -108,6 +119,7 @@ def get_var(var):
         color = 'red'
         label = '$\Delta$$\Theta$ in $^{\circ}$C'
         cmap = 'Reds'
+#turbidity
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
         label = 'Turbidity in NTU'
@@ -116,14 +128,17 @@ def get_var(var):
         color = 'blue'
         label = '$\Delta$ Turbidity in NTU'
         cmap = 'Blues'
+#ORP
     elif var == 'dORP':
         color = 'green'
         label = '$dE/dt$ in mV/sec'
         cmap = 'Greens_r'
+        cmap = truncate_colormap(cmap)
     elif var == 'upoly0':
         color = 'green'
         label = '$E$ in mV'
         cmap = 'Greens_r'
+#salinity
     elif var == 'PSAL' or var == 'PSAL_mean':
         color = 'cyan'
         label = 'Practical Salinity in 1'
@@ -132,6 +147,7 @@ def get_var(var):
         color = 'cyan'
         label = 'Absolute Salinity in ?'
         cmap = 'None'
+#density
     elif var == 'Sigma0':
         color = 'purple'
         label = '$\sigma_0$ in kg/m$^3$'
@@ -152,18 +168,22 @@ def get_var(var):
         color = 'purple'
         label = 'Potential Density Anomaly in kg/m$^3$'
         cmap = 'Purples_r'
+#depth
     elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
         color = 'black'
         label = 'Depth in m'
         cmap = 'None'
+#pressure
     elif var == 'PRES':
         color = 'black'
         label = 'Pressure in dbar'
         cmap = 'None'
+#helium
     elif var == 'delta3He':
         color = 'orange'
         label = '$\delta^3$He in %'
         cmap = 'Oranges'
+        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
     else:
         print('Properties for variable '+var+' not defined yet.')
 
