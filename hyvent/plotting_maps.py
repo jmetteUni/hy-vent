@@ -359,7 +359,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
 
     #plot bathymetry
     if bathy != 'None':
-        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40, colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
         ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
 
     #plot vent

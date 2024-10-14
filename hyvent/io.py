@@ -409,7 +409,7 @@ def read_he(he_path):
 
     return he_data, he_data_full
 
-def read_gebco(gebcopath): # hillshade_path
+def read_gebco(gebcopath,lonE,lonW,latS,latN): # hillshade_path
     """
     Reads in bathymetry from NetCDF file.
 
@@ -434,10 +434,10 @@ def read_gebco(gebcopath): # hillshade_path
 
     gebco = xa.open_dataset(gebcopath)
 
-    lonW = -6.45
-    lonE = -6.175
-    latS = 82.875
-    latN = 82.92
+    # lonW = -6.45
+    # lonE = -6.175
+    # latS = 82.875
+    # latN = 82.92
     #res = '10m'
 
     gebco = gebco.sel(lat=slice(latS,latN),lon=slice(lonW,lonE))

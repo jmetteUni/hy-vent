@@ -37,7 +37,7 @@ aurora_stations = ['022_01', '026_01', '028_01', '033_01', '036_01', '041_01', '
 btl_data = read_from_csv(btl_path, 'btl')
 profile_data = read_from_csv(cnv_path, 'cnv')
 mapr_data = read_from_csv(mapr_path, 'mapr')
-bathy = read_gebco(gebcopath)
+bathy = read_gebco(gebcopath,lonE,lonW,latS,latN)
 
 profile_data = keys_to_data(profile_data, 'cnv')
 btl_data = keys_to_data(btl_data, 'btl')
