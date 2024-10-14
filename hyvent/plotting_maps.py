@@ -226,7 +226,7 @@ def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'
 
     plt.show()
 
-def plot_track(profile_data, vent_loc='None', bathy='None'):
+def plot_track(profile_data, btl_data, vent_loc='None', bathy='None'):
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots()
@@ -234,7 +234,7 @@ def plot_track(profile_data, vent_loc='None', bathy='None'):
     #plot bathymetry
     if bathy != 'None':
         contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=23 ,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-        #ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')       #use this line to plot with lables instead colorbar
+        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')       #use this line to plot with lables instead colorbar
         contours = plt.contourf(bathy[0],bathy[1],bathy[2],levels=40,alpha=0.7)         #use this two lines to plot with colorbar instead labels
         plt.colorbar(contours,label='Depth in m')
 
@@ -245,15 +245,16 @@ def plot_track(profile_data, vent_loc='None', bathy='None'):
     #plot tracks
     data_list = [d for _, d in profile_data.groupby(['Station','SN'])]
     for profile in data_list:
-        lat = profile['CTD_lat']#.fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
-        lon = profile['CTD_lon']#.fillna(profile['Dship_lon'])
+        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
         #lat = profile['Dship_lat']
         #lon = profile['Dship_lon']
         ax.plot(lon,lat,color='black',linewidth='0.8')
 
         #plot labels & marker
         ax.scatter(lon.iloc[0],lat.iloc[0],marker='v',color='black')
-        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0].rstrip('_01').lstrip('0'))
+        print(profile['Station'].iloc[0])
+        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0][1:-3])
         ax.scatter(lon.iloc[-1],lat.iloc[-1],marker='^',color='black')
 
     plt.show()
@@ -391,11 +392,15 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
         var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
         fig.colorbar(var,label=label)
 
+        ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
+
     lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
     lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
 
-    ax.set_xlim(lon_limits)
-    ax.set_ylim(lat_limits)
+
+
+    #ax.set_xlim(lon_limits)
+    #ax.set_ylim(lat_limits)
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
