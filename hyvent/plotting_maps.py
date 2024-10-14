@@ -249,12 +249,11 @@ def plot_track(profile_data, btl_data, vent_loc='None', bathy='None'):
         lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
         #lat = profile['Dship_lat']
         #lon = profile['Dship_lon']
-        ax.plot(lon,lat,color='black',linewidth='0.8')
+        ax.scatter(lon,lat,color='black',s=0.001)
 
         #plot labels & marker
         ax.scatter(lon.iloc[0],lat.iloc[0],marker='v',color='black')
-        print(profile['Station'].iloc[0])
-        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0][1:-3])
+        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0][1:-3],fontsize='small')
         ax.scatter(lon.iloc[-1],lat.iloc[-1],marker='^',color='black')
 
     plt.show()
@@ -392,7 +391,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
         var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
         fig.colorbar(var,label=label)
 
-        ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
+        #ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
 
     lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
     lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
