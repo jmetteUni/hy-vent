@@ -355,7 +355,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     #get properties for variable
     label, color, cmap = get_var(var)
 
-    fig, ax = plt.subplots(figsize=(8,5))
+    fig, ax = plt.subplots(figsize=(8,6))
 
     #plot bathymetry
     if bathy != 'None':
@@ -375,34 +375,46 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
 
     data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by exspected plume depth
 
-    #plot station labels
-    data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
-    for profile in data_list:
-        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
-        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
-        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,profile['Station'].iloc[0][1:-3],fontsize='small')
-
-    #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
-    if nth_point == 0:      #plot line segments
-        data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
-        for profile in data_list:
-            lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
-            lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
-            lines = colored_line(lon,lat,data[var],ax,linewidth=2,cmap=cmap)
-        fig.colorbar(lines)
-    else:       #plot single dots
-        data_nb = data_nb.iloc[::nth_point,:]        #plot only every n-th point for better visibility
+    #plot data
+    if var == 'delta3He':
         lat = data_nb['CTD_lat'].fillna(data_nb['Dship_lat'])       #fill gaps in acoustic position with Dship positions
         lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
-        var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
-        fig.colorbar(var,label=label)
-        #ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
+        var_plot = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
+        fig.colorbar(var_plot,label=label)
 
-    lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
-    lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
+    else:
+        #plot station labels for continous measurements
+        station_list = [d for _, d in data_nb.groupby(['Station'])]
+        for station in station_list:
+            lat = station['CTD_lat'].fillna(station['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+            lon = station['CTD_lon'].fillna(station['Dship_lon'])
+            ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,station['Station'].iloc[0][1:-3],fontsize='small')
 
-    ax.set_xlim(lon_limits)
-    ax.set_ylim(lat_limits)
+        #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
+        if nth_point == 0:      #plot line segments
+            data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
+            for profile in data_list:
+                lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+                lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+                lines = colored_line(lon,lat,profile[var],ax,linewidth=2,cmap=cmap)
+            fig.colorbar(lines)
+        else:       #plot single dots
+            data_nb = data_nb.iloc[::nth_point,:]        #plot only every n-th point for better visibility
+            data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
+            for profile in data_list:
+                lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+                lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+                var_plot = ax.scatter(lon,lat,c=profile[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
+            fig.colorbar(var_plot,label=label)
+            #ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
+
+    #set plot limits
+    # lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+    # lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+    # lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
+    # lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
+    # ax.set_xlim(lon_limits)
+    # ax.set_ylim(lat_limits)
     #plt.gca().set_aspect(5)
 
     if path_save != 'None':
