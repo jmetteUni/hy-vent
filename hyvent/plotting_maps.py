@@ -355,7 +355,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     #get properties for variable
     label, color, cmap = get_var(var)
 
-    fig, ax = plt.subplots(figsize=(8,6))
+    fig, ax = plt.subplots(figsize=(8,5))
 
     #plot bathymetry
     if bathy != 'None':
@@ -373,16 +373,22 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     if var == 'delta3He':       #for delta3He, data is bottle data, therefore rename depth column
         data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
 
-    #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
     data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by exspected plume depth
 
+    #plot station labels
+    data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
+    for profile in data_list:
+        lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
+        lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
+        ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,profile['Station'].iloc[0][1:-3],fontsize='small')
 
+    #plot data, as colored line segments (nth_point=0) or as scatter points(nth_point>0)
     if nth_point == 0:      #plot line segments
         data_list = [d for _, d in data_nb.groupby(['Station','SN'])]
         for profile in data_list:
             lat = profile['CTD_lat'].fillna(profile['Dship_lat'])       #fill gaps in acoustic position with Dship positions
             lon = profile['CTD_lon'].fillna(profile['Dship_lon'])
-            lines = colored_line(lon,lat,profile[var],ax,linewidth=2,cmap=cmap)
+            lines = colored_line(lon,lat,data[var],ax,linewidth=2,cmap=cmap)
         fig.colorbar(lines)
     else:       #plot single dots
         data_nb = data_nb.iloc[::nth_point,:]        #plot only every n-th point for better visibility
@@ -390,16 +396,14 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
         lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
         var = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
         fig.colorbar(var,label=label)
-
         #ax.plot(data_nb['Dship_lon'],data_nb['Dship_lat'])
 
     lon_limits = [lon.min()-(lon.max()-lon.min())/15,lon.max()+(lon.max()-lon.min())/15]
     lat_limits = [lat.min()-(lat.max()-lat.min())/15,lat.max()+(lat.max()-lat.min())/15]
 
-
-
-    #ax.set_xlim(lon_limits)
-    #ax.set_ylim(lat_limits)
+    ax.set_xlim(lon_limits)
+    ax.set_ylim(lat_limits)
+    #plt.gca().set_aspect(5)
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
