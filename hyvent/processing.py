@@ -160,7 +160,30 @@ def derive_CTD(data):
 
     return data
 
-def subtract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
+def sel_bg_cast(data):
+    """
+    This function subsets all data until the deepest measurement which is expected to be the first downcast. This can be used as a background or standard profile.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of one station. Must contain a column "DEPTH" with depth values.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe with the data until the deepest value.
+
+    """
+    data = data.reset_index(drop=True)
+    i_deepest = data['DEPTH'].idxmax()
+    data = data.iloc[:i_deepest]
+
+    return data
+
+
+
+def subtract_bg_by_press(data, bg, var, min_dep, max_dep, control_plot=False):
     """
     This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.
 
@@ -189,10 +212,10 @@ def subtract_bg(data, bg, var, min_dep, max_dep, control_plot=False):
     import matplotlib.pyplot as plt
     import pandas as pd
 
-    #selects first downcast of background, prepares background for merge
-    bg = bg.reset_index(drop=True)
-    i_deepest = bg['DEPTH'].idxmax()
-    bg = bg.iloc[:i_deepest]
+    #selects first downcast as background
+    bg = sel_bg_cast(bg)
+
+    #prepares background for merge
     bg = bg[['Rho',var]]
     bg = bg.dropna(subset=['Rho'])
     bg = bg.sort_values(by='Rho')
