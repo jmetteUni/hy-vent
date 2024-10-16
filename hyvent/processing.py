@@ -160,6 +160,44 @@ def derive_CTD(data):
 
     return data
 
+def sep_casts(data, window_size=1000):
+    """
+    This function separates a station into up and down casts by local extrema.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of one station.
+    window_size : TYPE, optional
+        Size of the rolling window, to find local extrema within. The optimal size is dependent on the number of measurements per up or down cast. The default is 1000.
+
+    Returns
+    -------
+    casts : list of pandas dataframes
+        A list were each entry is a dataframe with the data of the consecutive up and down casts.
+    """
+    import pandas as pd
+
+    local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
+    local_max_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).max()]
+    #concat all local min, max and the start and end rows
+    extrema = pd.concat([local_max_vals,local_min_vals])
+    extrema = pd.concat([extrema,data[data.index==data.index.min()]])
+    extrema = pd.concat([extrema,data[data.index==data.index.max()]])
+    extrema = extrema.sort_index()
+
+    #separate data by the extrema indices and store it in list
+    casts = list()
+    indexes = extrema.index.to_list()
+    for i in  range(len(indexes)-1):
+        start = indexes[i]
+        end = indexes[i+1]
+
+        cast = data[(data.index >= start) & (data.index < end)]
+        casts.append(cast)
+
+    return casts
+
 def sel_bg_cast(data):
     """
     This function subsets all data until the deepest measurement which is expected to be the first downcast. This can be used as a background or standard profile.
