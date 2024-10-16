@@ -193,7 +193,11 @@ def sep_casts(data, window_size=1000):
         start = indexes[i]
         end = indexes[i+1]
 
-        cast = data[(data.index >= start) & (data.index < end)]
+        if i == len(indexes)-1:
+            cast = data[(data.index >= start) & (data.index <= end)]    #include the last row in the last cast
+        else:
+            cast = data[(data.index >= start) & (data.index < end)]
+
         casts.append(cast)
 
     return casts
@@ -221,7 +225,7 @@ def sel_bg_cast(data):
 
 
 
-def subtract_bg_by_press(data, bg, var, min_dep, max_dep, control_plot=False):
+def calc_delta_by_dens(data, bg, var, min_dep, max_dep, control_plot=False):
     """
     This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.
 
