@@ -251,3 +251,94 @@ def subtract_bg_by_press(data, bg, var, min_dep, max_dep, control_plot=False):
     data = data.join(merge)
 
     return data
+
+# calculates Temperature anomaly based on background and unique density values as layers
+def calcTempAnomaly(dataset, background):
+    """
+    [Depreciated, just for dicumentation] This function calculates a temperature anomaly between a dataset and a background dataset based on nearest common density values. The background curve is extracted from the background dataset by taking all values until the deepest pressure value.
+
+    Parameters
+    ----------
+    dataset : pandas dataframe
+        Dataframe with the data of one station.
+    background : pandas dataframe
+        Dataset which should be used as background.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataset like the input but with the background temperature and the calculated temperature anomaly as an additional column.
+
+    """
+    import pandas as pd
+
+    bg = background[background['PRES'] > 1800]
+    # select downcast to the highest pressure value
+    bg = bg[bg.index <= int(bg[['PRES']].idxmax())].reset_index()
+    # get unique density and corellated temperature
+    density_layers = bg.groupby('density')['potemperature'].mean().reset_index()
+    density_layers.rename(
+        {'density': 'density_l', 'potemperature': 'Tempbg'}, axis=1, inplace=True)
+
+    dataset = dataset[dataset['PRES'] > 1800]
+    dataset = pd.merge_asof(dataset.sort_values(by='density'), density_layers, left_on='density', right_on='density_l', direction='nearest').sort_values(
+        by='datetime')  # merge dataset and density layers from backgroundcast on nearest density values
+    # calculate Temperature anomaly by substracting temperature - background temperature
+    dataset['TempAnomaly'] = dataset['potemperature'] - dataset['Tempbg']
+
+    return(dataset)
+
+
+# calculates Temperature anomaly based on background and No of pressure layers
+def calcTempAnomalyPress(dataset, background, No_layers):
+    """
+    [Depreciated, just for documentation] This function calculates a temperature anomaly between a dataset and a background dataset based for common vertical pressure layer. The background curve is extracted from the background dataset by taking all values until the deepest pressure value. The number of pressure layer (e.g. resolution) must be specified.
+
+    Parameters
+    ----------
+    dataset : pandas dataframe
+        Dataframe with the data of one station.
+    background : pandas dataframe
+        Dataset which should be used as background.
+    No_layers : int
+        Number of pressure layers for which one temperature anomaly is calculated.
+
+    Returns
+    -------
+     data : pandas dataframe
+         Dataset like the input but with the background temperature and the calculated temperature anomaly as an additional column.
+
+    """
+    import numpy as np
+    import pandas as pd
+
+    bg = background[background['PRES'] > 1800]
+    # select downcast to the highest pressure value
+    bg = bg[bg.index <= int(bg[['PRES']].idxmax())].reset_index()
+
+    press_layers = pd.DataFrame()
+    press_layers['PRES_l'] = np.linspace(
+        bg['PRES'].iloc[0], bg['PRES'].iloc[-1], No_layers)  # linear spaced pressure layers
+    press_layers['PRES_mean'] = np.nan
+    press_layers['Tempbg'] = np.nan
+    # for every layer group bg by Press values between top of layer and next layer pressure
+    for index, row in press_layers.iterrows():
+        if index != len(press_layers)-1:  # accounts for out-of-bounds index
+            layer = bg[((bg['PRES'] >= press_layers['PRES_l'].iloc[index]) & (
+                bg['PRES'] < press_layers['PRES_l'].iloc[index+1]))]
+        else:
+            # bottom layer equals last row in background,
+            layer = bg[(bg['PRES'] >= press_layers['PRES_l'].iloc[index])]
+
+        # mean Pressure per layer for checking algorithm
+        press_layers['PRES_mean'][index] = layer['PRES'].mean()
+        # mean Temperature for this layer
+        press_layers['Tempbg'][index] = layer['potemperature'].mean()
+
+    dataset = dataset[dataset['PRES'] > 1800]
+    dataset = pd.merge_asof(dataset.sort_values(by='PRES'), press_layers, left_on='PRES', right_on='PRES_l', direction='nearest').sort_values(
+        by='datetime')  # merge dataset and density layers from backgroundcast on nearest density values
+    # calculate Temperature anomaly by substracting temperature - background temperature
+    dataset['TempAnomaly'] = dataset['potemperature'] - dataset['Tempbg']
+
+    return(dataset)
