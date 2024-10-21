@@ -134,6 +134,9 @@ def read_from_csv(csv_path,datatype):        #reads in stations in individual cs
             cnv_data[file.rstrip('_mapr.csv')] = pd.read_csv(csv_path+file)       #,encoding='iso-8859-1' sometimes needed
         print('Read '+file+' sucessfully')
 
+    for key in cnv_data:
+        cnv_data[key]['datetime'] = pd.to_datetime(cnv_data[key]['datetime'])
+
     return cnv_data
 
 def read_dshippos(dship_path):
