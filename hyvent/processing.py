@@ -384,3 +384,100 @@ def calcTempAnomalyPress(dataset, background, No_layers):
     dataset['TempAnomaly'] = dataset['potemperature'] - dataset['Tempbg']
 
     return(dataset)
+
+def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
+    """
+    This funtions fits a polynomial to a variable of a profile (usually to create a smooth background profile), with depth as x values for the fit.
+
+    Parameters
+    ----------
+    bg : pandas dataframe
+        Dataset which should be used as background.
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Minimum depth for the fit's depth range.
+    max_dep : int
+        Maximum depth for the fit's depth range.
+    fit_order : TYPE, optional
+        Order of the polynomial fit. The default is 10.
+
+    Returns
+    -------
+    df_fit : pandas dataframe
+        Datframe containing the depth and the fit result.
+
+    """
+    import numpy as np
+    import pandas as pd
+    from hyvent.processing import sep_casts
+
+    #get first downcast of background and subset by depth range
+    bg = sep_casts(bg, window_size=5000)
+    if len(bg) > 2:
+        print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
+    bg = bg[0]
+    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
+
+    coef = np.polyfit(bg['DEPTH'],bg[var],fit_order)
+    fit = np.poly1d(coef)
+    fit = fit(bg['DEPTH'])
+    df = {'DEPTH':bg['DEPTH'],'Bgfit_'+var:fit}
+    df_fit = pd.DataFrame(df)
+    df_fit = df_fit.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
+
+    return df_fit
+
+
+def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=10, control_plot=False):
+    """
+    This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on nearest depth values. Then this fit is substracted from the variable values in the main dataset.
+
+    Parameters
+    ----------
+  data : pandas dataframe or dictionary
+      Dataset containing one dataset. Must have the variables depth ("DEPTH") and datetime ("datetime").
+    bg : pandas dataframe
+        Dataset which should be used as background.
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Minimum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+    max_dep : int
+        Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+    fit_order : TYPE, optional
+        Order of the polynomial fit. The default is 10.
+    tolerance : int, optional
+        This values controls the maximum distance in depth, on which the background fit is merged with the main dataset. The default is 10.
+    control_plot : TYPE, optional
+        This option controls if a control plot is shown, containing the dataset variable and the background fit in the specified depth range. The default is False.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe similar to the original dataframe with the background fit and the deviation of the variable as additional columns. Values outside the depth range in these columns are NaN.
+    """
+    import pandas as pd
+
+    data['datetime'] = pd.to_datetime(data['datetime'])
+
+    bg_fit = get_bg_fit(bg, var, min_dep, max_dep, fit_order)
+
+    data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
+    data = pd.merge_asof(data, bg_fit, on='DEPTH', direction='nearest',tolerance=tolerance)
+    data['Delta_'+var] = data[var] - data['Bgfit_'+var]
+    data = data.sort_index()
+
+    if control_plot == True:
+        import matplotlib.pyplot as plt
+
+        plt.figure()
+        plt.plot(data['potemperature'],data['DEPTH'], label='$\theta$')
+        plt.plot(data['Bgfit_potemperature'],data['DEPTH'], label='Fit from background')
+        plt.gca().invert_yaxis()
+        plt.xlabel('Temperature in $^{\circ}$C')
+        plt.ylabel('Depth in m')
+        plt.ylim((max_dep,min_dep))
+        plt.show()
+
+    return data
