@@ -223,8 +223,6 @@ def sel_bg_cast(data):
 
     return data
 
-
-
 def calc_delta_by_dens(data, bg, var, min_dep, max_dep, control_plot=False):
     """
     This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.
@@ -385,7 +383,7 @@ def calcTempAnomalyPress(dataset, background, No_layers):
 
     return(dataset)
 
-def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
+def get_bg_polyfit(bg, var, min_dep, max_dep, fit_order):
     """
     This funtions fits a polynomial to a variable of a profile (usually to create a smooth background profile), with depth as x values for the fit.
 
@@ -422,6 +420,48 @@ def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
     coef = np.polyfit(bg['DEPTH'],bg[var],fit_order)
     fit = np.poly1d(coef)
     fit = fit(bg['DEPTH'])
+
+    df = {'DEPTH':bg['DEPTH'],'Bg_'+var:bg[var],'Bgfit_'+var:fit}
+    df_fit = pd.DataFrame(df)
+    df_fit = df_fit.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
+
+    return df_fit
+
+def get_bg_unifit(bg, var, min_dep, max_dep, s):
+    """
+    This funtions fits a polynomial to a variable of a profile (usually to create a smooth background profile), with depth as x values for the fit.
+
+    Parameters
+    ----------
+    bg : pandas dataframe
+        Dataset which should be used as background.
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Minimum depth for the fit's depth range.
+    max_dep : int
+        Maximum depth for the fit's depth range.
+
+    Returns
+    -------
+    df_fit : pandas dataframe
+        Datframe containing the depth, the original variable and the fit result.
+
+    """
+    import pandas as pd
+    from hyvent.processing import sep_casts
+    from scipy.interpolate import UnivariateSpline
+
+    #get first downcast of background and subset by depth range
+    bg = sep_casts(bg, window_size=5000)
+    if len(bg) > 2:
+        print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
+    bg = bg[0]
+    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
+
+    fit_func = UnivariateSpline(bg['DEPTH'], bg[var],s=s)
+    fit = fit_func(bg['DEPTH'])
+
     df = {'DEPTH':bg['DEPTH'],'Bg_'+var:bg[var],'Bgfit_'+var:fit}
     df_fit = pd.DataFrame(df)
     df_fit = df_fit.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
@@ -429,14 +469,15 @@ def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
     return df_fit
 
 
-def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=10, control_plot=False):
+
+def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, tolerance=10, control_plot=False):
     """
     This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on nearest depth values. Then this fit is substracted from the variable values in the main dataset.
 
     Parameters
     ----------
   data : pandas dataframe or dictionary
-      Dataset containing one dataset. Must have the variables depth ("DEPTH") and datetime ("datetime").
+      Dataset containing one station. Must have the variables depth ("DEPTH") and datetime ("datetime").
     bg : pandas dataframe
         Dataset which should be used as background.
     var : string
@@ -445,8 +486,10 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=1
         Minimum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
     max_dep : int
         Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
-    fit_order : TYPE, optional
-        Order of the polynomial fit. The default is 10.
+    fit : string
+    Keyword for the fit method used. Can be "poly" for polynomial fit (np.polyfit) or "uni" for univariate spline fit (scipy.interpolate.UnivariateSpline).
+    param : int
+        If the poly fit is used: Order of the polynomial fit. If the univariate Spline is used: smoothing parameter.
     tolerance : int, optional
         This values controls the maximum distance in depth, on which the background fit is merged with the main dataset. The default is 10.
     control_plot : TYPE, optional
@@ -460,10 +503,13 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=1
     import pandas as pd
 
     data['datetime'] = pd.to_datetime(data['datetime'])
-
-    bg_fit = get_bg_fit(bg, var, min_dep, max_dep, fit_order)
-
     data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
+
+    # if fit == 'poly':
+    #     bg_fit = get_bg_polyfit(bg, var, min_dep, max_dep, param)
+    if fit == 'uni':
+        bg_fit = get_bg_unifit(bg, var, min_dep, max_dep, param)
+
     data = pd.merge_asof(data, bg_fit, on='DEPTH', direction='nearest',tolerance=tolerance)
     data['Delta_'+var] = data[var] - data['Bgfit_'+var]
     data = data.sort_index()
@@ -479,6 +525,7 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=1
         plt.xlabel('Temperature in $^{\circ}$C')
         plt.ylabel('Depth in m')
         plt.ylim((max_dep,min_dep))
+        plt.title(fit+' s/n='+str(param))
         plt.legend()
         plt.show()
 
