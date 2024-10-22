@@ -405,7 +405,7 @@ def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
     Returns
     -------
     df_fit : pandas dataframe
-        Datframe containing the depth and the fit result.
+        Datframe containing the depth, the original variable and the fit result.
 
     """
     import numpy as np
@@ -422,7 +422,7 @@ def get_bg_fit(bg, var, min_dep, max_dep, fit_order):
     coef = np.polyfit(bg['DEPTH'],bg[var],fit_order)
     fit = np.poly1d(coef)
     fit = fit(bg['DEPTH'])
-    df = {'DEPTH':bg['DEPTH'],'Bgfit_'+var:fit}
+    df = {'DEPTH':bg['DEPTH'],'Bg_'+var:bg[var],'Bgfit_'+var:fit}
     df_fit = pd.DataFrame(df)
     df_fit = df_fit.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
 
@@ -472,12 +472,16 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit_order=10, tolerance=1
         import matplotlib.pyplot as plt
 
         plt.figure()
-        plt.plot(data['potemperature'],data['DEPTH'], label='$\theta$')
-        plt.plot(data['Bgfit_potemperature'],data['DEPTH'], label='Fit from background')
+        plt.plot(data[var],data['DEPTH'], label=r'$\theta$')
+        plt.plot(data['Bgfit_'+var],data['DEPTH'], label='Fit from background')
+        plt.plot(data['Bg_'+var],data['DEPTH'], label='Var from background')
         plt.gca().invert_yaxis()
         plt.xlabel('Temperature in $^{\circ}$C')
         plt.ylabel('Depth in m')
         plt.ylim((max_dep,min_dep))
+        plt.legend()
         plt.show()
+
+    del data['Bg_'+var]
 
     return data
