@@ -71,7 +71,7 @@ def calc_mean_profile(data, var, station_list):
         new_key = var+station
         profile.rename(columns={var:new_key},inplace=True)
         profile.sort_values(by='DEPTH',ascending=True,inplace=True)
-        profile.dropna(inplace=True)
+        profile = profile.dropna()
         all_profiles = pd.merge_asof(all_profiles,profile,on='DEPTH',direction='nearest')       # for every station merge variable by nearest depth value -> binning
     del all_profiles['DEPTH']
     mean_name = str(var)+'_mean'
@@ -476,8 +476,8 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, tolerance=
 
     Parameters
     ----------
-  data : pandas dataframe or dictionary
-      Dataset containing one station. Must have the variables depth ("DEPTH") and datetime ("datetime").
+    data : pandas dataframe or dictionary
+        Dataset containing one station. Must have the variables depth ("DEPTH") and datetime ("datetime").
     bg : pandas dataframe
         Dataset which should be used as background.
     var : string
@@ -487,7 +487,7 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, tolerance=
     max_dep : int
         Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
     fit : string
-    Keyword for the fit method used. Can be "poly" for polynomial fit (np.polyfit) or "uni" for univariate spline fit (scipy.interpolate.UnivariateSpline).
+        Keyword for the fit method used. Can be "poly" for polynomial fit (np.polyfit) or "uni" for univariate spline fit (scipy.interpolate.UnivariateSpline).
     param : int
         If the poly fit is used: Order of the polynomial fit. If the univariate Spline is used: smoothing parameter.
     tolerance : int, optional
@@ -502,11 +502,16 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, tolerance=
     """
     import pandas as pd
 
+    if var == 'delta3He':       #for delta3He, data is bottle data, therefore rename depth column
+        data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
+        bg = bg.rename({'DepSM_mean':'DEPTH'},axis=1)
+        bg = bg.dropna(subset=['delta3He'])
+
     data['datetime'] = pd.to_datetime(data['datetime'])
     data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
 
-    # if fit == 'poly':
-    #     bg_fit = get_bg_polyfit(bg, var, min_dep, max_dep, param)
+    if fit == 'poly':
+        bg_fit = get_bg_polyfit(bg, var, min_dep, max_dep, param)
     if fit == 'uni':
         bg_fit = get_bg_unifit(bg, var, min_dep, max_dep, param)
 
@@ -516,13 +521,14 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, tolerance=
 
     if control_plot == True:
         import matplotlib.pyplot as plt
+        from hyvent.misc import get_var
 
         plt.figure()
-        plt.plot(data[var],data['DEPTH'], label=r'$\theta$')
+        plt.plot(data[var],data['DEPTH'], label=get_var(var)[0])
         plt.plot(data['Bgfit_'+var],data['DEPTH'], label='Fit from background')
         plt.plot(data['Bg_'+var],data['DEPTH'], label='Var from background')
         plt.gca().invert_yaxis()
-        plt.xlabel('Temperature in $^{\circ}$C')
+        plt.xlabel(get_var(var)[0])
         plt.ylabel('Depth in m')
         plt.ylim((max_dep,min_dep))
         plt.title(fit+' s/n='+str(param))
