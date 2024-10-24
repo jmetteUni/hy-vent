@@ -108,4 +108,3 @@ delta_fit036 = calc_delta_by_fit(sta036, btl_background, 'delta3He', 900, 4600, 
 
 
 
-
