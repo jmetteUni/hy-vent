@@ -83,23 +83,7 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-# %% substract background T
-sta036 = profile_data[profile_data['Station']=='036_01']
 
-
-delta_polyfit036 = calc_delta_by_fit(sta036, profile_background, 'potemperature', 2000, 4600, 'poly', param=7, control_plot=True)
-delta_unifit036 = calc_delta_by_fit(sta036, profile_background, 'potemperature', 2000, 4700, 'uni', param=0.0005, control_plot=True)
-delta_fit036['Delta_potemperature'].max()
-
-
-control = calc_delta_by_fit(profile_background, profile_background, 'potemperature', 2000, 4700, 'uni', param=3, control_plot=True)
-control['Delta_potemperature'].max()
-
-#%% subtrack background
-sta036 = btl_data[btl_data['Station']=='036_01']
-
-
-delta_fit036 = calc_delta_by_fit(sta036, btl_background, 'delta3He', 900, 4600, 'uni', param=0.0001, control_plot=True)
 
 
 
