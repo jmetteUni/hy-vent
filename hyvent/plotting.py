@@ -417,6 +417,9 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
             #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
         if isinstance(background,pd.DataFrame):
             plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
+
+    if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He'):
+        plt.axvline(0, color = 'black')
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
