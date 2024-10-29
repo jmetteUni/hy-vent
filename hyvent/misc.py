@@ -184,6 +184,12 @@ def get_var(var):
         label = '$\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
+    elif var == 'Delta_delta3He':
+        color = 'orange'
+        label = '$\delta^3$He in %'
+        cmap = 'Oranges'
+        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
+
     else:
         print('Properties for variable '+var+' not defined yet.')
 
