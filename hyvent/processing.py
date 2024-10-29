@@ -473,7 +473,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
     bg = bg[bg[var].notna()]
 
     #calculate the univariate spline fit
-    fit_func = UnivariateSpline(bg['DEPTH'], bg[var], s=s)
+    fit_func = UnivariateSpline(bg['DEPTH'], bg[var],s=s)
     fit = fit_func(dep_vec)
 
     df = {'DEPTH':dep_vec['DEPTH'],'Bgfit_'+var:np.ravel(fit)}
