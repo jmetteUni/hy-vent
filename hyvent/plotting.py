@@ -406,7 +406,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
 
     data_list = [d for _, d in data.groupby(['Station','SN'])]
     plt.figure(figsize=(6,6))
-    if xvar == 'delta3He':
+    if (xvar == 'delta3He') | (xvar == 'Delta_delta3He'):
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
         if isinstance(background,pd.DataFrame):
