@@ -418,6 +418,8 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order):
         print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
     bg = bg[0]
     bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
+    bg = bg.sort_values(by='DEPTH')
+    bg = bg[bg[var].notna()]
 
     #calculate the polynomial fit
     coef = np.polyfit(bg['DEPTH'],bg[var],fit_order)
@@ -468,6 +470,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
     bg = bg[0]
     bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
     bg = bg.sort_values(by='DEPTH')
+    bg = bg[bg[var].notna()]
 
     #calculate the univariate spline fit
     fit_func = UnivariateSpline(bg['DEPTH'], bg[var], s=s)
