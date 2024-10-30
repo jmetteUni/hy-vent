@@ -53,6 +53,10 @@ mapr_data = pd.concat(mapr_data.values(),ignore_index=True)
 
 #%% processing
 
+#try to remove the density spike in 028-01
+#import numpy as np
+#profile_data[profile_data['Station']=='028_01'] = profile_data[profile_data['Station']=='028_01'].mask((profile_data[profile_data['Station']=='028_01']['DEPTH']>3180) & (profile_data[profile_data['Station']=='028_01']['DEPTH']<3220) & (profile_data[profile_data['Station']=='028_01']['density']>41.98396) & (profile_data[profile_data['Station']=='028_01']['density'] <41.9846),other=np.nan)
+
 profile_data = derive_CTD(profile_data)
 mapr_data = mapr_data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth_corr(m)':'DEPTH'})
 mapr_data = mapr_data[['datetime','PRES','TEMP','DEPTH','Neph_outl(volts)','Dship_lon','Dship_lat','CTD_lon','CTD_lat','dORP','Cruise','Station','SN','Operation']]
@@ -82,17 +86,4 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
-
-
-#%%  todo: test uni vs poly fit
-
-sta036 = mapr_data[mapr_data['Station']=='036_01']
-sta036 = mapr_data[mapr_data['SN']=='74']
-
-delta = calc_delta_by_fit(sta036, mapr_background, 'potemperature',  2000, 4600, 'uni', param=(3,0.005), control_plot=True)
-delta = calc_delta_by_fit(sta036, mapr_background, 'potemperature',  2000, 4600, 'poly', param=10, control_plot=True)
-
-depth_plot(delta_potemperature, 'potemperature', 'DEPTH', 2000)
-
-
 
