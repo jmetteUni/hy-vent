@@ -86,9 +86,13 @@ plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'de
 
 #%%  todo: test uni vs poly fit
 
+sta036 = mapr_data[mapr_data['Station']=='036_01']
+sta036 = mapr_data[mapr_data['SN']=='74']
 
+delta = calc_delta_by_fit(sta036, mapr_background, 'potemperature',  2000, 4600, 'uni', param=(3,0.005), control_plot=True)
+delta = calc_delta_by_fit(sta036, mapr_background, 'potemperature',  2000, 4600, 'poly', param=10, control_plot=True)
 
-
+depth_plot(delta_potemperature, 'potemperature', 'DEPTH', 2000)
 
 
 
