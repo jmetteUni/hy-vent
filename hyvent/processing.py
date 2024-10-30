@@ -566,7 +566,7 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param, control_plot=
         data_cut = pd.concat([data,bg])
         data_cut = data_cut[(data_cut['DEPTH']>=min_dep) & (data_cut['DEPTH']<=max_dep)]
         plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
-        plt.title(fit+' s/n='+str(param))
+        plt.title(fit+' s/n='+str(param)+'; Station = '+str(data.loc[0,'Station'])+', '+str(data.loc[0,'SN']))
         plt.legend()
         plt.show()
 
