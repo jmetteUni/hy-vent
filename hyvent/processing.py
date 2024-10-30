@@ -383,7 +383,7 @@ def calcTempAnomalyPress(dataset, background, No_layers):
 
     return(dataset)
 
-def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order):
+def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order=10):
     """
     This funtions fits a polynomial (np.polyfit) to a variable of a profile (usually to create a smooth background profile), with depth of the main dataset as x values for the fit.
 
@@ -399,8 +399,8 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order):
         Minimum depth for the fit's depth range.
     max_dep : int or float
         Maximum depth for the fit's depth range.
-    fit_order : int or float
-        Order of the polynomial fit.
+    fit_order : int or float, optional
+        Order of the polynomial fit. The default is 10.
 
     Returns
     -------
@@ -422,7 +422,8 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order):
     bg = bg[bg[var].notna()]
 
     #calculate the polynomial fit
-    coef = np.polyfit(bg['DEPTH'],bg[var],fit_order)
+    coef, res, rank, singular_val, rcond = np.polyfit(bg['DEPTH'],bg[var],fit_order,full=True)
+    print('Residual Polyfit: '+str(res))
     fit_func = np.poly1d(coef)
     fit = fit_func(dep_vec)
 
@@ -433,7 +434,7 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order):
 
     return df_fit
 
-def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
+def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, k=None, s=0.005):
     """
     This funtions fits a univariate spline (scipy.interpolate.UnivariateSpline) to a variable of a profile (usually to create a smooth background profile), with depth of the main dataset as x values for the fit.
 
@@ -449,8 +450,10 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
         Minimum depth for the fit's depth range.
     max_dep : int or float
         Maximum depth for the fit's depth range.
-    s : int or float
-        Smoothing paramter used to construct the spline function.
+    k : int or float, optional
+        Degree of the smoothing spline. The default is None.
+    s : int or float, optional
+        Smoothing paramter used to construct the spline function. The default is none.
 
     Returns
     -------
@@ -473,7 +476,9 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
     bg = bg[bg[var].notna()]
 
     #calculate the univariate spline fit
-    fit_func = UnivariateSpline(bg['DEPTH'], bg[var],s=s)
+    fit_func = UnivariateSpline(bg['DEPTH'], bg[var],k=k,s=s)
+    res = fit_func.get_residual()
+    print('Residual UnivariateSpline: '+str(res))
     fit = fit_func(dep_vec)
 
     df = {'DEPTH':dep_vec['DEPTH'],'Bgfit_'+var:np.ravel(fit)}
@@ -482,7 +487,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, s):
 
     return df_fit
 
-def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, control_plot=False):
+def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param, control_plot=False):
     """
     This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset. If the variable is "delta3He", that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.
 
@@ -500,9 +505,10 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, control_pl
         Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
     fit : string
         Keyword for the fit method used. Can be "poly" for polynomial fit (np.polyfit) or "uni" for univariate spline fit (scipy.interpolate.UnivariateSpline).
-    param : int
-        If the poly fit is used: Order of the polynomial fit. If the univariate Spline is used: smoothing parameter.
-    control_plot : TYPE, optional
+    param : int or tuple
+        If the poly fit is used: Order of the polynomial fit.
+        If the univariate Spline is used: Tuple of k (degree of the smoothing spline) and s (smoothing factor)
+    control_plot : boolean, optional
         This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.
 
     Returns
@@ -523,7 +529,7 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, control_pl
 
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
     else:
-        data['datetime'] = pd.to_datetime(data['datetime'])
+        data.loc['datetime'] = pd.to_datetime(data['datetime'])
         data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
         dep_vec = data[['DEPTH']]
         dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
@@ -531,7 +537,7 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param=10, control_pl
         if fit == 'poly':
             bg_fit = get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, param)
         if fit == 'uni':
-            bg_fit = get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, param)
+            bg_fit = get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, param[0],param[1])
 
         data = data.merge(bg_fit, how='left', on='DEPTH')
         data['Delta_'+var] = data[var] - data['Bgfit_'+var]
