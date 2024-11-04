@@ -413,8 +413,9 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
             plt.scatter(background[xvar],background[yvar],color='black')
     else:
         for station in data_list:
+            station = station.sort_index()
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
-            #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
+            plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
         if isinstance(background,pd.DataFrame):
             plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
 
