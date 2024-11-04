@@ -62,6 +62,12 @@ mapr_data = mapr_data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Dep
 mapr_data = mapr_data[['datetime','PRES','TEMP','DEPTH','Neph_outl(volts)','Dship_lon','Dship_lat','CTD_lon','CTD_lat','dORP','Cruise','Station','SN','Operation']]
 mapr_data = derive_mapr(mapr_data, profile_data, aurora_stations)
 
+#%% unify profile and mapr
+
+mapr_formerge = mapr_data[mapr_data['Operation']=='CTD']
+profile_mapr = pd.concat((profile_data,mapr_formerge),axis=0)
+profile_mapr['datetime'] = pd.to_datetime(profile_mapr['datetime'])
+
 #%% sort stations
 profile_background = profile_data[profile_data['Station']=='018_01']
 btl_background = btl_data[btl_data['Station']=='018_01']
@@ -74,6 +80,8 @@ btl_explo = btl_data[mapr_data['Station']=='049_01']
 profile_data = profile_data[profile_data['Station'].isin(aurora_stations)]
 btl_data = btl_data[btl_data['Station'].isin(aurora_stations)]
 mapr_data = mapr_data[mapr_data['Station'].isin(aurora_stations)]
+profile_mapr = profile_mapr[profile_mapr['Station'].isin(aurora_stations)]
+
 
 #%% histogramms & 2D plots & sections
 plot_hist_he(btl_data, lower_depth=3700, upper_depth=3000, bins=30)
@@ -86,4 +94,3 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
-
