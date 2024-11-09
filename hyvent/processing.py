@@ -83,7 +83,7 @@ def calc_mean_profile(data, var, station_list):
 
 def derive_mapr(data, data_for_mean, station_list):
     """
-    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations).
+    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations). The function also removes outliers ("Neph_outl(volts)") and adiitionally smoothes the turbdity data ("Neph_smoo(colts)").
 
     Parameters
     ----------
@@ -101,8 +101,11 @@ def derive_mapr(data, data_for_mean, station_list):
 
     """
     from hyvent.processing import calc_mean_profile
+    from hyvent.quality_control import qc_IQR
     import pandas as pd
     import gsw
+    import numpy as np
+    from scipy.signal import savgol_filter
 
     var = 'PSAL'
 
@@ -116,6 +119,18 @@ def derive_mapr(data, data_for_mean, station_list):
     data_der['CT'] = gsw.conversions.CT_from_pt(data_der['SA'], data_der['potemperature'])
     data_der['Rho'] = gsw.density.rho(data_der['SA'],data_der['CT'],data_der['PRES'])
     data_der['Sigma3'] = gsw.density.sigma3(data_der['SA'],data_der['CT'])
+
+    #remove outliers and smooth turbidity below 100m
+    data_list = [d for _, d in data_der.groupby(['Station','SN'])]
+    for data in data_list:
+        data_part = data.copy(deep=True)
+        data_part['Neph(volts)'] = data['Neph(volts)'].mask(data['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
+        data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', 1.5)     #remove outliers
+        data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 20, 4)       #smooth
+        data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
+        data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
+
+    data_der = pd.concat(data_list)
 
     data_der.sort_values(by='datetime',ascending=True,inplace=True)
     del data_der['PSAL_mean']
