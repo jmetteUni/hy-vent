@@ -124,7 +124,7 @@ def derive_mapr(data, data_for_mean, station_list):
     data_list = [d for _, d in data_der.groupby(['Station','SN'])]
     for data in data_list:
         data_part = data.copy(deep=True)
-        data_part['Neph(volts)'] = data['Neph(volts)'].mask(data['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
+        data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(data_part['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
         data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', 1.5)     #remove outliers
         data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 20, 4)       #smooth
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
@@ -644,3 +644,4 @@ def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
         plt.show()
 
     return data
+
