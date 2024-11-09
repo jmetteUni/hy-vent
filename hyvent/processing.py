@@ -594,15 +594,15 @@ def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
     Parameters
     ----------
     data : pandas dataframe or dictionary
-        Dataset containing one station. Must have the variables depth ("DEPTH") and datetime ("datetime").
+        Dataset containing one station. Must have the variables depth ("DEPTH").
     bg : pandas dataframe
         Dataset which should be used as background.
     var : string
         Variable, where the deviation should be calculated.
     min_dep : int
-        Minimum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+        Minimum depth for the depth range where the mean is calculated. It is advisable to exclude surface measurements.
     max_dep : int
-        Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+        Maximum depth for the depth range where the mean is calulated.
     control_plot : boolean, optional
         This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.
 
