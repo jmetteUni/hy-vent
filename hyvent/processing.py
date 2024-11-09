@@ -586,3 +586,61 @@ def calc_delta_by_fit(data, bg, var, min_dep, max_dep, fit, param, control_plot=
         plt.show()
 
     return data
+
+def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
+    """
+    This functions calculates the deviation of a delta3He from the mean of a different (background) station in a specified depth range. For this, the mean of the background variable is calculated and substracted from the variable's values in the main dataset.
+
+    Parameters
+    ----------
+    data : pandas dataframe or dictionary
+        Dataset containing one station. Must have the variables depth ("DEPTH") and datetime ("datetime").
+    bg : pandas dataframe
+        Dataset which should be used as background.
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Minimum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+    max_dep : int
+        Maximum depth for the fit's depth range. It is advisable to set this to the region of interest to produce a good fit.
+    control_plot : boolean, optional
+        This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe similar to the original dataframe with the bakcground's mean and the deviation as additional columns. Values outside the depth range in these columns are NaN.
+    """
+    import pandas as pd
+
+    #for delta3He, data is bottle data, therefore take only mean and subtract it
+    bg = bg.rename({'DepSM_mean':'DEPTH'},axis=1)
+    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
+    bg_mean = bg['delta3He'].mean()
+    data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
+    data['Bgmean_'+var] = bg_mean
+    data['Delta_'+var] = data[var] - data['Bgmean_'+var]
+
+    #control plot, showing the variable in the dataset and the variable in the background
+    if control_plot == True:
+        import matplotlib.pyplot as plt
+        from hyvent.misc import get_var
+
+        plt.figure()
+        if var == 'delta3He':
+            plt.scatter(data[var],data['DEPTH'], label=get_var(var)[0])
+            plt.scatter(bg[var],bg['DEPTH'], label='Var from background')
+            plt.vlines(bg_mean,min_dep,max_dep, label='Mean from background')
+
+        plt.gca().invert_yaxis()
+        plt.xlabel(get_var(var)[0])
+        plt.ylabel('Depth in m')
+        plt.ylim((max_dep,min_dep))
+        #get x limits
+        data_cut = pd.concat([data,bg])
+        data_cut = data_cut[(data_cut['DEPTH']>=min_dep) & (data_cut['DEPTH']<=max_dep)]
+        plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
+        plt.legend()
+        plt.show()
+
+    return data
