@@ -594,7 +594,7 @@ def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
     Parameters
     ----------
     data : pandas dataframe or dictionary
-        Dataset containing one station. Must have the variables depth ("DEPTH").
+        Dataset containing one station. Must have the variable depth ("DEPTH").
     bg : pandas dataframe
         Dataset which should be used as background.
     var : string
@@ -642,6 +642,37 @@ def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
         plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
         plt.legend()
         plt.show()
+
+    return data
+
+def calc_turb_delta(data, var, min_dep, max_dep):
+    """
+    This functions calculates the deviation of turbidity from the mean excluding a plume layer limited by min_dep and max_dep.
+
+    Parameters
+    ----------
+    data : pandas dataframe or dictionary
+        Dataset containing one station. Must have the variable depth ("DEPTH").
+    var : string
+        Variable, where the deviation should be calculated.
+    min_dep : int
+        Upper limit of the plume laye depth, which is excluded from the mean calculation.
+    max_dep : int
+        Lower limit of the plume laye depth, which is excluded from the mean calculation.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe similar to the original dataframe with the the deviation as an additional column. Values outside the depth range in these columns are NaN.
+    """
+
+    import numpy as np
+
+    above = data[data['DEPTH']<min_dep]
+    below = data[data['DEPTH']>max_dep]
+    mean = np.mean((above[var].mean(),below[var].mean()))
+
+    data['Delta_'+var] = data[var] - mean
 
     return data
 
