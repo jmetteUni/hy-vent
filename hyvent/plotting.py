@@ -430,7 +430,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
 
-    plt.locator_params(axis='x', nbins=8)
+    #plt.locator_params(axis='x', nbins=8)
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
