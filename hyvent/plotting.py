@@ -406,6 +406,11 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
 
     data_list = [d for _, d in data.groupby(['Station','SN'])]
     plt.figure(figsize=(6,6))
+    plt.tight_layout()
+    plt.rcParams['axes.autolimit_mode'] = 'data'
+    #plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
+
+
     if (xvar == 'delta3He') | (xvar == 'Delta_delta3He'):
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
@@ -415,15 +420,17 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
         for station in data_list:
             station = station.sort_index()
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
-            plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
+            #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
         if isinstance(background,pd.DataFrame):
             plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
 
     if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He') | (xvar == 'Delta_Neph_outl(volts)'):
-        plt.axvline(0, color = 'black')
+        plt.axvline(0, color = 'black',alpha=0.3)
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
+
+    #plt.locator_params(axis='x', nbins=8)
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
