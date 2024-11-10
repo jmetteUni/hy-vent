@@ -186,7 +186,7 @@ def get_var(var):
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
     elif var == 'Delta_delta3He':
         color = 'orange'
-        label = '$\delta^3$He in %'
+        label = '$\Delta$ $\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
 
