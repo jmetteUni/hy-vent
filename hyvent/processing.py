@@ -161,6 +161,7 @@ def derive_CTD(data):
         data['CT'] = gsw.conversions.CT_from_pt(data['SA'], data['potemperature'])
         data['Rho'] = gsw.density.rho(data['SA'],data['CT'],data['PRES'])
         data['Sigma3'] = gsw.density.sigma3(data['SA'],data['CT'])
+        data['Nsquared'] = gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])
 
     elif isinstance(data,dict):
 
@@ -169,6 +170,8 @@ def derive_CTD(data):
             data[key]['CT'] = gsw.conversions.CT_from_pt(data[key]['SA'], data[key]['potemperature'])
             data[key]['Rho'] = gsw.density.rho(data[key]['SA'],data[key]['CT'],data[key]['PRES'])
             data[key]['Sigma3'] = gsw.density.sigma3(data[key]['SA'],data[key]['CT'])
+            data[key]['Nsquared'] = gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])
+
 
     else:
         print('Could not derive properties, must be pd.DataFrame or dict.')
@@ -688,8 +691,8 @@ def zmax_theta(data, min_dep, vent_depth, uncert, control_plot=False):
         Minimum depth below which data is exmained for zmax.
     vent_depth : int
         Depth of the hydrothermal vent or the seafloor.
-    uncert : float
-        Uncertainty of the potential temperature which is added to zero. This defines the threshold a value has to pass to be considered for zmax.
+    thres: float
+        Threshold of the potential temperature which is added to zero. This defines the threshold a value has to pass to be considered for zmax.
     control_plot : boolean, optional
         Boolian which controlles if control plots are produced or not. The default is False.
 
