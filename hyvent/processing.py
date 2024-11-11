@@ -676,3 +676,51 @@ def calc_turb_delta(data, var, min_dep, max_dep):
 
     return data
 
+def zmax_theta(data, min_dep, vent_depth, uncert, control_plot=False):
+    """
+    This function finds the maximum rise height of a plume based on the potential temperature anomaly. That is the vent's depth minus the minimal depth below a limit ("min_dep") where the anomaly is higher then 0 + a threshold ("uncert"). Optionally a control plot is printed, which shows the profile and and zmax.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataset of one or several profiles. Must contain the potential temperature anomaly ("Delta_potemperature") and depth ("DEPTH").
+    min_dep : int
+        Minimum depth below which data is exmained for zmax.
+    vent_depth : int
+        Depth of the hydrothermal vent or the seafloor.
+    uncert : float
+        Uncertainty of the potential temperature which is added to zero. This defines the threshold a value has to pass to be considered for zmax.
+    control_plot : boolean, optional
+        Boolian which controlles if control plots are produced or not. The default is False.
+
+    Returns
+    -------
+    zmax : float
+        The maximum rise height of the plume above the vent depth.
+    """
+    import matplotlib.pyplot as plt
+    from hyvent.misc import get_var
+
+    var = 'Delta_potemperature'
+
+    #Find the minimum depth where the anomaly is larger then 0+the uncertainty and below a minimum depth
+    zmax = data['DEPTH'][(data[var]>0+uncert) & (data['DEPTH'] > min_dep)].min()
+    #print(vent_loc[2]-zmax)
+
+    #control plot with profile and zmax
+    if control_plot == True:
+        plt.figure()
+
+        data_list = [d for _, d in data.groupby(['Station','SN'])]
+        for station in data_list:
+            plt.plot(station[var],station['DEPTH'],color=get_var(var)[1])
+        plt.axhline(zmax)
+        plt.axvline(0, color = 'black',alpha=0.3)
+        plt.gca().invert_yaxis()
+        plt.show()
+
+    #calculate the rise height as height above the vent
+    zmax = vent_depth - zmax
+
+    return zmax
+
