@@ -154,6 +154,7 @@ def derive_CTD(data):
     """
     import gsw
     import pandas as pd
+    import numpy as np
 
     if isinstance(data,pd.DataFrame):
 
@@ -161,7 +162,7 @@ def derive_CTD(data):
         data['CT'] = gsw.conversions.CT_from_pt(data['SA'], data['potemperature'])
         data['Rho'] = gsw.density.rho(data['SA'],data['CT'],data['PRES'])
         data['Sigma3'] = gsw.density.sigma3(data['SA'],data['CT'])
-        data['Nsquared'] = gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])
+        #data['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     elif isinstance(data,dict):
 
@@ -170,7 +171,7 @@ def derive_CTD(data):
             data[key]['CT'] = gsw.conversions.CT_from_pt(data[key]['SA'], data[key]['potemperature'])
             data[key]['Rho'] = gsw.density.rho(data[key]['SA'],data[key]['CT'],data[key]['PRES'])
             data[key]['Sigma3'] = gsw.density.sigma3(data[key]['SA'],data[key]['CT'])
-            data[key]['Nsquared'] = gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])
+            #data[key]['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
 
     else:
