@@ -16,7 +16,7 @@ from hyvent.io import (read_from_csv,
 from hyvent.plotting_maps import *
 from hyvent.plotting import *
 from hyvent.misc import keys_to_data
-from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD, calc_delta_by_fit
+from hyvent.processing import calc_mean_profile, derive_mapr, derive_CTD, calc_delta_by_fit, zmax_theta
 
 import pandas as pd
 import gsw
@@ -34,7 +34,7 @@ lonW = -6.45
 lonE = -6.175
 latS = 82.875
 latN = 82.92
-vent_loc = (parse("6° 15.32'W"),parse("82° 53.83'N"))
+vent_loc = (parse("6° 15.32'W"),parse("82° 53.83'N"),3900)
 aurora_stations = ['022_01', '026_01', '028_01', '033_01', '036_01', '041_01', '054_01', '055_01']
 
 #%% import data
@@ -95,7 +95,57 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-#%%
+#%% calc delta
+
+min_dep = 2000
+max_dep = 4600
+
+control_plot =False
+
+var = 'potemperature'
+data_list = [d for _, d in profile_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_fit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+profile_delta_potemperature = pd.concat(data_list)
+
+#%% get zmax
+control_plot = True
+data = profile_delta_potemperature
+thres = 0      #this is u(temp) but not u(potemp)
+min_dep = 2500
+vent_depth = vent_loc[2]
+ref_station = '041_01'
+
+zmax = zmax_theta(data, min_dep, vent_depth, thres)
+
+from hyvent.processing import sep_casts
+import numpy as np
+
+rho0 =1000
+cp = 3890
+g = 9.8
+alpha = 1.3 * 10**(-4)
+
+#get the first downcast of the reference station for calculating N
+N_station = data[data['Station']==ref_station]
+N_cast = sep_casts(N_station)[0]
+
+#get rho at the vent depth and rho at zmax depth
+rho_vent = N_cast['density'].iloc[(N_cast['DEPTH']-vent_depth).abs().argsort()[:1]]
+rho_vent = np.float64(rho_vent.iloc[0])
+rho_zmax = N_cast['density'].iloc[(N_cast['DEPTH']-(vent_depth-zmax)).abs().argsort()[:1]]
+rho_zmax = np.float64(rho_zmax.iloc[0])
+#calculate buoyancy frequency and heat flux
+Nsquared = (- g/rho0 * (rho_vent-rho_zmax)/-zmax).astype(float)
+N = np.sqrt(Nsquared)
+N_gw = np.sqrt(0.25 * 10**(-7))
+zmax_gw = 800
+heat_flux = rho0 * cp * np.pi * N_gw**3 *(zmax/5)**4 / g / alpha
+
+
+
+
+
 
 
 
