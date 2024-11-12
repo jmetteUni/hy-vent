@@ -728,3 +728,60 @@ def zmax_theta(data, min_dep, vent_depth, uncert, control_plot=False):
 
     return zmax
 
+def calc_heatflux(zmax, depth_vent, ref_station, const=None):
+    """
+    This function calculates the estimates the heatflux of a hydrothermal vent based on the rise height of the plume. The calculation is based on McDougall, T. J. (1990) and implemented as shown in the supplemental material of Wegener, G.(2024).
+
+    Parameters
+    ----------
+    zmax : int or float
+        Maximum rise height of the plume, as zmax = depth_vent - minimum_plume_depth.
+    depth_vent : int or float
+        Depth of the vent site.
+    ref_station : pandas dataframe
+        Dataframe containing the potential density anomaly and depth of a CTD station. This density profile is used to calculate the buoyancy frequency N^2.
+    const : dictionary, optional
+        Dictionary of physical constants needed for the calculation. Should be in the form of "const = {'rho0' : 1000, 'cp' :  3890, 'g' : 9.8, 'alpha' : 1.3 * 10**(-4)}". If none is provided, the default values are used, which are taken from supplemental material of Wegener, G.(2024).. The default is None.
+
+    Returns
+    -------
+    heat_flux : float
+        The estimated heat flux of the vent site.
+    Nsquared : float
+        The buoyancy frequency of the stratification based on the reference station.
+    """
+    from hyvent.processing import sep_casts
+    import numpy as np
+
+    # default constants
+    const = {'rho0' : 1000, 'cp' :  3890, 'g' : 9.8, 'alpha' : 1.3 * 10**(-4)} #, 'theta_bg' : 0}
+    # paramers from Wegener, 2024 can be used for testing
+    # N_gw = np.sqrt(0.25 * 10**(-7))
+    # zmax_gw = 800
+
+    # assign constants
+    rho0 = const['rho0']
+    cp = const['cp']
+    g = const['g']
+    alpha = const['alpha']
+    #theta_bg = const['theta_bg']  #needed for calculation of Qv
+
+    #get the first downcast of the reference station for calculating N
+    N_cast = sep_casts(ref_station)[0]
+
+    #get rho at the vent depth and rho at zmax depth
+    rho_vent = N_cast['Sigma3'].iloc[(N_cast['DEPTH']-depth_vent).abs().argsort()[:1]]
+    rho_vent = np.float64(rho_vent.iloc[0])
+    rho_zmax = N_cast['Sigma3'].iloc[(N_cast['DEPTH']-(depth_vent-zmax)).abs().argsort()[:1]]
+    rho_zmax = np.float64(rho_zmax.iloc[0])
+
+    #calculate buoyancy frequency and heat flux
+    Nsquared = (- g/rho0 * (rho_vent-rho_zmax)/-zmax).astype(float)
+    N = np.sqrt(Nsquared)
+    heat_flux = rho0 * cp * np.pi * N**3 *(zmax/5)**4 / g / alpha
+
+    #calculate volume flux [not working]
+    #Qv = heat_flux/(cp * rho0 * (theta_vent - theta_bg))
+
+    return heat_flux, Nsquared
+
