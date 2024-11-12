@@ -728,7 +728,7 @@ def zmax_theta(data, min_dep, vent_depth, uncert, control_plot=False):
 
     return zmax
 
-def calc_heatflux(zmax, depth_vent, ref_station, const=None):
+def calc_flux(zmax, depth_vent, ref_station, const=None):
     """
     This function calculates the estimates the heatflux of a hydrothermal vent based on the rise height of the plume. The calculation is based on McDougall, T. J. (1990) and implemented as shown in the supplemental material of Wegener, G.(2024).
 
