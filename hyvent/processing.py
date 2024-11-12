@@ -585,7 +585,7 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
         data_cut = pd.concat([data,bg])
         data_cut = data_cut[(data_cut['DEPTH']>=min_dep) & (data_cut['DEPTH']<=max_dep)]
         plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
-        plt.title(fit+' s/n='+str(param)+'; Station = '+str(data.loc[0,'Station'])+', '+str(data.loc[0,'SN']))
+        plt.title(fit+' s/n='+str(param)+'; Station = '+str(data['Station'].iloc[0])+', '+str(data['SN'].iloc[0]))
         plt.legend()
         plt.show()
 
@@ -623,9 +623,6 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
 
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
     data['datetime'] = pd.to_datetime(data['datetime'])
-    #data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
-    #dep_vec = data[['DEPTH']]
-    #dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
     fit_data = data[['DEPTH',var]]
     fit_data = fit_data[(fit_data['DEPTH']>=min_dep) & (fit_data['DEPTH']<=max_dep)]
 
@@ -661,7 +658,7 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
         #data_cut = pd.concat([data,bg])
         #data_cut = data_cut[(data_cut['DEPTH']>=min_dep) & (data_cut['DEPTH']<=max_dep)]
         #plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
-        plt.title(fit+' s/n='+str(param)+'; Station = '+str(data.loc[0,'Station'])+', '+str(data.loc[0,'SN']))
+        plt.title(fit+' s/n='+str(param)+'; Station = '+str(data['Station'].iloc[0])+', '+str(data['SN'].iloc[0]))
         plt.legend()
         plt.show()
 
