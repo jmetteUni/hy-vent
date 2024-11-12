@@ -622,19 +622,20 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
     import numpy as np
 
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
-    data['datetime'] = pd.to_datetime(data['datetime'])
-    fit_data = data[['DEPTH',var]]
-    fit_data = fit_data[(fit_data['DEPTH']>=min_dep) & (fit_data['DEPTH']<=max_dep)]
-
+    fit_data = data[(data['DEPTH']>=min_dep) & (data['DEPTH']<=max_dep)]
 
     if fit == 'poly':
         #calculate the polynomial fit
         fit_order = param
-        coef, res, rank, singular_val, rcond = np.polyfit(fit_data['DEPTH'].astype(float),fit_data[var].astype(float),fit_order,full=True)
+        import matplotlib.pyplot as plt
+        plt.plot(fit_data['Sigma3'],fit_data[var])
+        coef, res, rank, singular_val, rcond = np.polyfit(fit_data['Sigma3'].astype(float),fit_data[var].astype(float),fit_order,full=True)
         print('Residual Polyfit: '+str(res))
-        fit_func = np.poly1d(coef)
-        fit_data['Fit_'+var] = fit_func(fit_data['DEPTH'])
-        fit_data = fit_data[['Fit_'+var]]
+        #fit_data['Func'] = coeff * fit_data['Sigma3']**
+
+        #fit_func = np.poly1d(coef)
+        #fit_data['Fit_'+var] = fit_func(fit_data['Sigma3'])
+        #fit_data = fit_data[['Fit_'+var]]
 
     data = pd.concat([data,fit_data],axis=1)
     data['Delta_'+var] = data[var] - data['Fit_'+var]
