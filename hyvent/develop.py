@@ -16,7 +16,7 @@ from hyvent.io import (read_from_csv,
 from hyvent.plotting_maps import *
 from hyvent.plotting import *
 from hyvent.misc import keys_to_data
-from hyvent.processing import derive_mapr, derive_CTD, calc_delta_by_bgfit, calc_delta_stafit
+from hyvent.processing import *
 
 import pandas as pd
 import gsw
@@ -110,6 +110,15 @@ delta = calc_delta_stafit(sta, var, min_dep, max_dep, fit='poly', param=(10),con
 
 depth_plot(delta, 'Delta_'+var, 'DEPTH', 2000)
 
+#%% calc delta turb
+
+
+var = 'Neph_smoo(volts)'
+mapr_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for mapr in mapr_list:
+    #depth_plot(mapr, var, 'DEPTH', min_dep)
+    delta_turb = calc_turb_delta(mapr, var, 2800,3600)
+    depth_plot(delta_turb, 'Delta_'+var, 'DEPTH', 200)
 
 
 
