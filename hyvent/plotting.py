@@ -437,7 +437,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
-    plt.legend()
+    #plt.legend()
 
     #plt.locator_params(axis='x', nbins=8)
 
