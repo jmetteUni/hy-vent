@@ -113,6 +113,8 @@ depth_plot(delta, 'Delta_'+var, 'DEPTH', 2000)
 #%% calc delta turb
 
 
+
+
 var = 'Neph_smoo(volts)'
 mapr_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
 for mapr in mapr_list:
