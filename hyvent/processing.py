@@ -125,8 +125,9 @@ def derive_mapr(data, data_for_mean, station_list):
     for data in data_list:
         data_part = data.copy(deep=True)
         data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(data_part['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
-        data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', 1.5)     #remove outliers
-        data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 20, 4)       #smooth
+        data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', 5)     #remove outliers
+        data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].interpolate()
+        data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 70, 3)       #smooth
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
 
@@ -621,6 +622,10 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
     import pandas as pd
     import numpy as np
 
+    # def sigma_func(fit_data, coef):
+    #     for k in coef:
+
+
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
     fit_data = data[(data['DEPTH']>=min_dep) & (data['DEPTH']<=max_dep)]
 
@@ -723,9 +728,9 @@ def calc_helium_delta(data, bg, var, min_dep, max_dep, control_plot=False):
 
     return data
 
-def calc_turb_delta(data, var, min_dep, max_dep):
+def calc_turb_delta(data, var, upper_layer, lower_layer):
     """
-    This functions calculates the deviation of turbidity from the mean excluding a plume layer limited by min_dep and max_dep.
+    This functions calculates the deviation of turbidity. This is done by excluding a plume layer and defining a layer above and below the plume, where the mean is calculated and then subtracted.
 
     Parameters
     ----------
@@ -733,21 +738,20 @@ def calc_turb_delta(data, var, min_dep, max_dep):
         Dataset containing one station. Must have the variable depth ("DEPTH").
     var : string
         Variable, where the deviation should be calculated.
-    min_dep : int
-        Upper limit of the plume laye depth, which is excluded from the mean calculation.
-    max_dep : int
-        Lower limit of the plume laye depth, which is excluded from the mean calculation.
+    upper_layer : tuple of float
+        Upper and lower depth of the layer above the plume, which is is used as the background.
+    lower_layer : tuple of float
+        Upper and lower depth of the layer below the plume, which is is used as the background.
 
     Returns
     -------
     data : pandas dataframe
         Dataframe similar to the original dataframe with the the deviation as an additional column. Values outside the depth range in these columns are NaN.
     """
-
     import numpy as np
 
-    above = data[data['DEPTH']<min_dep]
-    below = data[data['DEPTH']>max_dep]
+    above = data[(data['DEPTH']<upper_layer[1]) & (data['DEPTH']>upper_layer[0])]
+    below = data[(data['DEPTH']<lower_layer[1]) & (data['DEPTH']<lower_layer[0])]
     mean = np.mean((above[var].mean(),below[var].mean()))
 
     data['Delta_'+var] = data[var] - mean
