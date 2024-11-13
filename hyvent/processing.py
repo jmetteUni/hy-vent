@@ -538,6 +538,15 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
     """
     import pandas as pd
 
+    if len(bg['SN'].unique()) > 1:
+        sn = data['SN'].iloc[0]
+        if sn in bg['SN']:
+            bg = bg[bg['SN'] == sn]
+        else:
+            sn = bg['SN'].iloc[0]
+            bg = bg[bg['SN'] == sn]
+            print('Warning: No profile with the same serial number found in the background. Falling back to any other serial number: '+sn)
+
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
     data['datetime'] = pd.to_datetime(data['datetime'])
     data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
