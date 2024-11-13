@@ -403,8 +403,10 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     data = data[data[yvar]>depth_min]
     if isinstance(background,pd.DataFrame):
         background = background[background[yvar]>depth_min]
+        bg_list = [d for _, d in background.groupby(['SN'])]
 
     data_list = [d for _, d in data.groupby(['Station','SN'])]
+
     plt.figure(figsize=(6,6))
     plt.tight_layout()
     plt.rcParams['axes.autolimit_mode'] = 'data'
@@ -415,14 +417,16 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
         if isinstance(background,pd.DataFrame):
-            plt.scatter(background[xvar],background[yvar],color='black')
+            for device in bg_list:
+                plt.scatter(device[xvar],device[yvar],color='black',linewidth=1)
     else:
         for station in data_list:
             station = station.sort_index()
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
             #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])
         if isinstance(background,pd.DataFrame):
-            plt.plot(background[xvar],background[yvar],color='black',linewidth=1)
+            for device in bg_list:
+                plt.plot(device[xvar],device[yvar],color='black',linewidth=1)
 
     if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He') | (xvar == 'Delta_Neph_outl(volts)') | (xvar == 'Delta_Neph_smoo(volts)'):
         plt.axvline(0, color = 'black',alpha=0.3)
