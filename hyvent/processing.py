@@ -509,7 +509,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, k=None, s=0.005):
 
 def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plot=False):
     """
-    This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset. If the variable is "delta3He", that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.
+    This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset.
 
     Parameters
     ----------
@@ -538,30 +538,20 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
     """
     import pandas as pd
 
-    #for delta3He, data is bottle data, therefore take only mean and subtract it
-    if var == 'delta3He':
-        bg = bg.rename({'DepSM_mean':'DEPTH'},axis=1)
-        bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
-        bg_mean = bg['delta3He'].mean()
-        data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
-        data['Bgfit_'+var] = bg_mean
-        data['Delta_'+var] = data[var] - data['Bgfit_'+var]
-
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
-    else:
-        data['datetime'] = pd.to_datetime(data['datetime'])
-        data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
-        dep_vec = data[['DEPTH']]
-        dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
+    data['datetime'] = pd.to_datetime(data['datetime'])
+    data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
+    dep_vec = data[['DEPTH']]
+    dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
 
-        if fit == 'poly':
-            bg_fit = get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, param)
-        if fit == 'uni':
-            bg_fit = get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, param[0],param[1])
+    if fit == 'poly':
+        bg_fit = get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, param)
+    if fit == 'uni':
+        bg_fit = get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, param[0],param[1])
 
-        data = data.merge(bg_fit, how='left', on='DEPTH')
-        data['Delta_'+var] = data[var] - data['Bgfit_'+var]
-        data = data.sort_index()
+    data = data.merge(bg_fit, how='left', on='DEPTH')
+    data['Delta_'+var] = data[var] - data['Bgfit_'+var]
+    data = data.sort_index()
 
     #control plot, showing the variable in the dataset, the variable in the background and the calculated fit
     if control_plot == True:
@@ -569,14 +559,10 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
         from hyvent.misc import get_var
 
         plt.figure()
-        if var == 'delta3He':
-            plt.scatter(data[var],data['DEPTH'], label=get_var(var)[0])
-            plt.scatter(bg[var],bg['DEPTH'], label='Var from background')
-            plt.vlines(bg_mean,min_dep,max_dep, label='Mean from background')
-        else:
-            plt.plot(data[var],data['DEPTH'], label=get_var(var)[0])
-            plt.plot(bg[var],bg['DEPTH'], label='Var from background')
-            plt.plot(data['Bgfit_'+var],data['DEPTH'], label='Fit')
+
+        plt.plot(data[var],data['DEPTH'], label=get_var(var)[0])
+        plt.plot(bg[var],bg['DEPTH'], label='Var from background')
+        plt.plot(data['Bgfit_'+var],data['DEPTH'], label='Fit')
 
         plt.gca().invert_yaxis()
         plt.xlabel(get_var(var)[0])
@@ -594,7 +580,7 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
 
 def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=False):
     """
-    This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset. If the variable is "delta3He", that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.
+    [Not working yet] This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset. If the variable is "delta3He", that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.
 
     Parameters
     ----------
