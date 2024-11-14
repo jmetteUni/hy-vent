@@ -147,6 +147,10 @@ def get_var(var):
         color = 'cyan'
         label = 'Absolute Salinity in ?'
         cmap = 'None'
+    elif var == 'Delta_PSAL':
+        color = 'cyan'
+        label = 'Practical Salinity in 1'
+        cmap = 'None'
 #density
     elif var == 'Sigma0':
         color = 'purple'
