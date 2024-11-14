@@ -6,7 +6,7 @@ Created on Fri Jul 26 10:59:34 2024
 @author: jmette@uni-bremen.de
 """
 import os
-working_dir = '/home/jonathan/Dokumente/Masterarbeit/python/hy-vent/'
+working_dir = '/home/jonathan/Dokumente/Masterarbeit/python/hy-vent/hyvent/'
 os.chdir(working_dir)
 
 from lat_lon_parser import parse
@@ -95,33 +95,41 @@ plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
 plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
-#%% calc delta
-
-min_dep = 500
+#%% separate casts and group data for 2D plotting
+min_dep = 2000
 max_dep = 4600
 
 control_plot =False
 
 var = 'potemperature'
 data_list = [d for _, d in profile_data.groupby(['Station'])]
-sta = data_list[4]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+profile_delta_potemperature = pd.concat(data_list)
 
-delta = calc_delta_stafit(sta, var, min_dep, max_dep, fit='poly', param=(10),control_plot=True)
+#%% enumerates all casts
 
-depth_plot(delta, 'Delta_'+var, 'DEPTH', 2000)
+casts = []
+data_list = [d for _, d in profile_delta_potemperature.groupby(['Station'])]
+cast_no = 1
+for data in data_list:
+    casts_delta = sep_casts(data)
+    for cast in casts_delta:
+        cast['Cast'] = cast_no
+        cast_no = cast_no +1
+    casts.append(pd.concat(casts_delta))
+casts = pd.concat(casts)
+#casts = casts[(casts['Cast']<13) | (casts['Cast']>20)]      #remove casts during constant depth in station 028-01
 
-#%% calc delta turb
+#%%
 
-
-
-
-var = 'Neph_smoo(volts)'
-mapr_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
-for mapr in mapr_list:
-    #depth_plot(mapr, var, 'DEPTH', min_dep)
-    delta_turb = calc_turb_delta(mapr, var, 2800,3600)
-    depth_plot(delta_turb, 'Delta_'+var, 'DEPTH', 200)
-
-
+cast_list = [d for _, d in casts.groupby(['Cast'])]
+lon = []
+lat = []
+delta_max = []
+for cast in cast_list:
+        lon.append(cast['CTD_lon'].mean())
+        lat.append(cast['CTD_lat'].mean())
+        delta_max.append(cast['Delta_'+var].max)
 
 
