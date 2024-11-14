@@ -432,7 +432,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
                 #plt.plot(device[xvar],device[yvar],linewidth=1,linestyle='--',label=device['SN'].iloc[0])  #plot every station, SN in different color
 
 
-    if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He') | (xvar == 'Delta_Neph_outl(volts)') | (xvar == 'Delta_Neph_smoo(volts)'):
+    if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He') | (xvar == 'Delta_Neph_outl(volts)') | (xvar == 'Delta_Neph_smoo(volts)') | (xvar == 'Delta_PSAL'):
         plt.axvline(0, color = 'black',alpha=0.3)
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
