@@ -51,7 +51,7 @@ def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'
     # plt.rcParams['font.family'] = 'Arial'#'sans-serif'
     #plt.rcParams.update({'font.size': 10})
 
-    #%% subset profile data for plots
+    # subset profile data for plots
 
     profile_plot = dict()
 
@@ -120,7 +120,7 @@ def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'
     end_lon['PS137_055_01'] = parse('6W,13.519W')
     end_lat['PS137_055_01'] = parse('82N,53.728N')
 
-    #%%  DNA and POC positions
+    #  DNA and POC positions
     poc = {'PS137_026_01' :13,
            'PS137_028_01' :10,
            'PS137_036_01' :7,
@@ -373,7 +373,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     if var == 'delta3He':       #for delta3He, data is bottle data, therefore rename depth column
         data = data.rename({'DepSM_mean':'DEPTH'},axis=1)
 
-    data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by exspected plume depth
+    data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by expected plume depth
 
     #plot data
     if var == 'delta3He':
