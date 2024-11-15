@@ -538,6 +538,7 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
     """
     import pandas as pd
 
+    #check if there is the same serial number in background data, if not then warn
     if len(bg['SN'].unique()) > 1:
         sn = data['SN'].iloc[0]
         if sn in bg['SN']:
@@ -549,18 +550,22 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
 
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
     data['datetime'] = pd.to_datetime(data['datetime'])
-    data = data.sort_values(by='DEPTH',ascending=True).dropna(subset=['DEPTH'])
     dep_vec = data[['DEPTH']]
     dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
+    dep_vec = sep_casts(dep_vec)[0]
+
+
 
     if fit == 'poly':
         bg_fit = get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, param)
     if fit == 'uni':
         bg_fit = get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, param[0],param[1])
 
-    data = data.merge(bg_fit, how='left', on='DEPTH')
-    data['Delta_'+var] = data[var] - data['Bgfit_'+var]
+    #data maybe needs droppping DEPTH nan rows?
+    data = data.sort_values(by='DEPTH')
+    data = data.reset_index().merge(bg_fit.drop_duplicates(subset='DEPTH'), how='left', on='DEPTH').set_index('index')
     data = data.sort_index()
+    data['Delta_'+var] = data[var] - data['Bgfit_'+var]
 
     #control plot, showing the variable in the dataset, the variable in the background and the calculated fit
     if control_plot == True:
