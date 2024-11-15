@@ -151,8 +151,49 @@ for cast in cast_list:
 
 fig.colorbar(var_plot,label=label)
 
+#%% TS diagram
 
 
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
 
+# assuming your dataframe is named 'df'
+df = pd.DataFrame({
+    'Potential Temperature (°C)': [20, 22, 24, 26, 28, 30],
+    'Practical Salinity': [35, 36, 37, 38, 39, 40],
+    'Potential Density Anomaly (kg/m³)': [1026, 1027, 1028, 1029, 1030, 1031]
+})
+
+# create a grid of temperatures and salinities
+T = np.linspace(15, 30, 100)
+S = np.linspace(30, 40, 100)
+T, S = np.meshgrid(T, S)
+
+# calculate the density values for the grid
+def calculate_density(T, S):
+    # this is a simple example calculation, you can replace it with your own formula
+    return 1025 + 0.1 * T + 0.2 * S
+
+density = calculate_density(T, S)
+
+# create the T-S Diagram
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Potential Temperature (°C)'], df['Practical Salinity'], c=df['Potential Density Anomaly (kg/m³)'], cmap='viridis')
+
+# add constant density lines
+contours = plt.contour(T, S, density, levels=np.arange(1025, 1040, 0.5), colors='black')
+plt.clabel(contours, inline=True, fontsize=10)
+
+#plt.colorbar(label='Potential Density Anomaly (kg/m³)')
+plt.xlabel('Potential Temperature (°C)')
+plt.ylabel('Practical Salinity')
+plt.title('T-S Diagram')
+
+# add some nice features
+#plt.grid(True)
+#plt.axis([min(df['Potential Temperature (°C)']), max(df['Potential Temperature (°C)']), min(df['Practical Salinity']), max(df['Practical Salinity'])])
+
+plt.show()
 
 
