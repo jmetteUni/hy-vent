@@ -15,7 +15,7 @@ from hyvent.io import (read_from_csv,
                        read_gebco)
 from hyvent.plotting_maps import *
 from hyvent.plotting import *
-from hyvent.misc import keys_to_data
+from hyvent.misc import keys_to_data, add_castno
 from hyvent.processing import *
 
 import pandas as pd
@@ -51,6 +51,7 @@ profile_data = pd.concat(profile_data.values(),ignore_index=True)
 btl_data = pd.concat(btl_data.values(),ignore_index=True)
 mapr_data = pd.concat(mapr_data.values(),ignore_index=True)
 
+profile_data = add_castno(profile_data)
 #%% processing
 
 #try to remove the density spike in 028-01
@@ -109,27 +110,49 @@ profile_delta_potemperature = pd.concat(data_list)
 
 #%% enumerates all casts
 
-casts = []
-data_list = [d for _, d in profile_delta_potemperature.groupby(['Station'])]
-cast_no = 1
-for data in data_list:
-    casts_delta = sep_casts(data)
-    for cast in casts_delta:
-        cast['Cast'] = cast_no
-        cast_no = cast_no +1
-    casts.append(pd.concat(casts_delta))
-casts = pd.concat(casts)
-#casts = casts[(casts['Cast']<13) | (casts['Cast']>20)]      #remove casts during constant depth in station 028-01
+profile_delta_potemperature = profile_delta_potemperature[(profile_delta_potemperature['Cast']<13) | (casts['Cast']>20)]      #remove casts during constant depth in station 028-01
 
-#%%
+#%% plot binned cast data
 
-cast_list = [d for _, d in casts.groupby(['Cast'])]
-lon = []
-lat = []
-delta_max = []
+data = profile_delta_potemperature
+
+from hyvent.misc import get_var
+import numpy as np
+
+label, color, cmap = get_var(var)
+
+fig, ax = plt.subplots(figsize=(8,6))
+
+#plot bathymetry
+if bathy != 'None':
+    contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40, colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+    ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
+
+#plot vent
+if vent_loc != 'None':
+    ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
+
+cast_list = [d for _, d in data.groupby(['Cast'])]
 for cast in cast_list:
-        lon.append(cast['CTD_lon'].mean())
-        lat.append(cast['CTD_lat'].mean())
-        delta_max.append(cast['Delta_'+var].max)
+
+        lat = cast['CTD_lat'].mean()
+        lon = cast['CTD_lon'].mean()
+        if np.isnan(lat) == True:
+            lat = cast['Ship_lat'].mean()
+        if np.isnan(lon) == True:
+            lon = cast['Ship_lon'].mean()
+
+        value = cast['Delta_'+var].max()
+        var_plot = plt.scatter(lon, lat, c=value)
+
+        print(lon,lat,value)
+
+        #ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,cast['cast'].iloc[0][1:-3],fontsize='small')
+
+fig.colorbar(var_plot,label=label)
+
+
+
+
 
 
