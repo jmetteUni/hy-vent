@@ -75,7 +75,7 @@ def keys_to_data(data,datatype):
 
     return data
 
-def add_castno(data):
+def add_castno(data, window_size=1000):
     """
     This funcion adds to each measurement a cast identification number, increasing for all up and down cast which are found in the data, ignoring station. It identifies casts by local extrema using the function hyvent.processing.sep_casts(). Check, if the window size in sep_casts is fitting.
 
@@ -83,6 +83,8 @@ def add_castno(data):
     ----------
     data : pandas dataframe
         Dataframe containing data with several up and downcasts. Must contain the column "Station".
+    window_size : int, optional
+        Size of the window use by the sep_casts() function. Default is 1000.
 
     Returns
     -------
@@ -96,7 +98,7 @@ def add_castno(data):
     data_list = [d for _, d in data.groupby(['Station'])]
     cast_no = 1
     for data in data_list:
-        casts_delta = sep_casts(data)
+        casts_delta = sep_casts(data, window_size)
         for cast in casts_delta:
             cast['Cast'] = cast_no
             cast_no = cast_no +1
