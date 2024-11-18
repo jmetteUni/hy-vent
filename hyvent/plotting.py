@@ -523,5 +523,66 @@ def time_plot(data,station,depth_min,path_save='None'):
 
     plt.show()
 
+def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
+    """
+    This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with CTD data containing the potential temperature and practical salinity.
+    min_dep : int
+        Minimal depth of the samples used.
+    max_dep : int
+        Maximal depth of the samples used.
+    p_ref : int
+        Reference pressure used for calculating the isopycnals of the potential density anomaly in dbar.
+    lon : float
+        Longitude of the samples.
+    lat : float
+        Latitude of the samples.
+
+    Returns
+    -------
+    None.
+
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import gsw
+    from hyvent.misc import get_var
+
+    data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
+
+    # create a grid of temperatures and salinities
+    pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
+    psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
+    pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+
+    # calculate the density values for the grid
+    def calculate_density(pt_grid, psal_grid, p, lon, lat):
+        # this is a simple example calculation, you can replace it with your own formula
+        SA = gsw.conversions.SA_from_SP(psal_grid, p, lon, lat)
+        CT = gsw.conversions.CT_from_pt(SA, pt_grid)
+        return gsw.density.sigma3(SA, CT)
+
+    density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+
+    plt.figure(figsize=(8, 6))
+    # add constant density lines
+    contours = plt.contour(pt_grid, psal_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    plt.clabel(contours, inline=True, fontsize=10)
+
+    # create the T-S Diagram
+    plt.scatter(data['potemperature'], data['PSAL'], c=data['DEPTH'], cmap='viridis_r',s=1)
+    cbar = plt.colorbar()
+    cbar.set_label(get_var('DEPTH')[0])
+
+    #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
+    plt.xlabel(get_var('potemperature')[0])
+    plt.ylabel(get_var('PSAL')[0])
+
+    plt.show()
+
 
 
