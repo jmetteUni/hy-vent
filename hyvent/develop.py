@@ -51,7 +51,6 @@ profile_data = pd.concat(profile_data.values(),ignore_index=True)
 btl_data = pd.concat(btl_data.values(),ignore_index=True)
 mapr_data = pd.concat(mapr_data.values(),ignore_index=True)
 
-profile_data = add_castno(profile_data)
 #%% processing
 
 #try to remove the density spike in 028-01
@@ -103,23 +102,37 @@ max_dep = 4600
 control_plot =False
 
 var = 'potemperature'
-data_list = [d for _, d in profile_data.groupby(['Station'])]
+data_list = [d for _, d in profile_data.groupby(['Station','SN'])]
 for i, station in enumerate(data_list):
     data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
 profile_delta_potemperature = pd.concat(data_list)
 
-#%% enumerates all casts
 
-profile_delta_potemperature = profile_delta_potemperature[(profile_delta_potemperature['Cast']<13) | (profile_delta_potemperature['Cast']>20)]      #remove casts during constant depth in station 028-01
+var = 'potemperature'
+data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, mapr_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+mapr_delta_potemperature = pd.concat(data_list)
+mapr_delta_potemperature = mapr_delta_potemperature[(mapr_delta_potemperature['SN']=='74') | (mapr_delta_potemperature['SN']=='72')]
+
 
 #%% plot binned cast data
 
+
+#%%
+
 data = profile_delta_potemperature
+
+#data = data[(data['Cast']<13) | (data['Cast']>20)]      #remove casts during constant depth in station 028-01
+
 
 from hyvent.misc import get_var
 import numpy as np
 
 label, color, cmap = get_var(var)
+
+data = add_castno(data)
+data = data[(data['DEPTH']<min_dep) & data['DEPTH']<max_dep]
 
 fig, ax = plt.subplots(figsize=(8,6))
 
@@ -133,44 +146,31 @@ if vent_loc != 'None':
     ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
 
 # initialize an empty DataFrame to collect values
-data_binned = pd.DataFrame(columns=['lon', 'lat', 'var_max'])
+data_binned = pd.DataFrame(columns=['Station','lon', 'lat', 'var_max'])
 
 # loop through the list of dataframes
 cast_list = [d for _, d in data.groupby(['Cast'])]
 for i, cast in enumerate(cast_list):
     # get the values from the current dataframe
+    station = cast['Station'].iloc[0]
     lon = cast['CTD_lon'].mean()
     lat = cast['CTD_lat'].mean()
     if np.isnan(lat) == True:
-        lat = cast['Ship_lat'].mean()
+        lat = cast['Dship_lat'].mean()
     if np.isnan(lon) == True:
-        lon = cast['Ship_lon'].mean()
+        lon = cast['Dship_lon'].mean()
     var_max = cast['Delta_'+var].max()
 
     # add the values to the DataFrame
-    data_binned.loc[i] = [lon, lat, var_max]
+    data_binned.loc[i] = [station, lon, lat, var_max]
 
-# cast_list = [d for _, d in data.groupby(['Cast'])]
-# for cast in cast_list:
-
-#         lat = cast['CTD_lat'].mean()
-#         lon = cast['CTD_lon'].mean()
-#         if np.isnan(lat) == True:
-#             lat = cast['Ship_lat'].mean()
-#         if np.isnan(lon) == True:
-#             lon = cast['Ship_lon'].mean()
-
-#         value = cast['Delta_'+var].max()
-#         var_plot = plt.scatter(lon, lat, c=value)
-
-#         print(lon,lat,value)
-
-        #ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,cast['cast'].iloc[0][1:-3],fontsize='small')
+var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'])
 
 fig.colorbar(var_plot,label=label)
 
+plt.show()
 
+#this is working, but there are some casts with only nans
 
-
-
+#%%
 
