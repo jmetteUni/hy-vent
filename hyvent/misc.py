@@ -77,7 +77,7 @@ def keys_to_data(data,datatype):
 
 def add_castno(data, window_size=1000):
     """
-    This funcion adds to each measurement a cast identification number, increasing for all up and down cast which are found in the data, ignoring station. It identifies casts by local extrema using the function hyvent.processing.sep_casts(). Check, if the window size in sep_casts is fitting.
+    This funcion adds to each measurement a cast identification number, increasing for all up and down cast which are found in the data per station, ignoring station. It identifies casts by local extrema using the function hyvent.processing.sep_casts(). Check, if the window size in sep_casts is fitting.
 
     Parameters
     ----------
@@ -95,9 +95,9 @@ def add_castno(data, window_size=1000):
     import pandas as pd
 
     casts = []
-    data_list = [d for _, d in data.groupby(['Station'])]
-    cast_no = 1
+    data_list = [d for _, d in data.groupby(['Station','SN'])]
     for data in data_list:
+        cast_no = 1
         casts_delta = sep_casts(data, window_size)
         for cast in casts_delta:
             cast['Cast'] = cast_no
