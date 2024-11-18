@@ -94,18 +94,19 @@ def add_castno(data, window_size=1000):
     from hyvent.processing import sep_casts
     import pandas as pd
 
-    casts = []
-    data_list = [d for _, d in data.groupby(['Station','SN'])]
-    for data in data_list:
-        cast_no = 1
-        casts_delta = sep_casts(data, window_size)
-        for cast in casts_delta:
-            cast['Cast'] = cast_no
-            cast_no = cast_no +1
-        casts.append(pd.concat(casts_delta))
-    data_cast = pd.concat(casts)
+    if isinstance(data, pd.DataFrame):
+        casts = []
+        data_list = [d for _, d in data.groupby(['Station','SN'])]
+        for data in data_list:
+            cast_no = 1
+            casts_delta = sep_casts(data, window_size)
+            for cast in casts_delta:
+                cast['Cast'] = cast_no
+                cast_no = cast_no +1
+            casts.append(pd.concat(casts_delta))
+        data_cast = pd.concat(casts)
 
-    return data_cast
+        return data_cast
 
 def get_var(var):
     """
