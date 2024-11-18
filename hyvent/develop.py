@@ -110,7 +110,7 @@ profile_delta_potemperature = pd.concat(data_list)
 
 #%% enumerates all casts
 
-profile_delta_potemperature = profile_delta_potemperature[(profile_delta_potemperature['Cast']<13) | (casts['Cast']>20)]      #remove casts during constant depth in station 028-01
+profile_delta_potemperature = profile_delta_potemperature[(profile_delta_potemperature['Cast']<13) | (profile_delta_potemperature['Cast']>20)]      #remove casts during constant depth in station 028-01
 
 #%% plot binned cast data
 
@@ -132,68 +132,45 @@ if bathy != 'None':
 if vent_loc != 'None':
     ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
 
+# initialize an empty DataFrame to collect values
+data_binned = pd.DataFrame(columns=['lon', 'lat', 'var_max'])
+
+# loop through the list of dataframes
 cast_list = [d for _, d in data.groupby(['Cast'])]
-for cast in cast_list:
+for i, cast in enumerate(cast_list):
+    # get the values from the current dataframe
+    lon = cast['CTD_lon'].mean()
+    lat = cast['CTD_lat'].mean()
+    if np.isnan(lat) == True:
+        lat = cast['Ship_lat'].mean()
+    if np.isnan(lon) == True:
+        lon = cast['Ship_lon'].mean()
+    var_max = cast['Delta_'+var].max()
 
-        lat = cast['CTD_lat'].mean()
-        lon = cast['CTD_lon'].mean()
-        if np.isnan(lat) == True:
-            lat = cast['Ship_lat'].mean()
-        if np.isnan(lon) == True:
-            lon = cast['Ship_lon'].mean()
+    # add the values to the DataFrame
+    data_binned.loc[i] = [lon, lat, var_max]
 
-        value = cast['Delta_'+var].max()
-        var_plot = plt.scatter(lon, lat, c=value)
+# cast_list = [d for _, d in data.groupby(['Cast'])]
+# for cast in cast_list:
 
-        print(lon,lat,value)
+#         lat = cast['CTD_lat'].mean()
+#         lon = cast['CTD_lon'].mean()
+#         if np.isnan(lat) == True:
+#             lat = cast['Ship_lat'].mean()
+#         if np.isnan(lon) == True:
+#             lon = cast['Ship_lon'].mean()
+
+#         value = cast['Delta_'+var].max()
+#         var_plot = plt.scatter(lon, lat, c=value)
+
+#         print(lon,lat,value)
 
         #ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.0005,cast['cast'].iloc[0][1:-3],fontsize='small')
 
 fig.colorbar(var_plot,label=label)
 
-#%% TS diagram
 
 
-import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 
-# assuming your dataframe is named 'df'
-df = pd.DataFrame({
-    'Potential Temperature (°C)': [20, 22, 24, 26, 28, 30],
-    'Practical Salinity': [35, 36, 37, 38, 39, 40],
-    'Potential Density Anomaly (kg/m³)': [1026, 1027, 1028, 1029, 1030, 1031]
-})
-
-# create a grid of temperatures and salinities
-T = np.linspace(15, 30, 100)
-S = np.linspace(30, 40, 100)
-T, S = np.meshgrid(T, S)
-
-# calculate the density values for the grid
-def calculate_density(T, S):
-    # this is a simple example calculation, you can replace it with your own formula
-    return 1025 + 0.1 * T + 0.2 * S
-
-density = calculate_density(T, S)
-
-# create the T-S Diagram
-plt.figure(figsize=(8, 6))
-plt.scatter(df['Potential Temperature (°C)'], df['Practical Salinity'], c=df['Potential Density Anomaly (kg/m³)'], cmap='viridis')
-
-# add constant density lines
-contours = plt.contour(T, S, density, levels=np.arange(1025, 1040, 0.5), colors='black')
-plt.clabel(contours, inline=True, fontsize=10)
-
-#plt.colorbar(label='Potential Density Anomaly (kg/m³)')
-plt.xlabel('Potential Temperature (°C)')
-plt.ylabel('Practical Salinity')
-plt.title('T-S Diagram')
-
-# add some nice features
-#plt.grid(True)
-#plt.axis([min(df['Potential Temperature (°C)']), max(df['Potential Temperature (°C)']), min(df['Practical Salinity']), max(df['Practical Salinity'])])
-
-plt.show()
 
 
