@@ -198,8 +198,14 @@ def sep_casts(data, window_size=1000):
     """
     import pandas as pd
 
-    local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
-    local_max_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).max()]
+    try:
+        local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
+        local_max_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).max()]
+    except:
+        print('Did not find a depth coordinate "DEPTH", trying with "Depth(m))" ')
+        local_min_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).min()]
+        local_max_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).max()]
+
     #concat all local min, max and the start and end rows
     extrema = pd.concat([local_max_vals,local_min_vals])
     extrema = pd.concat([extrema,data[data.index==data.index.min()]])
