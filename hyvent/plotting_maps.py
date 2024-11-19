@@ -376,10 +376,10 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     data_nb = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]       #subset by expected plume depth
 
     #plot data
-    if var == 'delta3He':
+    if 'delta3He' in var:
         lat = data_nb['CTD_lat'].fillna(data_nb['Dship_lat'])       #fill gaps in acoustic position with Dship positions
         lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
-        var_plot = ax.scatter(lon,lat,c=data_nb[var],s=15,cmap=cmap, edgecolors='black',linewidth=0)
+        var_plot = ax.scatter(lon,lat,c=data_nb[var],s=40,cmap=cmap, edgecolors='black',linewidth=0)
         fig.colorbar(var_plot,label=label)
 
     else:
