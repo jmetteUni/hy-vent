@@ -84,16 +84,16 @@ profile_mapr = profile_mapr[profile_mapr['Station'].isin(aurora_stations)]
 
 
 #%% histogramms & 2D plots & sections
-plot_hist_he(btl_data, lower_depth=3700, upper_depth=3000, bins=30)
-plot_hist_dorp(profile_data, lower_depth=3700, upper_depth=3000, bins=100, ranges=(-0.2,0.2))
+# plot_hist_he(btl_data, lower_depth=3700, upper_depth=3000, bins=30)
+# plot_hist_dorp(profile_data, lower_depth=3700, upper_depth=3000, bins=100, ranges=(-0.2,0.2))
 
-plot2D_all_stations(profile_data, 'dORP', vent_loc, 2000, 5000,bathy)
+# plot2D_all_stations(profile_data, 'dORP', vent_loc, 2000, 5000,bathy)
 
-plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
-plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
+# plot2D_all_stations_btl(btl_data, 'delta3He', vent_loc, 2000, 5000,bathy)
+# plot2D_station(profile_data, 'PS137_036_01', 'dORP', vent_loc, 2000, 5000,bathy)
 
-plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
-plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
+# plot_section(profile_data, 'PS137_028_01', 'CTD_lat', 'DEPTH', 'dORP', 2400, 20)
+# plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
 #%% separate casts and group data for 2D plotting
 min_dep = 2000
@@ -116,12 +116,29 @@ mapr_delta_potemperature = pd.concat(data_list)
 mapr_delta_potemperature = mapr_delta_potemperature[(mapr_delta_potemperature['SN']=='74') | (mapr_delta_potemperature['SN']=='72')]
 
 
-#%% plot binned cast data
+#%% add cast no mapr
 
+data = mapr_data.copy(deep=True)
+
+data_list = [d for _, d in data.groupby(['Station','SN'])]
+for station in data_list:
+    cast_no = 1
+    casts_list=sep_casts(station, 500)
+    for cast in casts_list:
+        plt.figure()
+        plt.plot(cast['datetime'],cast['DEPTH'])
 
 #%%
 
-data = profile_delta_potemperature
+station = data_list[0]
+casts_list=sep_casts(station, 1000)
+for cast in casts_list:
+    plt.figure()
+    plt.plot(cast['datetime'],cast['DEPTH'])
+
+#%%
+
+data = test_binning
 
 #data = data[(data['Cast']<13) | (data['Cast']>20)]      #remove casts during constant depth in station 028-01
 
@@ -131,7 +148,6 @@ import numpy as np
 
 label, color, cmap = get_var(var)
 
-data = add_castno(data)
 data = data[(data['DEPTH']<min_dep) & data['DEPTH']<max_dep]
 
 fig, ax = plt.subplots(figsize=(8,6))
@@ -149,7 +165,7 @@ if vent_loc != 'None':
 data_binned = pd.DataFrame(columns=['Station','lon', 'lat', 'var_max'])
 
 # loop through the list of dataframes
-cast_list = [d for _, d in data.groupby(['Cast'])]
+cast_list = [d for _, d in data.groupby(['Cast','Station'])]
 for i, cast in enumerate(cast_list):
     # get the values from the current dataframe
     station = cast['Station'].iloc[0]
