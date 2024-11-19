@@ -198,6 +198,9 @@ def sep_casts(data, window_size=1000):
     """
     import pandas as pd
 
+    #for mapr: sort by datetime and reindex.
+    # would be also good for ctd data, needs testing
+
     try:
         local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
         local_max_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).max()]
