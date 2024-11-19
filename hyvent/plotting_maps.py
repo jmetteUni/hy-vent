@@ -379,7 +379,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     if 'delta3He' in var:
         lat = data_nb['CTD_lat'].fillna(data_nb['Dship_lat'])       #fill gaps in acoustic position with Dship positions
         lon = data_nb['CTD_lon'].fillna(data_nb['Dship_lon'])
-        var_plot = ax.scatter(lon,lat,c=data_nb[var],s=40,cmap=cmap, edgecolors='black',linewidth=0)
+        var_plot = ax.scatter(lon,lat,c=data_nb[var],cmap=cmap, edgecolors='black',linewidth=0.1)
         fig.colorbar(var_plot,label=label)
 
     else:
@@ -448,6 +448,8 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
     None.
 
     """
+    import matplotlib.pyplot as plt
+    import pandas as pd
     from hyvent.misc import get_var
     from hyvent.misc import add_castno
     import numpy as np
@@ -482,12 +484,12 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
             lat = cast['Dship_lat'].mean()
         if np.isnan(lon) == True:
             lon = cast['Dship_lon'].mean()
-        var_max = cast['Delta_'+var].max()
+        var_max = cast[var].max()
 
         # add the values to the DataFrame
         data_binned.loc[i] = [station, lon, lat, var_max]
 
-    var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2])
+    var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2],edgecolors='black',linewidth=0.3)
 
     fig.colorbar(var_plot,label=label)
     #change colorbar ticks settings at some point?
