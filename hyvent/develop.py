@@ -115,78 +115,95 @@ for i, station in enumerate(data_list):
 mapr_delta_potemperature = pd.concat(data_list)
 mapr_delta_potemperature = mapr_delta_potemperature[(mapr_delta_potemperature['SN']=='74') | (mapr_delta_potemperature['SN']=='72')]
 
+var = 'Neph_smoo(volts)'
+data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_turb_delta(station, var, (2000,3000), (3500,4500))
+mapr_delta_turb = pd.concat(data_list)
 
-#%% add cast no mapr
-
-data = mapr_data.copy(deep=True)
-
-data_list = [d for _, d in data.groupby(['Station','SN'])]
-for station in data_list:
-    cast_no = 1
-    casts_list=sep_casts(station, 500)
-    for cast in casts_list:
-        plt.figure()
-        plt.plot(cast['datetime'],cast['DEPTH'])
 
 #%%
 
-station = data_list[0]
-casts_list=sep_casts(station, 1000)
-for cast in casts_list:
-    plt.figure()
-    plt.plot(cast['datetime'],cast['DEPTH'])
-
-#%%
-
-data = test_binning
-
+data = mapr_delta_turb
+window_size = 700
+var = 'potemperature'
 #data = data[(data['Cast']<13) | (data['Cast']>20)]      #remove casts during constant depth in station 028-01
 
 
-from hyvent.misc import get_var
-import numpy as np
+def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', vent_loc='None'):
+    """
+    This function plots the data of one or mutliple CTD stations on a 2D Map, with one point per up- or downcast and the value being the maximum value of the variable during this cast. It is plotted on the mean position calculated from the position data of the cast. The data can be limited by a depth range and optionaly bathymetry and a vent location can be plooted.
 
-label, color, cmap = get_var(var)
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of the CTD station or multiple stations with variable as columns.
+    var : string
+        Variable to plot. Must be a key for a column in data and is only plotted for values with coordinates in the columns "CTD_lon"/"CTD_lat" or "Dship_lon"/"Dship_lat".
+    min_dep : int
+        Minimum depth below which datapoints should be plotted.
+    max_dep :  int
+        Maximum depth above which datapoints should be plotted.
+    window_size : int
+        Size of the rolling window, to find local extrema within. The optimal size is dependent on the number of measurements per up or down cast. The default is 1000.
+    vent_loc : tuple, optional
+        Longitude and latitude of a point of interest, plotted as a red star. Default is 'None"'
+    bathy : tuple, optional
+        Tuple of longitude, latitude and elevation of bathymetry data. The default is 'None'.
 
-data = data[(data['DEPTH']<min_dep) & data['DEPTH']<max_dep]
+    Returns
+    -------
+    None.
 
-fig, ax = plt.subplots(figsize=(8,6))
+    """
+    from hyvent.misc import get_var
+    from hyvent.misc import add_castno
+    import numpy as np
 
-#plot bathymetry
-if bathy != 'None':
-    contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40, colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-    ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
+    label, color, cmap = get_var(var)
 
-#plot vent
-if vent_loc != 'None':
-    ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
+    data = add_castno(data, window_size)
+    data = data[(data['DEPTH']<min_dep) & data['DEPTH']<max_dep]
 
-# initialize an empty DataFrame to collect values
-data_binned = pd.DataFrame(columns=['Station','lon', 'lat', 'var_max'])
+    fig, ax = plt.subplots(figsize=(8,6))
 
-# loop through the list of dataframes
-cast_list = [d for _, d in data.groupby(['Cast','Station'])]
-for i, cast in enumerate(cast_list):
-    # get the values from the current dataframe
-    station = cast['Station'].iloc[0]
-    lon = cast['CTD_lon'].mean()
-    lat = cast['CTD_lat'].mean()
-    if np.isnan(lat) == True:
-        lat = cast['Dship_lat'].mean()
-    if np.isnan(lon) == True:
-        lon = cast['Dship_lon'].mean()
-    var_max = cast['Delta_'+var].max()
+    #plot bathymetry
+    if bathy != 'None':
+        contourlines = ax.contour(bathy[0],bathy[1],-bathy[2],levels=40, colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
+        ax.clabel(contourlines, inline=True, fontsize=6, fmt='%d', colors = 'black')
 
-    # add the values to the DataFrame
-    data_binned.loc[i] = [station, lon, lat, var_max]
+    #plot vent
+    if vent_loc != 'None':
+        ax.scatter(vent_loc[0],vent_loc[1],color='red',marker='*',s=100,label='Aurora Vent Site')
 
-var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'])
+    # initialize an empty DataFrame to collect values
+    data_binned = pd.DataFrame(columns=['Station','lon', 'lat', 'var_max'])
 
-fig.colorbar(var_plot,label=label)
+    # loop through the list of dataframes
+    cast_list = [d for _, d in data.groupby(['Cast','Station'])]
+    for i, cast in enumerate(cast_list):
+        # get the values from the current dataframe
+        station = cast['Station'].iloc[0]
+        lon = cast['CTD_lon'].mean()
+        lat = cast['CTD_lat'].mean()
+        if np.isnan(lat) == True:
+            lat = cast['Dship_lat'].mean()
+        if np.isnan(lon) == True:
+            lon = cast['Dship_lon'].mean()
+        var_max = cast['Delta_'+var].max()
 
-plt.show()
+        # add the values to the DataFrame
+        data_binned.loc[i] = [station, lon, lat, var_max]
 
-#this is working, but there are some casts with only nans
+    var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2])
+
+    fig.colorbar(var_plot,label=label)
+    #change colorbar ticks settings at some point?
+
+    plt.show()
+
+plot_2Dpercast(mapr_delta_turb, 'Neph_smoo(volts)', 2000, 4600, window_size=700, bathy=bathy, vent_loc=vent_loc)
+
 
 #%%
 
