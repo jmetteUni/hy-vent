@@ -200,14 +200,14 @@ def sep_casts(data, window_size=1000):
 
     #for mapr: sort by datetime and reindex.
     # would be also good for ctd data, needs testing
-    if 'datetime' in data.columns:
-        if data['datetime'].isna().any() == True:
-            nan_rows = len(data[data['datetime'].isna()==True])
-            print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
-            data = data[data['datetime'].isna()==False]
+    # if 'datetime' in data.columns:
+    #     if data['datetime'].isna().any() == True:
+    #         nan_rows = len(data[data['datetime'].isna()==True])
+    #         print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
+    #         data = data[data['datetime'].isna()==False]
 
-        data = data.sort_values(by='datetime')
-        data = data.reset_index(drop = True)
+    #     data = data.sort_values(by='datetime')
+    #     data = data.reset_index(drop = True)
 
     try:
         local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
@@ -450,7 +450,7 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order=10):
     from hyvent.processing import sep_casts
 
     #get first downcast of background
-    bg = sep_casts(bg, window_size=5000)
+    bg = sep_casts(bg[['DEPTH',var]], window_size=5000)
     if len(bg) > 2:
         print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
     bg = bg[0]
@@ -569,7 +569,8 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
     data['datetime'] = pd.to_datetime(data['datetime'])
     dep_vec = data[['DEPTH']]
     dep_vec = dep_vec[(dep_vec['DEPTH']>=min_dep) & (dep_vec['DEPTH']<=max_dep)]
-    dep_vec = sep_casts(dep_vec)[0]
+    #dep_vec = sep_casts(dep_vec)[0]
+    dep_vec = dep_vec.sort_values(by='DEPTH')
 
 
 
