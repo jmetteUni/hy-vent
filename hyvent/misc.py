@@ -100,7 +100,10 @@ def add_castno(data, window_size=1000):
         for data in data_list:
             cast_no = 1
             casts_list = sep_casts(data, window_size)
+            # import matplotlib.pyplot as plt   #used for controlling number of casts
+            # plt.figure()
             for cast in casts_list:
+                # plt.plot(cast['DEPTH'])
                 cast['Cast'] = cast_no
                 cast_no = cast_no +1
             casts.append(pd.concat(casts_list))
