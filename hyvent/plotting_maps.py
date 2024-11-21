@@ -457,7 +457,7 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
     label, color, cmap = get_var(var)
 
     data = add_castno(data, window_size)
-    data = data[(data['DEPTH']<min_dep) & data['DEPTH']<max_dep]
+    data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
     fig, ax = plt.subplots(figsize=(8,6))
 
@@ -484,7 +484,10 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
             lat = cast['Dship_lat'].mean()
         if np.isnan(lon) == True:
             lon = cast['Dship_lon'].mean()
-        var_max = cast[var].max()
+        if var == 'dORP':
+            var_max = cast[var].min()
+        else:
+            var_max = cast[var].max()
 
         # add the values to the DataFrame
         data_binned.loc[i] = [station, lon, lat, var_max]
