@@ -98,3 +98,13 @@ profile_mapr = profile_mapr[profile_mapr['Station'].isin(aurora_stations)]
 
 #%%
 
+for i in data_list:
+    print(i['Station'].unique())
+    print(i['SN'].unique())
+    print('   ')
+
+
+data_list = [d for _, d in data.groupby(['Station','SN'])]
+for i in data_list:
+    import matplotlib.pyplot as plt
+    plt.plot(i['DEPTH'])
