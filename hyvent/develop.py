@@ -82,6 +82,65 @@ btl_data = btl_data[btl_data['Station'].isin(aurora_stations)]
 mapr_data = mapr_data[mapr_data['Station'].isin(aurora_stations)]
 profile_mapr = profile_mapr[profile_mapr['Station'].isin(aurora_stations)]
 
+#%% calc deltas for profile
+min_dep = 2000
+max_dep = 4600
+
+control_plot =False
+
+var = 'potemperature'
+data_list = [d for _, d in profile_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+profile_delta_potemperature = pd.concat(data_list)
+
+var = 'Sigma3'
+data_list = [d for _, d in profile_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+profile_delta_sigma3 = pd.concat(data_list)
+
+var = 'PSAL'
+data_list = [d for _, d in profile_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+profile_delta_psal = pd.concat(data_list)
+
+var = 'delta3He'
+data_list = [d for _, d in btl_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_helium_delta(station, btl_background, var, 990, max_dep,control_plot=control_plot)
+btl_delta_he = pd.concat(data_list)
+
+#cal deltas for mapr
+var = 'potemperature'
+data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, mapr_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+mapr_delta_potemperature = pd.concat(data_list)
+mapr_delta_potemperature = mapr_delta_potemperature[(mapr_delta_potemperature['SN']=='74') | (mapr_delta_potemperature['SN']=='72')]
+
+var = 'Sigma3'
+data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_by_bgfit(station, mapr_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+mapr_delta_sigma3 = pd.concat(data_list)
+mapr_delta_sigma3 = mapr_delta_sigma3[(mapr_delta_sigma3['SN']=='74') | (mapr_delta_sigma3['SN']=='72')]
+
+
+# var = 'Neph_outl(volts)'
+# data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+# for i, station in enumerate(data_list):
+#     data_list[i] = calc_delta_by_bgfit(station, mapr_background, var, min_dep, max_dep, fit='poly', param=(10),control_plot=control_plot)
+# mapr_delta_turb = pd.concat(data_list)
+
+#Turb deltas by steation mean for a smaller range
+var = 'Neph_smoo(volts)'
+data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_turb_delta(station, var, (2000,3000), (3500,4500))
+mapr_delta_turb = pd.concat(data_list)
+
 
 #%% histogramms & 2D plots & sections
 # plot_hist_he(btl_data, lower_depth=3700, upper_depth=3000, bins=30)
@@ -96,15 +155,33 @@ profile_mapr = profile_mapr[profile_mapr['Station'].isin(aurora_stations)]
 # plot_section(profile_mapr[profile_mapr['Station']=='028_01'], '', 'CTD_lat', 'density', 'dORP', 2400, 20)
 
 
-#%%
+#%% crosssection
 
-for i in data_list:
-    print(i['Station'].unique())
-    print(i['SN'].unique())
-    print('   ')
+data = mapr_delta_turb
+var = 'Delta_Neph_smoo(volts)'
+min_dep = 2500
+x = 'CTD_lat'
+
+data = data[data['Station']=='028_01']
+data = add_castno(data)
+data = data[data['DEPTH']>min_dep]
+
+# data_list = [d for _, d in data.groupby(['Cast'])]
+
+# for i, cast in enumerate(data_list):
+#     cast['Lat_mean'] = cast['CTD_lat'].mean()
+#     data_list[i] = cast
+
+# data = pd.concat(data_list)
+data = data.dropna(subset=[x,'DEPTH',var])
+
+fig, ax = plt.subplots()
+fig.set_tight_layout(True)
 
 
-data_list = [d for _, d in data.groupby(['Station','SN'])]
-for i in data_list:
-    import matplotlib.pyplot as plt
-    plt.plot(i['DEPTH'])
+contourf = ax.tricontourf(data[x], data['DEPTH'], data[var], levels=50)
+
+ax.invert_yaxis()
+plt.colorbar(contourf)  # r'$\Delta \theta$'
+
+
