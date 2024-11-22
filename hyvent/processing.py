@@ -200,15 +200,16 @@ def sep_casts(data, window_size=1000):
 
     #for mapr: sort by datetime and reindex.
     #would be also good for ctd data, needs testing
-    if  data['Operation'].iloc[0] == 'CTD':          # this is a lazy and bad check for MAPR data, needs improvement and testing
-        if 'datetime' in data.columns:
-            if data['datetime'].isna().any() == True:
-                nan_rows = len(data[data['datetime'].isna()==True])
-                print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
-                data = data[data['datetime'].isna()==False]
+    if 'Operation' in data.columns:
+        if 'CTD' in data['Operation']:          # this is a lazy and bad check for MAPR data, needs improvement and testing
+            if 'datetime' in data.columns:
+                if data['datetime'].isna().any() == True:
+                    nan_rows = len(data[data['datetime'].isna()==True])
+                    print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
+                    data = data[data['datetime'].isna()==False]
 
-            data = data.sort_values(by='datetime')
-            data = data.reset_index(drop = True)
+                data = data.sort_values(by='datetime')
+                data = data.reset_index(drop = True)
 
     try:
         local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
