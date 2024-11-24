@@ -29,6 +29,7 @@ def read_cnv(path):
     from seabird.cnv import fCNV
     import os
     import datetime as dt
+    import numpy as np
 
     file_list = []                  #get all cnv filenames
     for file in os.listdir(path):
@@ -41,7 +42,11 @@ def read_cnv(path):
         key = file.rstrip('.cnv')
         cnv_data[key] = fCNV(path+file).as_DataFrame()
         cnv_data[key]['basedate'] = dt.datetime(2000,1,1)      #create datetime object column
-        cnv_data[key]['datetime'] = cnv_data[key]['basedate']+pd.to_timedelta(cnv_data[key]['timeQ'],unit='seconds')
+        if cnv_data[key]['timeQ'].isna().any()==True:
+            cnv_data[key]['timeQ_lin'] = cnv_data[key]['timeQ'].interpolate(axis=0)     #interpolates nan values
+        if cnv_data[key]['timeQ'].duplicated().any()==True:
+            cnv_data[key]['timeQ_lin'] = np.linspace(cnv_data[key]['timeQ'].min(), cnv_data[key]['timeQ'].max(),len(cnv_data[key]))     #interpolate to remove double values
+        cnv_data[key]['datetime'] = cnv_data[key]['basedate']+pd.to_timedelta(cnv_data[key]['timeQ_lin'],unit='seconds')
         del cnv_data[key]['basedate']
         print('Read '+file+' sucessfully')
 
