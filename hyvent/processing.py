@@ -449,16 +449,6 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order=10):
     """
     import numpy as np
     import pandas as pd
-    from hyvent.processing import sep_casts
-
-    #get first downcast of background
-    bg = sep_casts(bg[['DEPTH',var]], window_size=5000)
-    if len(bg) > 2:
-        print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
-    bg = bg[0]
-    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
-    bg = bg.sort_values(by='DEPTH')
-    bg = bg[bg[var].notna()]
 
     #calculate the polynomial fit
     coef, res, rank, singular_val, rcond = np.polyfit(bg['DEPTH'],bg[var],fit_order,full=True)
@@ -502,17 +492,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, k=None, s=0.005):
     """
     import pandas as pd
     import numpy as np
-    from hyvent.processing import sep_casts
     from scipy.interpolate import UnivariateSpline
-
-    #get first downcast of background
-    bg = sep_casts(bg, window_size=5000)
-    if len(bg) > 2:
-        print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
-    bg = bg[0]
-    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
-    bg = bg.sort_values(by='DEPTH')
-    bg = bg[bg[var].notna()]
 
     #calculate the univariate spline fit
     fit_func = UnivariateSpline(bg['DEPTH'], bg[var],k=k,s=s)
@@ -574,7 +554,14 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
     #dep_vec = sep_casts(dep_vec)[0]
     dep_vec = dep_vec.sort_values(by='DEPTH')
 
-
+    #get first downcast of background
+    bg = sep_casts(bg, window_size=5000)
+    if len(bg) > 2:
+        print('Warning: Your background station was separated into more than two up or down casts. Check the casts returned by sep_casts and the used window size.')
+    bg = bg[0]
+    bg = bg[(bg['DEPTH']>=min_dep) & (bg['DEPTH']<=max_dep)]
+    bg = bg.sort_values(by='DEPTH')
+    bg = bg[bg[var].notna()]
 
     if fit == 'poly':
         bg_fit = get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, param)
@@ -651,10 +638,13 @@ def calc_delta_stafit(data, var, lim_above, lim_below, fit, param, control_plot=
     above = data[(data['DEPTH']>=lim_above[0]) & (data['DEPTH']<=lim_above[1])]
     below = data[(data['DEPTH']>=lim_below[0]) & (data['DEPTH']<=lim_below[1])]
     data_fit = pd.concat([above,below])
+    data_fit = data_fit.sort_values(by='DEPTH')
+    data_fit = data_fit[data_fit[var].notna()]
 
     if fit == 'poly':
         bg_fit = get_bg_polyfit(data_fit, dep_vec, var, lim_above[1], lim_below[0], param)
     if fit == 'uni':
+
         bg_fit = get_bg_unifit(data_fit, dep_vec, var, lim_above[1], lim_below[0], param[0],param[1])
 
     #data maybe needs droppping DEPTH nan rows?
@@ -677,7 +667,7 @@ def calc_delta_stafit(data, var, lim_above, lim_below, fit, param, control_plot=
         plt.gca().invert_yaxis()
         plt.xlabel(get_var(var)[0])
         plt.ylabel('Depth in m')
-        plt.ylim((above[0],below[0]))
+        plt.ylim((lim_below[1]),lim_above[0])
         #get x limits
         data_cut = data
         data_cut = data_cut[(data_cut['DEPTH']>=lim_above[1]) & (data_cut['DEPTH']<=lim_below[0])]
