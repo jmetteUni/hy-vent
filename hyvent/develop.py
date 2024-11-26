@@ -91,7 +91,7 @@ control_plot =False
 var = 'potemperature'
 data_list = [d for _, d in profile_data.groupby(['Station'])]
 for i, station in enumerate(data_list):
-    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=True)
 profile_delta_potemperature = pd.concat(data_list)
 
 var = 'Sigma3'
@@ -185,5 +185,63 @@ ax.invert_yaxis()
 plt.colorbar(contourf)  # r'$\Delta \theta$'
 
 
-#%% test delta missing stations
+#%%  temp anomaly baker 2004
+
+data = profile_data[profile_data['Station']=='022_01']
+#data = data.sort_values(by='DEPTH')
+# maybe take only first downcast
+lim_above = (1000,2200)
+lim_below = (3200,5000)
+fit_order = 1
+
+import numpy as np
+
+data = sep_casts(data)[0]
+data = data.sort_values(by='DEPTH')
+
+data = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_below[1])]
+
+import matplotlib.pyplot as plt
+plt.scatter(data['potemperature'],data['Sigma3'])
+#plt.scatter(data['potemperature'],data['DEPTH'])
+plt.gca().invert_yaxis()
+
+plt.colorbar()
+plt.scatter(data_fit['Sigma3'],data_fit['potemperature'])
+plt.scatter(below['Sigma3'],below['potemperature'])
+
+above = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_above[1])]
+below = data[(data['DEPTH']>lim_below[0]) & (data['DEPTH']<lim_below[1])]
+
+data_fit = pd.concat([above,below])
+data_fit = data_fit.dropna(subset=['potemperature','Sigma3'])
+
+lin_theta = np.linspace(data_fit['potemperature'].min(),data_fit['potemperature'].max(),data_fit.index.max()-data_fit.index.min())
+
+
+coef, res, rank, singular_val, rcond = np.polyfit(data_fit['potemperature'],data_fit['Sigma3'],fit_order,full=True)
+
+plt.plot(data_fit['Sigma3'],data_fit['potemperature'])
+fit_func = np.poly1d(coef)
+fit = fit_func(lin_theta)
+plt.plot(fit,lin_theta)
+
+data['Bg_potemperature'] = (coef[0]*data['Sigma3']**1+coef[1]*data['Sigma3']**0)
+
+plt.plot(data['Bg_potemperature'],data['DEPTH'])
+plt.plot(data['potemperature'],data['DEPTH'])
+plt.plot(data['potemperature']-data['Bg_potemperature'],data['DEPTH'])
+
+#%%
+
+min_dep = 2000
+max_dep = 4600
+
+control_plot =False
+
+var = 'potemperature'
+data_list = [d for _, d in profile_data.groupby(['Station'])]
+for i, station in enumerate(data_list):
+    data_list[i] = calc_delta_stafit(station, var, (1000,2500), (3500,4600), fit='uni',param=(5,0.005),control_plot=True)
+profile_delta_potemperature = pd.concat(data_list)
 
