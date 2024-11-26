@@ -163,6 +163,7 @@ def derive_CTD(data):
         data['CT'] = gsw.conversions.CT_from_pt(data['SA'], data['potemperature'])
         data['Rho'] = gsw.density.rho(data['SA'],data['CT'],data['PRES'])
         data['Sigma3'] = gsw.density.sigma3(data['SA'],data['CT'])
+        data['Sigma0'] = gsw.density.sigma0(data['SA'],data['CT'])
         #data['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     elif isinstance(data,dict):
@@ -437,7 +438,6 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order=10):
     min_dep : int or float
         Minimum depth for the fit's depth range.
     max_dep : int or float
-        Maximum depth for the fit's depth range.
     fit_order : int or float, optional
         Order of the polynomial fit. The default is 10.
 
@@ -492,7 +492,7 @@ def get_bg_unifit(bg, dep_vec, var, min_dep, max_dep, k=None, s=0.005):
     k : int or float, optional
         Degree of the smoothing spline. The default is None.
     s : int or float, optional
-        Smoothing paramter used to construct the spline function. The default is none.
+        Smoothing paramter used to construct the spline function. The default is 0.005.
 
     Returns
     -------
@@ -612,7 +612,7 @@ def calc_delta_by_bgfit(data, bg, var, min_dep, max_dep, fit, param, control_plo
 
     return data
 
-def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=False):
+def calc_delta_stafit(data, var, lim_above, lim_below, fit, param, control_plot=False):
     """
     [Not working yet] This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable's values in the main dataset. If the variable is "delta3He", that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.
 
@@ -640,31 +640,28 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
         Dataframe similar to the original dataframe with the background fit and the deviation of the variable as additional columns. Values outside the depth range in these columns are NaN.
     """
     import pandas as pd
-    import numpy as np
-
-    # def sigma_func(fit_data, coef):
-    #     for k in coef:
-
 
     #for continous data, the fit based on the background is calculated, merged with the dataset and subtracted
-    fit_data = data[(data['DEPTH']>=min_dep) & (data['DEPTH']<=max_dep)]
+    data['datetime'] = pd.to_datetime(data['datetime'])
+    dep_vec = data[['DEPTH']]
+    dep_vec = dep_vec[(dep_vec['DEPTH']>=lim_above[1]) & (dep_vec['DEPTH']<=lim_below[0])]
+    #dep_vec = sep_casts(dep_vec)[0]
+    dep_vec = dep_vec.sort_values(by='DEPTH')
+
+    above = data[(data['DEPTH']>=lim_above[0]) & (data['DEPTH']<=lim_above[1])]
+    below = data[(data['DEPTH']>=lim_below[0]) & (data['DEPTH']<=lim_below[1])]
+    data_fit = pd.concat([above,below])
 
     if fit == 'poly':
-        #calculate the polynomial fit
-        fit_order = param
-        import matplotlib.pyplot as plt
-        plt.plot(fit_data['Sigma3'],fit_data[var])
-        coef, res, rank, singular_val, rcond = np.polyfit(fit_data['Sigma3'].astype(float),fit_data[var].astype(float),fit_order,full=True)
-        print('Residual Polyfit: '+str(res))
-        #fit_data['Func'] = coeff * fit_data['Sigma3']**
+        bg_fit = get_bg_polyfit(data_fit, dep_vec, var, lim_above[1], lim_below[0], param)
+    if fit == 'uni':
+        bg_fit = get_bg_unifit(data_fit, dep_vec, var, lim_above[1], lim_below[0], param[0],param[1])
 
-        #fit_func = np.poly1d(coef)
-        #fit_data['Fit_'+var] = fit_func(fit_data['Sigma3'])
-        #fit_data = fit_data[['Fit_'+var]]
-
-    data = pd.concat([data,fit_data],axis=1)
-    data['Delta_'+var] = data[var] - data['Fit_'+var]
+    #data maybe needs droppping DEPTH nan rows?
+    data = data.sort_values(by='DEPTH')
+    data = data.reset_index().merge(bg_fit.drop_duplicates(subset='DEPTH'), how='left', on='DEPTH').set_index('index')
     data = data.sort_index()
+    data['Delta_'+var] = data[var] - data['Bgfit_'+var]
 
     #control plot, showing the variable in the dataset, the variable in the background and the calculated fit
     if control_plot == True:
@@ -674,16 +671,17 @@ def calc_delta_stafit(data, var, min_dep, max_dep, fit, param, control_plot=Fals
         plt.figure()
 
         plt.plot(data[var],data['DEPTH'], label=get_var(var)[0])
-        plt.plot(data['Fit_'+var],data['DEPTH'], label='Fit')
+        plt.scatter(data_fit[var],data_fit['DEPTH'], label='Fit data',s=0.1)
+        plt.plot(data['Bgfit_'+var],data['DEPTH'], label='Fit')
 
         plt.gca().invert_yaxis()
         plt.xlabel(get_var(var)[0])
         plt.ylabel('Depth in m')
-        plt.ylim((max_dep,min_dep))
+        plt.ylim((above[0],below[0]))
         #get x limits
-        #data_cut = pd.concat([data,bg])
-        #data_cut = data_cut[(data_cut['DEPTH']>=min_dep) & (data_cut['DEPTH']<=max_dep)]
-        #plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
+        data_cut = data
+        data_cut = data_cut[(data_cut['DEPTH']>=lim_above[1]) & (data_cut['DEPTH']<=lim_below[0])]
+        plt.xlim((data_cut[var].min()-abs(data_cut[var].min()/50),data_cut[var].max()+abs(data_cut[var].max()/50)))
         plt.title(fit+' s/n='+str(param)+'; Station = '+str(data['Station'].iloc[0])+', '+str(data['SN'].iloc[0]))
         plt.legend()
         plt.show()
