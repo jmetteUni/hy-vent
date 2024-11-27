@@ -187,50 +187,90 @@ plt.colorbar(contourf)  # r'$\Delta \theta$'
 
 #%%  temp anomaly baker 2004
 
-data = profile_data[profile_data['Station']=='022_01']
-#data = data.sort_values(by='DEPTH')
-# maybe take only first downcast
-lim_above = (1000,2200)
-lim_below = (3200,5000)
-fit_order = 1
+data = profile_data[profile_data['Station']=='036_01']
+fit_order = 3
 
-import numpy as np
 
-data = sep_casts(data)[0]
-data = data.sort_values(by='DEPTH')
-
-data = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_below[1])]
+data = data[data['DEPTH']>1000]
 
 import matplotlib.pyplot as plt
-plt.scatter(data['potemperature'],data['Sigma3'])
-#plt.scatter(data['potemperature'],data['DEPTH'])
+plt.figure()
+plt.plot(data['potemperature'],data['Sigma0'])
 plt.gca().invert_yaxis()
 
-plt.colorbar()
-plt.scatter(data_fit['Sigma3'],data_fit['potemperature'])
-plt.scatter(below['Sigma3'],below['potemperature'])
+data_fit = data[data['Sigma0']>28.065]
 
-above = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_above[1])]
-below = data[(data['DEPTH']>lim_below[0]) & (data['DEPTH']<lim_below[1])]
+from numpy.polynomial import polynomial as poly
+coef = poly.polyfit(data_fit['potemperature'],data_fit['Sigma0'],fit_order)
+fit = poly.polyval(data_fit['potemperature'],coef)
 
-data_fit = pd.concat([above,below])
-data_fit = data_fit.dropna(subset=['potemperature','Sigma3'])
+plt.figure()
+plt.plot(data_fit['potemperature'],data_fit['Sigma0'])
+plt.plot(data_fit['potemperature'],fit)
+plt.gca().invert_yaxis()
 
-lin_theta = np.linspace(data_fit['potemperature'].min(),data_fit['potemperature'].max(),data_fit.index.max()-data_fit.index.min())
+fit_pt = coef[3]*data_fit['Sigma3']**3+coef[2]*data_fit['Sigma3']**2+coef[1]*data_fit['Sigma3']**1+coef[0]*data_fit['Sigma3']**0
+
+plt.figure()
+plt.plot(data_fit['potemperature'],data_fit['DEPTH'])
+plt.plot(fit_pt,data_fit['DEPTH'])
+plt.gca().invert_yaxis()
 
 
-coef, res, rank, singular_val, rcond = np.polyfit(data_fit['potemperature'],data_fit['Sigma3'],fit_order,full=True)
 
-plt.plot(data_fit['Sigma3'],data_fit['potemperature'])
-fit_func = np.poly1d(coef)
-fit = fit_func(lin_theta)
-plt.plot(fit,lin_theta)
+#%%
 
-data['Bg_potemperature'] = (coef[0]*data['Sigma3']**1+coef[1]*data['Sigma3']**0)
+# data = profile_data[profile_data['Station']=='022_01']
+# #data = data.sort_values(by='DEPTH')
+# # maybe take only first downcast
+# lim_above = (1000,2200)
+# lim_below = (3200,5000)
+# fit_order = 3
 
-plt.plot(data['Bg_potemperature'],data['DEPTH'])
-plt.plot(data['potemperature'],data['DEPTH'])
-plt.plot(data['potemperature']-data['Bg_potemperature'],data['DEPTH'])
+# import numpy as np
+
+# #data = sep_casts(data)[0]
+# #data = data.sort_values(by='DEPTH')
+
+# data = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_below[1])]
+
+# import matplotlib.pyplot as plt
+# plt.scatter(data['potemperature'],data['Sigma3'],s=0.1)
+# #plt.scatter(data['potemperature'],data['DEPTH'])
+# plt.gca().invert_yaxis()
+
+
+# plt.colorbar()
+# plt.scatter(data_fit['Sigma3'],data_fit['potemperature'])
+# plt.scatter(below['Sigma3'],below['potemperature'])
+
+# data_fit = data[(data['Sigma3']>41.93)]
+
+# above = data[(data['DEPTH']>lim_above[0]) & (data['DEPTH']<lim_above[1])]
+# below = data[(data['DEPTH']>lim_below[0]) & (data['DEPTH']<lim_below[1])]
+
+# data_fit = pd.concat([above,below])
+# data_fit = data_fit.dropna(subset=['potemperature','Sigma3'])
+
+# lin_theta = np.linspace(data_fit['potemperature'].min(),data_fit['potemperature'].max(),data_fit.index.max()-data_fit.index.min())
+
+
+# coef, res, rank, singular_val, rcond = np.polyfit(data_fit['potemperature'],data_fit['Sigma3'],fit_order,full=True)
+
+# plt.plot(data_fit['Sigma3'],data_fit['potemperature'])
+# fit_func = np.poly1d(coef)
+# fit = fit_func(lin_theta)
+# fit_hand = coef[0]*lin_theta**3+coef[1]*lin_theta**2+coef[2]*lin_theta**1+coef[3]*lin_theta*0
+# plt.plot(fit,lin_theta)
+# plt.plot(fit_hand,lin_theta)
+
+# data['Bg_potemperature'] = (coef[0]*data['Sigma3']**3+coef[1]*data['Sigma3']**2+coef[2]*data['Sigma3']**1+coef[3]*data['Sigma3']**0)
+
+# plt.plot(data['Bg_potemperature'],data['DEPTH'])
+# #plt.plot(data['potemperature'],data['DEPTH'])
+# plt.gca().invert_yaxis()
+
+# plt.plot(data['potemperature']-data['Bg_potemperature'],data['DEPTH'])
 
 #%%
 
