@@ -272,7 +272,7 @@ plt.gca().invert_yaxis()
 
 # plt.plot(data['potemperature']-data['Bg_potemperature'],data['DEPTH'])
 
-#%%
+#%% test in station fit
 
 min_dep = 2000
 max_dep = 4600
