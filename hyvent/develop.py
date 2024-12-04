@@ -184,118 +184,29 @@ contourf = ax.tricontourf(data[x], data['DEPTH'], data[var], levels=50)
 ax.invert_yaxis()
 plt.colorbar(contourf)  # r'$\Delta \theta$'
 
-
-#%%  temp anomaly baker 2004
-
-def get_fit_cast(data_fit, dens_var, min_dep):
-
-    from hyvent.processing import sep_casts
-    from hyvent.misc import get_var
-    import matplotlib.pyplot as plt
-
-    data_fit = data_fit[data_fit['DEPTH']>min_dep]
-
-    cast_list = sep_casts(data_fit)
-
-    plt.figure()
-    #cycle through colors:
-    cm = plt.get_cmap('tab20')
-    num_col = len(cast_list)
-    plt.gca().set_prop_cycle('color', [cm(1.*i/num_col) for i in range(num_col)])
-
-    #plot all up and down casts, to choose one for the fit
-    for i, cast in enumerate(cast_list):
-        plt.plot(cast[dens_var],cast['potemperature'],label=str(i),marker='.')
-
-        plt.gca().invert_yaxis()
-        plt.ylabel(get_var(dens_var)[0])
-        plt.xlabel(get_var('potemperature')[0])
-        plt.legend()
-        plt.title(data_fit['Station'].iloc[0])
-    plt.show()
-
-
-    # #take input from console for which cast should be used for fitting
-    # plt.pause(0.1)
-    # print('Type the number of the cast that should be used for fitting. Figure will be closed then:')
-    # cast_no = int(input())
-    # plt.close()
-
-    # fit_cast = cast_list[cast_no]
-
-    return(cast_list)
-
-def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_plot=False):
-
-    from hyvent.misc import get_var
-    from numpy.polynomial import polynomial as poly
-    import matplotlib.pyplot as plt
-
-    #interpolate NaNs
-    if fit_cast[dens_var].isna().sum()>0:
-        print('Interpolating '+str(fit_cast[dens_var].isna().sum())+' NaN values...')
-        fit_cast[dens_var] = fit_cast[dens_var].interpolate()
-
-    #do poly fit
-    coef = poly.polyfit(fit_cast[dens_var],fit_cast['potemperature'],fit_order)
-    fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
-
-    if control_plot == True:
-        #plot data and fit
-        plt.figure()
-        plt.plot(fit_cast['potemperature'],fit_cast[dens_var],label='Data')
-        plt.plot(fit_cast['Fit'], fit_cast[dens_var],label='Fit')
-        plt.gca().invert_yaxis()
-        plt.ylabel(get_var(dens_var)[0])
-        plt.xlabel(get_var('potemperature')[0])
-        plt.legend()
-        plt.title(data['Station'].iloc[0])
-        plt.show()
-
-    #merge with dataset
-    fit_cast = fit_cast.sort_values(by='DEPTH')
-    data = data.interpolate().sort_values(by='DEPTH')
-    data = pd.merge_asof(data, fit_cast[['DEPTH','Fit']], on='DEPTH', direction='nearest', tolerance=1)
-    data = data.sort_index()
-
-    if control_plot == True:
-        #plot all data and fit result vs depth
-        plt.figure()
-        plt.plot(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data')
-        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit')
-        plt.gca().invert_yaxis()
-        plt.ylabel(get_var('DEPTH')[0])
-        plt.xlabel(get_var('potemperature')[0])
-        plt.legend()
-        plt.title(data['Station'].iloc[0])
-        plt.show()
-
-    # plt.pause(1)
-    # print('Enter "y" to use this fit and continue:')
-
-    # plt.close('all')
-
-    data['Delta_potemperature'] = data['potemperature'] - data['Fit']
-    del data['Fit']
-
-    return data
-
-
-
 #%% test in dens fit
 
 min_dep = 2500
+dens_var = 'Sigma3'
+control_plot = False
 
-control_plot =True
-
+fit_cast_no = {'022_01':0,'026_01':0,'028_01':0,'033_01':18,'036_01':11,'041_01':1,'054_01':0,'055_01':1}
 data_list = [d for _, d in profile_data.groupby(['Station'])]
-i=7
-cast_list = get_fit_cast(data_list[i], 'Sigma0', 2500)
-fit_cast = cast_list[1]
+for i, station in enumerate(data_list):
+    station_name = station['Station'].iloc[0]
+    fit_cast = get_fit_cast(station, dens_var, min_dep)[fit_cast_no[station_name]]
+    data_list[i] = calc_delta_densfit(station, dens_var, min_dep, fit_cast, fit_order=3, control_plot=control_plot)
+profile_delta_potemperature = pd.concat(data_list)
+
+cutoff_depth = min_dep
+
+depth_plot(profile_delta_potemperature, 'Delta_potemperature', 'DEPTH', cutoff_depth)
+
+
+#%%
 calc_delta_densfit(data_list[i], 'Sigma3', 2500, fit_cast, fit_order=3, control_plot=True)
 #profile_delta_potemperature = pd.concat(data_list)
 
 
-#### ToDO
-#note down cast number for every station
-#check polyfit error
+#%%### ToDO
+
