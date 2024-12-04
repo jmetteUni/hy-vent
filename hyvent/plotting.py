@@ -425,7 +425,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
             plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
             #plt.plot(station[xvar],station[yvar],linewidth=1,label=station['SN'].iloc[0])  #plot every station, SN in different color
 
-            plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])   #plotting station and SN for debugging
+            #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])   #plotting station and SN for debugging
         if isinstance(background,pd.DataFrame):
             for device in bg_list:
                 plt.plot(device[xvar],device[yvar],color='black',linewidth=1)
