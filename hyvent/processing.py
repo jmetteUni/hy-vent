@@ -201,16 +201,22 @@ def sep_casts(data, window_size=1000):
 
     #for mapr: sort by datetime and reindex.
     #would be also good for ctd data, needs testing
-    if 'Operation' in data.columns:
-        if 'CTD' in data['Operation']:          # this is a lazy and bad check for MAPR data, needs improvement and testing
-            if 'datetime' in data.columns:
-                if data['datetime'].isna().any() == True:
-                    nan_rows = len(data[data['datetime'].isna()==True])
-                    print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
-                    data = data[data['datetime'].isna()==False]
+    # if 'Operation' in data.columns:
+    #     if 'CTD' in data['Operation']:          # this is a lazy and bad check for MAPR data, needs improvement and testing
+    #         if 'datetime' in data.columns:
+    #             if data['datetime'].isna().any() == True:
+    #                 nan_rows = len(data[data['datetime'].isna()==True])
+    #                 print('Warning: Dataset contains '+str(nan_rows)+' rows without datetime. These are removed.')
+    #                 data = data[data['datetime'].isna()==False]
 
-                data = data.sort_values(by='datetime')
-                data = data.reset_index(drop = True)
+    #             data = data.sort_values(by='datetime')
+    #         data = data.reset_index(drop = True)
+    if 'datetime' in data.columns:
+        if data['datetime'].isna().any() == True:
+            print('Warning: NaN values in datetime. Remove this prior for correct cast separation!')
+
+    data = data.sort_values(by='datetime')
+    data = data.reset_index(drop = True)
 
     try:
         local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
@@ -871,7 +877,7 @@ def calc_flux(zmax, depth_vent, ref_station, const=None):
 
     return heat_flux, Nsquared
 
-def get_fit_cast(data_fit, dens_var, min_dep, control_plot=False):
+def get_fit_cast(data_fit, dens_var, min_dep, window_size, control_plot=False):
     """
     This function returns a list of all up- and down cast
 
@@ -896,9 +902,11 @@ def get_fit_cast(data_fit, dens_var, min_dep, control_plot=False):
     from hyvent.misc import get_var
     import matplotlib.pyplot as plt
 
-    data_fit = data_fit[data_fit['DEPTH']>min_dep]
+    cast_list = sep_casts(data_fit, window_size=window_size)
 
-    cast_list = sep_casts(data_fit)
+    for i, cast in enumerate(cast_list):
+        cast_list[i] = cast[cast['DEPTH']>min_dep]
+
     #remove stationary part in station 028_01
     if data_fit['Station'].iloc[0] == '028_01':
         cast_list = cast_list[:8] + cast_list[17:]
@@ -921,7 +929,7 @@ def get_fit_cast(data_fit, dens_var, min_dep, control_plot=False):
             plt.ylabel(get_var(dens_var)[0])
             plt.xlabel(get_var('potemperature')[0])
             plt.legend()
-            plt.title(data_fit['Station'].iloc[0])
+            plt.title(data_fit['Station'].iloc[0]+'; '+data_fit['SN'].iloc[0])
         plt.show()
 
 
@@ -950,7 +958,7 @@ def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_p
 
     #for station 028_01 all cast have a anomaly, therfore cut this part and only fit the rest
     if fit_cast['Station'].iloc[0]=='028_01':
-        fit_cast_part = fit_cast[(fit_cast[dens_var] < 41.98279) | (fit_cast[dens_var] > 41.98494)]
+        fit_cast_part = fit_cast[(fit_cast[dens_var] < 41.98279)]
         coef = poly.polyfit(fit_cast_part[dens_var],fit_cast_part['potemperature'],fit_order)
         fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
 
@@ -968,7 +976,7 @@ def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_p
         plt.ylabel(get_var(dens_var)[0])
         plt.xlabel(get_var('potemperature')[0])
         plt.legend()
-        plt.title(data['Station'].iloc[0])
+        plt.title(fit_cast['Station'].iloc[0]+'; '+fit_cast['SN'].iloc[0])
         plt.show()
 
     #merge with dataset
@@ -987,7 +995,7 @@ def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_p
         plt.ylabel(get_var('DEPTH')[0])
         plt.xlabel(get_var('potemperature')[0])
         plt.legend()
-        plt.title(data['Station'].iloc[0])
+        plt.title(data['Station'].iloc[0]+'; '+data['SN'].iloc[0])
         plt.show()
 
     # plt.pause(1)
