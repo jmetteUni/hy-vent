@@ -184,21 +184,4 @@ contourf = ax.tricontourf(data[x], data['DEPTH'], data[var], levels=50)
 ax.invert_yaxis()
 plt.colorbar(contourf)  # r'$\Delta \theta$'
 
-#%% test in dens fit for mapr
-
-dens_var = 'Sigma3'
-fit_cast_no = {'022_01':0,'026_01':0,'028_01':0,'033_01':18,'036_01':11,'041_01':1,'054_01':0,'055_01':1}
-data_list = [d for _, d in mapr_data.groupby(['Station','SN'])]
-for i, station in enumerate(data_list):
-    station_name = station['Station'].iloc[0]
-    fit_cast = get_fit_cast(station, dens_var, min_dep)[fit_cast_no[station_name]]
-    data_list[i] = calc_delta_densfit(station, dens_var, 2500, fit_cast, fit_order=3, control_plot=control_plot)
-profile_delta_potemperature = pd.concat(data_list)
-
-#%%
-calc_delta_densfit(data_list[i], 'Sigma3', 2500, fit_cast, fit_order=3, control_plot=True)
-#profile_delta_potemperature = pd.concat(data_list)
-
-
-#%%### ToDO
 
