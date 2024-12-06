@@ -943,7 +943,7 @@ def get_fit_cast(data_fit, dens_var, min_dep, window_size, control_plot=False):
 
     return(cast_list)
 
-def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_plot=False):
+def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3, control_plot=False):
 
     from hyvent.misc import get_var
     from numpy.polynomial import polynomial as poly
@@ -957,15 +957,14 @@ def calc_delta_densfit(data, dens_var, min_dep, fit_cast, fit_order=3, control_p
         fit_cast = fit_cast.dropna(subset=[dens_var])
 
     #for station 028_01 all cast have a anomaly, therfore cut this part and only fit the rest
-    if fit_cast['Station'].iloc[0]=='028_01':
-        fit_cast_part = fit_cast[(fit_cast[dens_var] < 41.98279)]
-        coef = poly.polyfit(fit_cast_part[dens_var],fit_cast_part['potemperature'],fit_order)
-        fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
+    fit_cast_part = fit_cast[(fit_cast[dens_var] < dens_cut)]
+    coef = poly.polyfit(fit_cast_part[dens_var],fit_cast_part['potemperature'],fit_order)
+    fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
 
-    else:
-        #do poly fit
-        coef = poly.polyfit(fit_cast[dens_var],fit_cast['potemperature'],fit_order)
-        fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
+    # else:
+    #     #do poly fit
+    #     coef = poly.polyfit(fit_cast[dens_var],fit_cast['potemperature'],fit_order)
+    #     fit_cast['Fit'] = poly.polyval(fit_cast[dens_var],coef)
 
     if control_plot == True:
         #plot data and fit
