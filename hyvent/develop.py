@@ -91,7 +91,7 @@ control_plot =False
 var = 'potemperature'
 data_list = [d for _, d in profile_data.groupby(['Station'])]
 for i, station in enumerate(data_list):
-    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=True)
+    data_list[i] = calc_delta_by_bgfit(station, profile_background, var, min_dep, max_dep, fit='poly',param=(10),control_plot=control_plot)
 profile_delta_potemperature = pd.concat(data_list)
 
 var = 'Sigma3'
@@ -183,5 +183,3 @@ contourf = ax.tricontourf(data[x], data['DEPTH'], data[var], levels=50)
 
 ax.invert_yaxis()
 plt.colorbar(contourf)  # r'$\Delta \theta$'
-
-
