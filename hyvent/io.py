@@ -141,7 +141,7 @@ def read_from_csv(csv_path,datatype):        #reads in stations in individual cs
         print('Read '+file+' sucessfully')
 
     for key in cnv_data:
-        cnv_data[key]['datetime'] = pd.to_datetime(cnv_data[key]['datetime'])
+        cnv_data[key]['datetime'] = pd.to_datetime(cnv_data[key]['datetime'], format='mixed')
 
     return cnv_data
 
