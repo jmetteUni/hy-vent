@@ -43,10 +43,11 @@ def read_cnv(path):
         cnv_data[key] = fCNV(path+file).as_DataFrame()
         cnv_data[key]['basedate'] = dt.datetime(2000,1,1)      #create datetime object column
         if cnv_data[key]['timeQ'].isna().any()==True:
-            cnv_data[key]['timeQ_lin'] = cnv_data[key]['timeQ'].interpolate(axis=0)     #interpolates nan values
-        if cnv_data[key]['timeQ'].duplicated().any()==True:
-            cnv_data[key]['timeQ_lin'] = np.linspace(cnv_data[key]['timeQ'].min(), cnv_data[key]['timeQ'].max(),len(cnv_data[key]))     #interpolate to remove double values
-        cnv_data[key]['datetime'] = cnv_data[key]['basedate']+pd.to_timedelta(cnv_data[key]['timeQ_lin'],unit='seconds')
+            cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(axis=0)     #interpolates nan values
+            if cnv_data[key]['timeQ'].duplicated().any()==True:
+                cnv_data[key] = cnv_data[key].groupby('timeQ').mean().reset_index() #average rows with the same timestamp, NaNs already filled
+
+        cnv_data[key]['datetime'] = cnv_data[key]['basedate']+pd.to_timedelta(cnv_data[key]['timeQ'],unit='seconds')
         del cnv_data[key]['basedate']
         print('Read '+file+' sucessfully')
 
