@@ -492,7 +492,17 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
         # add the values to the DataFrame
         data_binned.loc[i] = [station, lon, lat, var_max]
 
-    var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2],edgecolors='black',linewidth=0.3)
+    if var == 'Delta_potemperature':
+        var_min = 0
+        var_max = 0.0138
+    elif var == 'dORP':
+        var_min = -0.135
+        var_max = 0
+    else:
+        var_min = data_binned['var_max'].min()
+        var_max = data_binned['var_max'].max()
+
+    var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2],edgecolors='black',linewidth=0.3, vmin=var_min, vmax=var_max)
 
     fig.colorbar(var_plot,label=label)
     #change colorbar ticks settings at some point?
