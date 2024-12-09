@@ -969,8 +969,8 @@ def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3,
     if control_plot == True:
         #plot data and fit
         plt.figure()
-        plt.plot(fit_cast['potemperature'],fit_cast[dens_var],label='Data')
-        plt.plot(fit_cast['Fit'], fit_cast[dens_var],label='Fit')
+        plt.scatter(fit_cast['potemperature'],fit_cast[dens_var],label='Data',s=0.5,color='blue')
+        plt.plot(fit_cast['Fit'], fit_cast[dens_var],label='Fit',color='orange')
         plt.gca().invert_yaxis()
         plt.ylabel(get_var(dens_var)[0])
         plt.xlabel(get_var('potemperature')[0])
@@ -988,8 +988,8 @@ def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3,
     if control_plot == True:
         #plot all data and fit result vs depth
         plt.figure()
-        plt.plot(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data')
-        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit')
+        plt.scatter(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data',s=0.5,color='blue')
+        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit',color='orange')
         plt.gca().invert_yaxis()
         plt.ylabel(get_var('DEPTH')[0])
         plt.xlabel(get_var('potemperature')[0])
