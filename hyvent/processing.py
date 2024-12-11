@@ -930,6 +930,7 @@ def get_fit_cast(data_fit, dens_var, min_dep, window_size, control_plot=False):
             plt.xlabel(get_var('potemperature')[0])
             plt.legend()
             plt.title(data_fit['Station'].iloc[0]+'; '+data_fit['SN'].iloc[0])
+        plt.tight_layout()
         plt.show()
 
 
@@ -969,13 +970,14 @@ def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3,
     if control_plot == True:
         #plot data and fit
         plt.figure()
-        plt.scatter(fit_cast['potemperature'],fit_cast[dens_var],label='Data',s=0.5,color='blue')
-        plt.plot(fit_cast['Fit'], fit_cast[dens_var],label='Fit',color='orange')
+        plt.scatter(fit_cast['potemperature'],fit_cast[dens_var],label='Data',s=0.5,color=get_var('potemperature')[1])
+        plt.plot(fit_cast['Fit'], fit_cast[dens_var],label='Fit',color='black')
         plt.gca().invert_yaxis()
         plt.ylabel(get_var(dens_var)[0])
         plt.xlabel(get_var('potemperature')[0])
         plt.legend()
         plt.title(fit_cast['Station'].iloc[0]+'; '+fit_cast['SN'].iloc[0])
+        plt.tight_layout()
         plt.show()
 
     #merge with dataset
@@ -988,13 +990,15 @@ def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3,
     if control_plot == True:
         #plot all data and fit result vs depth
         plt.figure()
-        plt.scatter(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data',s=0.5,color='blue')
-        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit',color='orange')
+        plt.tight_layout()
+        plt.scatter(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data',s=0.5,color = get_var('potemperature')[1])
+        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit',color='black')
         plt.gca().invert_yaxis()
         plt.ylabel(get_var('DEPTH')[0])
         plt.xlabel(get_var('potemperature')[0])
         plt.legend()
         plt.title(data['Station'].iloc[0]+'; '+data['SN'].iloc[0])
+        plt.tight_layout()
         plt.show()
 
     # plt.pause(1)
