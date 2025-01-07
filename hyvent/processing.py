@@ -992,7 +992,7 @@ def calc_delta_densfit(data, dens_var, dens_cut, min_dep, fit_cast, fit_order=3,
         plt.figure()
         plt.tight_layout()
         plt.scatter(data['potemperature'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Data',s=0.5,color = get_var('potemperature')[1])
-        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit',color='black')
+        plt.plot(data['Fit'][data['DEPTH']>min_dep],data['DEPTH'][data['DEPTH']>min_dep],label='Fit evaluation',color='black')
         plt.gca().invert_yaxis()
         plt.ylabel(get_var('DEPTH')[0])
         plt.xlabel(get_var('potemperature')[0])
