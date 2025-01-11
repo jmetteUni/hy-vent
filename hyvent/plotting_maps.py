@@ -417,6 +417,8 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     # ax.set_xlim(lon_limits)
     # ax.set_ylim(lat_limits)
     #plt.gca().set_aspect(5)
+    plt.xlabel('Longitude')
+    plt.ylabel('Longitude')
     plt.tight_layout()
 
     if path_save != 'None':
@@ -506,6 +508,8 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
 
     var_plot = plt.scatter(data_binned['lon'], data_binned['lat'], c=data_binned['var_max'], cmap = get_var(var)[2],edgecolors='black',linewidth=0.3, vmin=var_min, vmax=var_max)
 
+    plt.xlabel('Longitude')
+    plt.ylabel('Latitude')
     fig.colorbar(var_plot,label=label)
     #change colorbar ticks settings at some point?
     plt.tight_layout()
