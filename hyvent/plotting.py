@@ -44,7 +44,7 @@ def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
     plt.xlabel('Delta 3He in %')
     plt.ylabel('Number of samples')
     plt.legend()
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -90,7 +90,7 @@ def plot_hist_dorp(data,depth_max,depth_min,bins,ranges,path_save='None'):
     plt.xlabel('dORP')
     plt.ylabel('Number of samples')
     plt.legend()
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -155,7 +155,7 @@ def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
     plt.colorbar(contourf,label=zvar)
     plt.xlabel(xvar)
     plt.ylabel(yvar)
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -222,7 +222,7 @@ def plot3Ddistr(profile_data,key,var,bathy,vent_loc,path_save='None'):
     ax.yaxis.labelpad=10
     ax.zaxis.labelpad=10
     ax.view_init(8, -173)
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -293,7 +293,7 @@ def plot2D_station(profile_data,key,var,vent_loc,depth_min,depth_max,bathy=False
     fig.colorbar(var_plot, label=var)
     ax.set_ylabel('Latitude')
     ax.set_xlabel('Longitude')
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -364,7 +364,7 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
     fig.colorbar(var_plot, label=var)
     ax.set_ylabel('Latitude')
     ax.set_xlabel('Longitude')
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -440,7 +440,7 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     #plt.legend()
 
     #plt.locator_params(axis='x', nbins=8)
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -517,10 +517,9 @@ def time_plot(data,station,depth_min,path_save='None'):
 
     ax.set_xlabel('Time')
     #plt.legend(handles=[press,neph,temp,orp,trans],loc='lower right')
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
-
     plt.show()
 
 def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
@@ -582,6 +581,7 @@ def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
     plt.xlabel(get_var('potemperature')[0])
     plt.ylabel(get_var('PSAL')[0])
 
+    plt.tight_layout()
     plt.show()
 
 

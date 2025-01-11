@@ -220,7 +220,7 @@ def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'
     plt.xlabel('Longitude')
     plt.legend(loc='lower left')
     #plt.title('Aurora Vent Site')
-
+    plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
 
@@ -256,6 +256,7 @@ def plot_track(profile_data, btl_data, vent_loc='None', bathy='None'):
         ax.text(lon.iloc[0]+0.007,lat.iloc[0]+0.00005,profile['Station'].iloc[0][1:-3],fontsize='small')
         ax.scatter(lon.iloc[-1],lat.iloc[-1],marker='^',color='black')
 
+    plt.tight_layout()
     plt.show()
 
 def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='None',path_save='None'):
@@ -416,6 +417,7 @@ def plot_var_in_2D(data,var,min_dep,max_dep,nth_point,vent_loc='None',bathy='Non
     # ax.set_xlim(lon_limits)
     # ax.set_ylim(lat_limits)
     #plt.gca().set_aspect(5)
+    plt.tight_layout()
 
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
@@ -506,6 +508,7 @@ def plot_2Dpercast(data, var, min_dep, max_dep, window_size=1000, bathy='None', 
 
     fig.colorbar(var_plot,label=label)
     #change colorbar ticks settings at some point?
+    plt.tight_layout()
 
     plt.show()
 
