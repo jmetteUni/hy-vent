@@ -229,6 +229,10 @@ def get_var(var):
         label = '$\Delta$ $\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
+    elif var == 'Dist_vent':
+        color = 'black'
+        label = 'Distance to vent in m'
+        cmap = 'None'
 
     else:
         print('Properties for variable '+var+' not defined yet.')
