@@ -600,9 +600,14 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
         contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
         plt.clabel(contours, inline=True, fontsize=10)
 
+        #iterate markers
+        # import itertools
+        # marker = itertools.cycle((',', '+', '.', '*','v','^','<','>'))
+        # put this in plt.scatter(): marker = next(marker), linestyle='',
+
         for dataset in data:
             # create the T-S Diagram
-            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=1, label=dataset['Station'].iloc[0])
+            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=5, label=dataset['Station'].iloc[0])
 
         plt.legend(markerscale=5)
 
