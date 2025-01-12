@@ -550,32 +550,60 @@ def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
     import numpy as np
     import gsw
     from hyvent.misc import get_var
-
-    data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
-
-    # create a grid of temperatures and salinities
-    pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
-    psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
-    pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+    import pandas as pd
 
     # calculate the density values for the grid
     def calculate_density(pt_grid, psal_grid, p, lon, lat):
-        # this is a simple example calculation, you can replace it with your own formula
         SA = gsw.conversions.SA_from_SP(psal_grid, p, lon, lat)
         CT = gsw.conversions.CT_from_pt(SA, pt_grid)
         return gsw.density.sigma3(SA, CT)
 
-    density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+    #for one dataframe
+    if isinstance(data, pd.DataFrame):
 
-    plt.figure(figsize=(8, 6))
-    # add constant density lines
-    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
-    plt.clabel(contours, inline=True, fontsize=10)
+        data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
-    # create the T-S Diagram
-    plt.scatter(data['PSAL'], data['potemperature'], c=data['DEPTH'], cmap='viridis_r',s=1)
-    cbar = plt.colorbar()
-    cbar.set_label(get_var('DEPTH')[0])
+        # create a grid of temperatures and salinities
+        pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
+        psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
+        pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+
+        density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+
+        #plt.figure(figsize=(8, 6))
+        # add constant density lines
+        contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+        plt.clabel(contours, inline=True, fontsize=10)
+
+        # create the T-S Diagram
+        plt.scatter(data['PSAL'], data['potemperature'], c=data['DEPTH'], cmap='viridis_r',s=1)
+
+        cbar = plt.colorbar()
+        cbar.set_label(get_var('DEPTH')[0])
+
+    #for a list of dataframes
+    if isinstance(data, list):
+
+        for i, dataset in enumerate(data):
+            data[i] = dataset[(dataset['DEPTH']>min_dep) & (dataset['DEPTH']<max_dep)]
+
+        data_all = pd.concat(data)
+
+        # create a grid of temperatures and salinities
+        pt_grid = np.linspace(data_all['potemperature'].min()-0.01, data_all['potemperature'].max()+0.01, 100)
+        psal_grid = np.linspace(data_all['PSAL'].min()-0.001, data_all['PSAL'].max()+0.001, 100)
+        pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+
+        density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+
+        contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+        plt.clabel(contours, inline=True, fontsize=10)
+
+        for dataset in data:
+            # create the T-S Diagram
+            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=1, label=dataset['Station'].iloc[0])
+
+        plt.legend(markerscale=5)
 
     #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
     plt.ylabel(get_var('potemperature')[0])
