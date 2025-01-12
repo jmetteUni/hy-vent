@@ -359,7 +359,6 @@ def plot2D_all_stations_btl(btl_data,var,vent_loc,depth_min,depth_max,bathy=Fals
 
     vent = ax.scatter(vent_loc[0],vent_loc[1], marker='*', color='r', s=100)
 
-
     ax.set_title(label_title)
     fig.colorbar(var_plot, label=var)
     ax.set_ylabel('Latitude')
@@ -522,7 +521,7 @@ def time_plot(data,station,depth_min,path_save='None'):
         plt.savefig(path_save, dpi=300)
     plt.show()
 
-def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
+def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     """
     This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
 
@@ -530,6 +529,8 @@ def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
     ----------
     data : pandas dataframe
         Dataframe with CTD data containing the potential temperature and practical salinity.
+    c_var : string
+        Variable which should be used as third dimension with colorbar.
     min_dep : int
         Minimal depth of the samples used.
     max_dep : int
@@ -576,10 +577,10 @@ def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
         plt.clabel(contours, inline=True, fontsize=10)
 
         # create the T-S Diagram
-        plt.scatter(data['PSAL'], data['potemperature'], c=data['DEPTH'], cmap='viridis_r',s=1)
+        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=1)
 
         cbar = plt.colorbar()
-        cbar.set_label(get_var('DEPTH')[0])
+        cbar.set_label(get_var(c_var)[0])
 
     #for a list of dataframes
     if isinstance(data, list):
