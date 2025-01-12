@@ -569,17 +569,17 @@ def plot_ts(data, min_dep, max_dep, p_ref, lon, lat):
 
     plt.figure(figsize=(8, 6))
     # add constant density lines
-    contours = plt.contour(pt_grid, psal_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
     plt.clabel(contours, inline=True, fontsize=10)
 
     # create the T-S Diagram
-    plt.scatter(data['potemperature'], data['PSAL'], c=data['DEPTH'], cmap='viridis_r',s=1)
+    plt.scatter(data['PSAL'], data['potemperature'], c=data['DEPTH'], cmap='viridis_r',s=1)
     cbar = plt.colorbar()
     cbar.set_label(get_var('DEPTH')[0])
 
     #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
-    plt.xlabel(get_var('potemperature')[0])
-    plt.ylabel(get_var('PSAL')[0])
+    plt.ylabel(get_var('potemperature')[0])
+    plt.xlabel(get_var('PSAL')[0])
 
     plt.tight_layout()
     plt.show()
