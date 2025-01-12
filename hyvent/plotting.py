@@ -559,6 +559,8 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
         CT = gsw.conversions.CT_from_pt(SA, pt_grid)
         return gsw.density.sigma3(SA, CT)
 
+    plt.figure(figsize=(8,6))
+
     #for one dataframe
     if isinstance(data, pd.DataFrame):
 
@@ -605,11 +607,15 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
         # marker = itertools.cycle((',', '+', '.', '*','v','^','<','>'))
         # put this in plt.scatter(): marker = next(marker), linestyle='',
 
-        for dataset in data:
-            # create the T-S Diagram
-            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=5, label=dataset['Station'].iloc[0])
+        #iterate colors
+        ncolors = len(data)
+        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
 
-        plt.legend(markerscale=5)
+        for i, dataset in enumerate(data):
+            # create the T-S Diagram
+            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=5, label=dataset['Station'].iloc[0], color=colors[i])
+
+        plt.legend(markerscale=5, ncol=2)
 
     #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
     plt.ylabel(get_var('potemperature')[0])
