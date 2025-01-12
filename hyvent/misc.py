@@ -235,6 +235,70 @@ def get_var(var):
 
     return label,color,cmap
 
+def dist(lon1, lat1, lon2, lat2):
+    """
+    This function calculates the geodesic distance between two geographical positions.
+
+    Parameters
+    ----------
+    lon1 : float
+        Longitude of first position.
+    lat1 : float
+        Latitude of first position.
+    lon2 : float
+        Longitude of second position.
+    lat2 : float
+        Latitude of second position.
+
+    Returns
+    -------
+    d : float
+        The calculated distance.
+
+    """
+    #from geopy.distance import geodesic
+    from geographiclib.geodesic import Geodesic
+    import pandas as pd
+    import numpy as np
+
+    if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True:
+        d = np.nan
+    else:
+        #d = geodesic((lat1, lon1), (lat2, lon2)).m
+        d = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
+    return(d)
+
+def bearing(lon1, lat1, lon2, lat2):
+    """
+    This function calculates the bearing between two geographical positions, from the view of the first point.
+
+    Parameters
+    ----------
+    lon1 : float
+        Longitude of first position.
+    lat1 : float
+        Latitude of first position.
+    lon2 : float
+        Longitude of second position.
+    lat2 : float
+        Latitude of second position.
+
+    Returns
+    -------
+    bearing : float
+        The calculated bearing.
+    """
+    from geographiclib.geodesic import Geodesic
+    import pandas as pd
+
+    import numpy as np
+
+    if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True:
+        bearing = np.nan
+    else:
+        bearing = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['azi2']
+    return(bearing)
+
 def calc_delta_pos(data):
     """
     This function calculates the differences in distance and bearing between lon/lat position in one row and the next row in a dataframe.
@@ -249,71 +313,6 @@ def calc_delta_pos(data):
     data : pandas dataframe
         Dataframe containing the longitude, latitude, distance and bearing between position in this row and the next row.
     """
-
-    def dist(lon1, lat1, lon2, lat2):
-        """
-        This function calculates the geodesic distance between two geographical positions.
-
-        Parameters
-        ----------
-        lon1 : float
-            Longitude of first position.
-        lat1 : float
-            Latitude of first position.
-        lon2 : float
-            Longitude of second position.
-        lat2 : float
-            Latitude of second position.
-
-        Returns
-        -------
-        d : float
-            The calculated distance.
-
-        """
-        #from geopy.distance import geodesic
-        from geographiclib.geodesic import Geodesic
-        import pandas as pd
-        import numpy as np
-
-        if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True:
-            d = np.nan
-        else:
-            #d = geodesic((lat1, lon1), (lat2, lon2)).m
-            d = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
-        return(d)
-
-    def bearing(lon1, lat1, lon2, lat2):
-        """
-        This function calculates the bearing between two geographical positions, from the view of the first point.
-
-        Parameters
-        ----------
-        lon1 : float
-            Longitude of first position.
-        lat1 : float
-            Latitude of first position.
-        lon2 : float
-            Longitude of second position.
-        lat2 : float
-            Latitude of second position.
-
-        Returns
-        -------
-        bearing : float
-            The calculated bearing.
-        """
-        from geographiclib.geodesic import Geodesic
-        import pandas as pd
-
-        import numpy as np
-
-        if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True:
-            bearing = np.nan
-        else:
-            bearing = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['azi2']
-        return(bearing)
-
 
     data = data[['CTD_lon','CTD_lat']]
     data['Lat_next'] = data['CTD_lat'].shift()
