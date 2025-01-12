@@ -550,7 +550,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     import matplotlib.pyplot as plt
     import numpy as np
     import gsw
-    from hyvent.misc import get_var
+    from hyvent.misc import get_var, add_castno
     import pandas as pd
 
     # calculate the density values for the grid
@@ -561,61 +561,59 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
     plt.figure(figsize=(8,6))
 
-    #for one dataframe
-    if isinstance(data, pd.DataFrame):
+    data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
-        data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
+    # create a grid of temperatures and salinities
+    pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
+    psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
+    pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
 
-        # create a grid of temperatures and salinities
-        pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
-        psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
-        pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+    density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
 
-        density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+    #plt.figure(figsize=(8, 6))
+    # add constant density lines
+    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    plt.clabel(contours, inline=True, fontsize=10)
 
-        #plt.figure(figsize=(8, 6))
-        # add constant density lines
-        contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
-        plt.clabel(contours, inline=True, fontsize=10)
+    #iterate through stations
+    if c_var == 'Station':
+        station_list = [d for _, d in data.groupby(['Station'])]
 
+        #iterate colors
+        ncolors = len(station_list)
+        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
+
+        for i, station in enumerate(station_list):
+                # create the T-S Diagram
+                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i])
+
+        plt.legend(markerscale=5, ncol=2)
+
+    #iterate through casts
+    elif c_var == 'Cast':
+        station_list = [d for _, d in data.groupby(['Station'])]
+        for i, station in enumerate(station_list):
+            station_list[i] = add_castno(station_list[i])
+        all_casts = pd.concat(station_list)
+        all_casts = [d for _, d in all_casts.groupby(['Station','Cast'])]
+        print(len(all_casts))
+
+        #iterate colors
+        ncolors = len(all_casts)
+        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
+
+        for i, cast in enumerate(all_casts):
+                # create the T-S Diagram
+                plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
+
+        plt.legend(markerscale=5, ncol=2)
+
+    else:
         # create the T-S Diagram
         plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=1)
 
         cbar = plt.colorbar()
         cbar.set_label(get_var(c_var)[0])
-
-    #for a list of dataframes
-    if isinstance(data, list):
-
-        for i, dataset in enumerate(data):
-            data[i] = dataset[(dataset['DEPTH']>min_dep) & (dataset['DEPTH']<max_dep)]
-
-        data_all = pd.concat(data)
-
-        # create a grid of temperatures and salinities
-        pt_grid = np.linspace(data_all['potemperature'].min()-0.01, data_all['potemperature'].max()+0.01, 100)
-        psal_grid = np.linspace(data_all['PSAL'].min()-0.001, data_all['PSAL'].max()+0.001, 100)
-        pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
-
-        density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
-
-        contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
-        plt.clabel(contours, inline=True, fontsize=10)
-
-        #iterate markers
-        # import itertools
-        # marker = itertools.cycle((',', '+', '.', '*','v','^','<','>'))
-        # put this in plt.scatter(): marker = next(marker), linestyle='',
-
-        #iterate colors
-        ncolors = len(data)
-        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
-
-        for i, dataset in enumerate(data):
-            # create the T-S Diagram
-            plt.scatter(dataset['PSAL'], dataset['potemperature'],s=5, label=dataset['Station'].iloc[0], color=colors[i])
-
-        plt.legend(markerscale=5, ncol=2)
 
     #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
     plt.ylabel(get_var('potemperature')[0])
