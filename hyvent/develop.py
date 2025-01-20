@@ -47,15 +47,28 @@ profile_data = keys_to_data(profile_data, 'cnv')
 btl_data = keys_to_data(btl_data, 'btl')
 mapr_data = keys_to_data(mapr_data, 'mapr')
 
+#remove level part from 018 and 028 (no reindexing, maybe needed?) and stores it separetely -> Todo also MAPR
+sta018 = profile_data['PS137_018_01']
+sta028 = profile_data['PS137_028_01']
+sta018_level = sta018.loc[(sta018['datetime'] > '2023-07-01 02:20:00') & (sta018['datetime'] < '2023-07-01 04:03:00')]
+sta028_level = sta028.loc[(sta028['datetime'] > '2023-07-06 00:39:00') & (sta028['datetime'] < '2023-07-06 03:11:00')]
+sta018 = pd.concat([sta018[sta018['datetime'] <= '2023-07-01 02:20:00'],sta018[sta018['datetime'] >= '2023-07-01 04:03:00']])
+sta028 = pd.concat([sta028[sta028['datetime'] <= '2023-07-06 00:39:00'],sta028[sta028['datetime'] >= '2023-07-06 03:11:00']])
+
+profile_data['PS137_018_01'] = sta018
+profile_data['PS137_028_01'] = sta028
+profile_data['PS137_018_le'] = sta018_level
+profile_data['PS137_028_le'] = sta028_level
+
+profile_data = keys_to_data(profile_data, 'cnv')
+btl_data = keys_to_data(btl_data, 'btl')
+mapr_data = keys_to_data(mapr_data, 'mapr')
+
 profile_data = pd.concat(profile_data.values(),ignore_index=True)
 btl_data = pd.concat(btl_data.values(),ignore_index=True)
 mapr_data = pd.concat(mapr_data.values(),ignore_index=True)
 
 #%% processing
-
-#try to remove the density spike in 028-01
-#import numpy as np
-#profile_data[profile_data['Station']=='028_01'] = profile_data[profile_data['Station']=='028_01'].mask((profile_data[profile_data['Station']=='028_01']['DEPTH']>3180) & (profile_data[profile_data['Station']=='028_01']['DEPTH']<3220) & (profile_data[profile_data['Station']=='028_01']['density']>41.98396) & (profile_data[profile_data['Station']=='028_01']['density'] <41.9846),other=np.nan)
 
 profile_data = derive_CTD(profile_data)
 mapr_data = mapr_data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth_corr(m)':'DEPTH'})
@@ -72,6 +85,9 @@ profile_mapr['datetime'] = pd.to_datetime(profile_mapr['datetime'])
 profile_background = profile_data[profile_data['Station']=='018_01']
 btl_background = btl_data[btl_data['Station']=='018_01']
 mapr_background = mapr_data[mapr_data['Station']=='018_01']
+
+sta018_level = profile_data[profile_data['Station']=='018_le']
+sta028_level = profile_data[profile_data['Station']=='028_le']
 
 profile_explo = profile_data[profile_data['Station']=='049_01']
 mapr_explo = mapr_data[mapr_data['Station']=='049_01']
@@ -162,7 +178,7 @@ var = 'Delta_Neph_smoo(volts)'
 min_dep = 2500
 x = 'CTD_lat'
 
-data = data[data['Station']=='028_01']
+data = data[data['Station']=='041_01']
 data = add_castno(data)
 data = data[data['DEPTH']>min_dep]
 
