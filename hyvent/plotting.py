@@ -564,15 +564,15 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
     # create a grid of temperatures and salinities
-    pt_grid = np.linspace(data['potemperature'].min()-0.01, data['potemperature'].max()+0.01, 100)
-    psal_grid = np.linspace(data['PSAL'].min()-0.001, data['PSAL'].max()+0.001, 100)
+    pt_grid = np.linspace(data['potemperature'].min()-0.005, data['potemperature'].max()+0.005, 100)
+    psal_grid = np.linspace(data['PSAL'].min()-0.0005, data['PSAL'].max()+0.0005, 100)
     pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
 
     density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
 
     #plt.figure(figsize=(8, 6))
     # add constant density lines
-    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/20), colors='black')       #for all 10, for zoom 20
     plt.clabel(contours, inline=True, fontsize=10)
 
     #iterate through stations
@@ -585,9 +585,16 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, station in enumerate(station_list):
                 # create the T-S Diagram
-                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i])
+                plt.scatter(station['PSAL'], station['potemperature'],s=20, label=station['Station'].iloc[0], color=colors[i])      #for all: s=5, for zoom s=20
 
-        plt.legend(markerscale=5, ncol=2)
+        plt.legend(markerscale=2, ncol=2, loc='lower left')  #for markerscale=2, else =5
+
+        #format x axis without exponetial
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
 
     #iterate through casts
     elif c_var == 'Cast':
@@ -606,14 +613,28 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
                 # create the T-S Diagram
                 plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
 
-        plt.legend(markerscale=5, ncol=2)
+        #plt.legend(markerscale=5, ncol=2,loc='lower left')
+
+        #format x axis without exponetial
+        # from matplotlib.ticker import ScalarFormatter
+        # ax = plt.gca()
+        # formatter = ScalarFormatter(useOffset=False)
+        # formatter.set_scientific(False)
+        # ax.xaxis.set_major_formatter(formatter)
 
     else:
         # create the T-S Diagram
-        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=1)
+        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=20)
 
         cbar = plt.colorbar()
         cbar.set_label(get_var(c_var)[0])
+
+        #format x axis without exponetial
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
 
     #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
     plt.ylabel(get_var('potemperature')[0])
