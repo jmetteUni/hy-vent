@@ -239,9 +239,9 @@ def get_var(var):
 
     return label,color,cmap
 
-def dist(lon1, lat1, lon2, lat2):
+def dist(lon1, lat1, lon2, lat2, dep1='None', dep2='None'):
     """
-    This function calculates the geodesic distance between two geographical positions.
+    This function calculates the geodesic distance between two geographical positions. If depth values is also given, it calculates the 3D geometric distance instead. The second method is only recommended for shorter distances.
 
     Parameters
     ----------
@@ -253,6 +253,10 @@ def dist(lon1, lat1, lon2, lat2):
         Longitude of second position.
     lat2 : float
         Latitude of second position.
+    dep1 : float, optional
+        Depth (positive) of first position. Default is None.
+    dep2 : float, optional
+        Depth (positive) of second position. Default is None.
 
     Returns
     -------
@@ -269,7 +273,10 @@ def dist(lon1, lat1, lon2, lat2):
         d = np.nan
     else:
         #d = geodesic((lat1, lon1), (lat2, lon2)).m
-        d = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
+        if dep1 =='None':
+            d = np.sqrt((lat2+lat1)**2+(lon2+lon1)**2+(dep2-dep1)^2)
+        else:
+            d = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
     return(d)
 
 def bearing(lon1, lat1, lon2, lat2):
