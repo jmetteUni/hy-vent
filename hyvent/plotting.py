@@ -521,9 +521,9 @@ def time_plot(data,station,depth_min,path_save='None'):
         plt.savefig(path_save, dpi=300)
     plt.show()
 
-def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
+def plot_ts_zoom(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     """
-    This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
+    This function plots a zoomed version of the data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
 
     Parameters
     ----------
@@ -585,7 +585,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, station in enumerate(station_list):
                 # create the T-S Diagram
-                plt.scatter(station['PSAL'], station['potemperature'],s=20, label=station['Station'].iloc[0], color=colors[i])      #for all: s=5, for zoom s=20
+                plt.scatter(station['PSAL'], station['potemperature'],s=20, label=station['Station'].iloc[0], color=colors[i])
 
         plt.legend(markerscale=2, ncol=2, loc='lower left')  #for markerscale=2, else =5
 
@@ -613,18 +613,140 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
                 # create the T-S Diagram
                 plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
 
-        #plt.legend(markerscale=5, ncol=2,loc='lower left')
+        plt.legend(markerscale=5, ncol=2,loc='lower left')
 
         #format x axis without exponetial
-        # from matplotlib.ticker import ScalarFormatter
-        # ax = plt.gca()
-        # formatter = ScalarFormatter(useOffset=False)
-        # formatter.set_scientific(False)
-        # ax.xaxis.set_major_formatter(formatter)
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
 
     else:
         # create the T-S Diagram
         plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=20)
+
+        cbar = plt.colorbar()
+        cbar.set_label(get_var(c_var)[0])
+
+        #format x axis without exponetial
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
+
+    #plt.colorbar(label='Potential Density Anomaly (kg/m³)')
+    plt.ylabel(get_var('potemperature')[0])
+    plt.xlabel(get_var('PSAL')[0])
+
+    plt.tight_layout()
+    plt.show()
+
+def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
+    """
+    This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with CTD data containing the potential temperature and practical salinity.
+    c_var : string
+        Variable which should be used as third dimension with colorbar.
+    min_dep : int
+        Minimal depth of the samples used.
+    max_dep : int
+        Maximal depth of the samples used.
+    p_ref : int
+        Reference pressure used for calculating the isopycnals of the potential density anomaly in dbar.
+    lon : float
+        Longitude of the samples.
+    lat : float
+        Latitude of the samples.
+
+    Returns
+    -------
+    None.
+
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import gsw
+    from hyvent.misc import get_var, add_castno
+    import pandas as pd
+
+    # calculate the density values for the grid
+    def calculate_density(pt_grid, psal_grid, p, lon, lat):
+        SA = gsw.conversions.SA_from_SP(psal_grid, p, lon, lat)
+        CT = gsw.conversions.CT_from_pt(SA, pt_grid)
+        return gsw.density.sigma3(SA, CT)
+
+    plt.figure(figsize=(8,6))
+
+    data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
+
+    # create a grid of temperatures and salinities
+    pt_grid = np.linspace(data['potemperature'].min()-0.005, data['potemperature'].max()+0.005, 100)
+    psal_grid = np.linspace(data['PSAL'].min()-0.0005, data['PSAL'].max()+0.0005, 100)
+    pt_grid, psal_grid = np.meshgrid(pt_grid, psal_grid)
+
+    density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
+
+    #plt.figure(figsize=(8, 6))
+    # add constant density lines
+    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    plt.clabel(contours, inline=True, fontsize=10)
+
+    #iterate through stations
+    if c_var == 'Station':
+        station_list = [d for _, d in data.groupby(['Station'])]
+
+        #iterate colors
+        ncolors = len(station_list)
+        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
+
+        for i, station in enumerate(station_list):
+                # create the T-S Diagram
+                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i])
+
+        plt.legend(markerscale=5, ncol=2, loc='lower left')
+
+        #format x axis without exponetial
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
+
+    #iterate through casts
+    elif c_var == 'Cast':
+        station_list = [d for _, d in data.groupby(['Station'])]
+        for i, station in enumerate(station_list):
+            station_list[i] = add_castno(station_list[i])
+        all_casts = pd.concat(station_list)
+        all_casts = [d for _, d in all_casts.groupby(['Station','Cast'])]
+        print(len(all_casts))
+
+        #iterate colors
+        ncolors = len(all_casts)
+        colors = plt.cm.jet(np.linspace(0,1,ncolors))# Initialize holder for trajectories
+
+        for i, cast in enumerate(all_casts):
+                # create the T-S Diagram
+                plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
+
+        plt.legend(markerscale=5, ncol=2,loc='lower left')
+
+        #format x axis without exponetial
+        from matplotlib.ticker import ScalarFormatter
+        ax = plt.gca()
+        formatter = ScalarFormatter(useOffset=False)
+        formatter.set_scientific(False)
+        ax.xaxis.set_major_formatter(formatter)
+
+    else:
+        # create the T-S Diagram
+        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=5)
 
         cbar = plt.colorbar()
         cbar.set_label(get_var(c_var)[0])
