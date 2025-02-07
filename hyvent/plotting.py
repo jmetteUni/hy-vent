@@ -377,14 +377,14 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     ----------
     data : pandas dataframe
         Dataframe with the data of the CTD station or multiple stations with variable as columns. One column has to be the station designation.
-    background : pandas dataframe
-        Dataframe with the data of the station which should be plotted separately.
     xvar : string
         Variable to plot as x-variable. Must be a column key in data and background. If xvar is "delta3He" it is plotted as a scatterplot, else as a lineplot.
     yvar : string
         Variable to plot as y-variable. Must be a column key in data and background. Should be a type of depth or pressure coordinate and is plotted inverted.
     depth_min : int
         Minimal cutoff depth to plot.
+    background : pandas dataframe, optional
+        Dataframe with the data of the station which should be plotted separately. The default is 'None'.
     path_save : string, optional
         Path to save the plot as a png with dpi=300. The default is 'None'.
 
