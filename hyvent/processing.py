@@ -83,7 +83,7 @@ def calc_mean_profile(data, var, station_list):
 
 def derive_mapr(data, data_for_mean, station_list):
     """
-    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations). The function also removes outliers ("Neph_outl(volts)") and adiitionally smoothes the turbdity data ("Neph_smoo(colts)").
+    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations). The function also removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)").
 
     Parameters
     ----------
