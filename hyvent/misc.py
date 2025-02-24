@@ -269,7 +269,7 @@ def dist(lon1, lat1, lon2, lat2, dep1='None', dep2='None'):
     import pandas as pd
     import numpy as np
 
-    if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True:
+    if pd.isna(lat1) == True or pd.isna(lon1) == True or pd.isna(lat2) == True or pd.isna(lon2) == True or pd.isna(dep1) == True or pd.isna(dep2):
         d = np.nan
     else:
         #d = geodesic((lat1, lon1), (lat2, lon2)).m
