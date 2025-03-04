@@ -484,7 +484,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     label = get_var(var)[0]
     depth, = ax.plot(station['datetime'], station[var], color = color, label = label)
     ax.set_ylabel(label)
-    ax.yaxis.label.set_color(color)
+    #ax.yaxis.label.set_color(color)
 
     twin1 = ax.twinx()
     var = 'potemperature'
@@ -492,7 +492,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     label = get_var(var)[0]
     temp, = twin1.plot(station['datetime'], station[var], color = color, label = label)
     twin1.set_ylabel(label)
-    twin1.yaxis.label.set_color(color)
+    #twin1.yaxis.label.set_color(color)
 
     twin2 = ax.twinx()
     twin2.spines.right.set_position(("axes", 1.12))
@@ -501,7 +501,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     label = get_var(var)[0]
     orp, = twin2.plot(station['datetime'], station[var], color = color, label = label)
     twin2.set_ylabel(label)
-    twin2.yaxis.label.set_color(color)
+    #twin2.yaxis.label.set_color(color)
 
     twin3 = ax.twinx()
     twin3.spines.right.set_position(("axes", 1.25))
@@ -510,12 +510,12 @@ def time_plot(data,station,depth_min,path_save='None'):
     label = get_var(var)[0]
     dens, = twin3.plot(station['datetime'], station[var],color = color, label = label)
     twin3.set_ylabel(label)
-    twin3.yaxis.label.set_color(color)
+    #twin3.yaxis.label.set_color(color)
 
     ax.invert_yaxis()
 
     ax.set_xlabel('Time')
-    #plt.legend(handles=[press,neph,temp,orp,trans],loc='lower right')
+    fig.legend(bbox_to_anchor=(1,0.3), bbox_transform=ax.transAxes)
     plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)
