@@ -765,5 +765,152 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     plt.tight_layout()
     plt.show()
 
+def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
+    """
+    This functions plots a variable of a dataset of one or a list of stations in 3D space together with the bathymetry.
+
+    Parameters
+    ----------
+    data : pandas dataframe or list of pandas dataframes
+        Dataframes containing the data with 3D coordinates.
+    var : string
+        Key of dataframe column to plot.
+    depth_min : int
+        Minimal cutoff depth to plot.
+    bathy : tuple of three int, OPTIONAL
+        Bathymetry data with longitude and latitude coordinates and elevation. Default is None.
+    vent_loc : tuple of three float, OPTIONAL
+        Longitude, latitude and depth of a position of interest to mark in the plot. Default is None.
+
+    Returns
+    -------
+    None.
+
+    """
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    import numpy as np
+    from hyvent.misc import get_var
+
+    fig = plt.figure(figsize=(14, 14))
+    ax = fig.add_subplot(projection='3d')
+
+    #prepare and plot data for one dataframe
+    if isinstance(data, pd.DataFrame):
+        #subset depth
+        dataset =data[data.DEPTH>depth_min]
+        #mask negative anomalies with nan, because not interesting
+        if var =='dORP':
+            dataset = dataset.mask(dataset[var]>0, np.nan)
+        else:
+            dataset = dataset.mask(dataset[var]<0, np.nan)
+
+        #plot only nth point
+        n=1
+        dataset = dataset.iloc[::n,:]
+
+        data = ax.scatter(dataset['CTD_lon'], dataset['CTD_lat'],dataset['DEPTH'], c=dataset[var],marker='.',alpha=1,cmap=get_var(var)[2],linewidth=0.2)
+
+    #prepare and plot data for a list of dataframes
+    if isinstance(data, list):
+        for station in data:
+            #subset depth
+            dataset =station[station.DEPTH>depth_min]
+            #mask negative anomalies with nan, because not interesting
+            if var =='dORP':
+                dataset = dataset.mask(dataset[var]>0, np.nan)
+            else:
+                dataset = dataset.mask(dataset[var]<0, np.nan)
+            #plot only nth point
+            n=1
+            dataset = dataset.iloc[::n,:]
+
+            data = ax.scatter(dataset['CTD_lon'], dataset['CTD_lat'],dataset['DEPTH'], c=dataset[var],marker='.',alpha=1,cmap=get_var(var)[2],linewidth=0.2)
+
+    #plot bathymetry
+    if bathy != None:
+        surf = ax.plot_surface(bathy[0], bathy[1], -bathy[2],alpha=0.3,linewidth=0.5,color='white',antialiased=False)
+    #plot vent location
+    if vent_loc != None:
+        vent = ax.scatter(vent_loc[0], vent_loc[1], vent_loc[2], marker='*', color='r', s=300)
+
+    ax.invert_zaxis()
+    fig.colorbar(data, label=get_var(var)[0],fraction=0.02)
+
+    ax.set_ylabel('Latitude')
+    ax.set_xlabel('Longitude')
+    ax.set_zlabel('Depth in m')
+
+    ax.xaxis.labelpad=10
+    ax.yaxis.labelpad=10
+    ax.zaxis.labelpad=10
+
+    ax.view_init(8, -173)
+
+    plt.show()
+
+def plot_contourf(data, var, xvar, depth_min, vent_loc=None):
+    """
+    This funtion plots interpolated crossections along an x coordinate and depth.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the CTD data in two dimensions.
+    var : string
+        Key of dataframe column to plot as the interpolated data.
+    xvar : string
+        Key of dataframe column to use as an x coordinate. Must be latitude or longitude.
+    depth_min : int
+        Minimal cutoff depth to plot.
+    vent_loc : tuple of three float, OPTIONAL
+        Longitude, latitude and depth of a position of interest to mark in the plot. Default is None..
+
+    Returns
+    -------
+    None.
+
+    """
+
+    import matplotlib.pyplot as plt
+    from hyvent.misc import get_var
+
+    #subset data by depth and remove nan in var
+    data = data[data['DEPTH']>depth_min]
+    data = data.dropna(subset=[var,xvar])
+
+    #set vmin and vmax for colobar to ignore not interesting anomaly values
+    if var =='dORP':
+        vmin = data[var].min()
+        vmax = 0
+    else:
+        vmin = 0
+        vmax = data[var].max()
+
+    fig,ax = plt.subplots()
+
+    #plot data
+    contourf = ax.tricontourf(data[xvar],data['DEPTH'],data[var],levels=50,cmap=get_var(var)[2],vmin=vmin,vmax=vmax)
+    #plot sample locations
+    ax.scatter(data[xvar],data['DEPTH'],color='black',s=0.2,alpha=0.2)
+
+    ax.set_ylabel(get_var('DEPTH')[0])
+    if xvar == 'CTD_lat':
+        ax.set_xlabel('Latitude')
+    if xvar == 'CTD_lon':
+        ax.set_xlable('Longitude')
+    fig.colorbar(contourf, label=get_var(var)[0])
+
+    #plot vent location
+    if vent_loc != None:
+        if xvar == 'CTD_lon':
+            vent = ax.scatter(vent_loc[0], vent_loc[2], marker='*', color='r', s=300)
+        if xvar == 'CTD_lat':
+            vent = ax.scatter(vent_loc[1], vent_loc[2], marker='*', color='r', s=300)
+
+    ax.invert_yaxis()
+
+    fig.set_tight_layout(True)
+    plt.show()
 
 
