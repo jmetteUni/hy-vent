@@ -406,7 +406,11 @@ def read_he(he_path):
     import pandas as pd
     import numpy as np
 
-    he_data_full = pd.read_csv(he_path)
+    try:
+        he_data_full = pd.read_csv(he_path)
+    except:
+        he_data_full = pd.read_csv(he_path, encoding = "ISO-8859-1")
+
     del he_data_full['Unnamed: 54']
     del he_data_full['Unnamed: 55']
     he_data_full.replace('kommt noch', np.nan, inplace=True)
