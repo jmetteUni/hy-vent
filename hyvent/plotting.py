@@ -849,7 +849,7 @@ def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
 
     plt.show()
 
-def plot_contourf(data, var, xvar, depth_min, vent_loc=None):
+def plot_contourf(data, var, xvar, depth_min, da_bathy=None, vent_loc=None):
     """
     This funtion plots interpolated crossections along an x coordinate and depth.
 
@@ -863,21 +863,34 @@ def plot_contourf(data, var, xvar, depth_min, vent_loc=None):
         Key of dataframe column to use as an x coordinate. Must be latitude or longitude.
     depth_min : int
         Minimal cutoff depth to plot.
+    da_bathy : xarray dataarray, OPTIONAL
+        Bathymetry data with longitude and latitude coordinates and elevation as an xarray dataarray. Default is None.
     vent_loc : tuple of three float, OPTIONAL
         Longitude, latitude and depth of a position of interest to mark in the plot. Default is None..
 
     Returns
     -------
     None.
-
     """
 
     import matplotlib.pyplot as plt
     from hyvent.misc import get_var
+    import xarray as xa
+    import pandas as pd
+
+    #prepare bathy
+
+    track_lon = xa.DataArray(data['CTD_lon'])
+    track_lat = xa.DataArray(data['CTD_lat'])
+
+    bathy_track = da_bathy.interp(lon=track_lon,lat=track_lat,method='nearest').to_dataframe()
+    bathy_track = bathy_track.rename(columns={'lon':'CTD_lon','lat':'CTD_lat'})
+    bathy_track = bathy_track.sort_values(by=xvar)
 
     #subset data by depth and remove nan in var
     data = data[data['DEPTH']>depth_min]
     data = data.dropna(subset=[var,xvar])
+    data = data.sort_values(by=xvar)
 
     #set vmin and vmax for colobar to ignore not interesting anomaly values
     if var =='dORP':
@@ -887,12 +900,15 @@ def plot_contourf(data, var, xvar, depth_min, vent_loc=None):
         vmin = 0
         vmax = data[var].max()
 
-    fig,ax = plt.subplots()
+    fig,ax = plt.subplots(figsize=(12,6))
 
     #plot data
     contourf = ax.tricontourf(data[xvar],data['DEPTH'],data[var],levels=50,cmap=get_var(var)[2],vmin=vmin,vmax=vmax)
     #plot sample locations
-    ax.scatter(data[xvar],data['DEPTH'],color='black',s=0.2,alpha=0.2)
+    ax.scatter(data[xvar],data['DEPTH'],color='black',s=0.1,alpha=1,label='CTD track')
+    #plot bathy
+    ax.plot(bathy_track[xvar],-bathy_track['Band1'].rolling(1000).mean(),color='black',label='Bathymetry')
+
 
     ax.set_ylabel(get_var('DEPTH')[0])
     if xvar == 'CTD_lat':
@@ -910,7 +926,9 @@ def plot_contourf(data, var, xvar, depth_min, vent_loc=None):
 
     ax.invert_yaxis()
 
-    fig.set_tight_layout(True)
+    plt.legend(markerscale=20)
+    plt.xlim((data[xvar].min(),data[xvar].max()))
+    plt.tight_layout()
     plt.show()
 
 
