@@ -222,9 +222,15 @@ def sep_casts(data, window_size=1000):
         local_min_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).min()]
         local_max_vals = data.loc[data['DEPTH'] == data['DEPTH'].rolling(window_size, center=True).max()]
     except:
-        print('Did not find a depth coordinate "DEPTH", trying with "Depth(m))" ')
-        local_min_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).min()]
-        local_max_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).max()]
+        try:
+            print('Did not find a depth coordinate "DEPTH", trying with "Depth(m))" ')
+            local_min_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).min()]
+            local_max_vals = data.loc[data['Depth(m)'] == data['Depth(m)'].rolling(window_size, center=True).max()]
+        except:
+            print('Did not find a depth coordinate "DEPTH", trying with "DepSM_mean" ')
+            local_min_vals = data.loc[data['DepSM_mean'] == data['DepSM_mean'].rolling(window_size, center=True).min()]
+            local_max_vals = data.loc[data['DepSM_mean'] == data['DepSM_mean'].rolling(window_size, center=True).max()]
+
 
     #concat all local min, max and the start and end rows
     extrema = pd.concat([local_max_vals,local_min_vals])
