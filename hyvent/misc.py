@@ -274,7 +274,7 @@ def dist(lon1, lat1, lon2, lat2, dep1='None', dep2='None'):
     else:
         #d = geodesic((lat1, lon1), (lat2, lon2)).m
         if dep1 !='None':
-            d = np.sqrt((lat2+lat1)**2+(lon2+lon1)**2+(dep2-dep1)^2)
+            d = np.sqrt((lat2+lat1)**2+(lon2+lon1)**2+(dep2-dep1)**2)
         else:
             d = Geodesic.WGS84.Inverse(lat1, lon1, lat2, lon2)['s12']
     return(d)

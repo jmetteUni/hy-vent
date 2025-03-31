@@ -474,10 +474,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     station = data[data['Station']==station]
     station['datetime'] = pd.to_datetime(station['datetime'])
 
-    fig, ax = plt.subplots()
-    fig.set_tight_layout(True)
-    fig.set_figwidth(12)
-    fig.set_figheight(5)
+    fig, ax = plt.subplots(figsize=(10,4))
 
     var = 'DEPTH'
     color = get_var(var)[1]
