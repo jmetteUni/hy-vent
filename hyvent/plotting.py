@@ -396,7 +396,6 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     from hyvent.misc import get_var
     import matplotlib.pyplot as plt
     import pandas as pd
-    from scipy.signal import savgol_filter
 
     xlabel, xcolor, cmap = get_var(xvar)
 
@@ -416,46 +415,24 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
     if (xvar == 'delta3He') | (xvar == 'Delta_delta3He'):
         for station in data_list:
             plt.scatter(station[xvar],station[yvar],color=get_var(xvar)[1])
-        #plot 0 level vertical line
-        plt.axvline(0, color = 'black',alpha=0.3)
         if isinstance(background,pd.DataFrame):
             for device in bg_list:
                 plt.scatter(device[xvar],device[yvar],color='black',linewidth=1)
     else:
-        #plot deltas smoothed with all data in the background
-        if 'Delta' in xvar:
-            for station in data_list:
-                station = station.sort_index()
-                if xvar == 'Delta_potemperature':
-                    plt.plot(station[xvar],station[yvar],color='grey',alpha=0.3,linewidth=1)
-                    plt.plot(station[xvar].rolling(5).max(),station[yvar],color=xcolor,linewidth=1)
-                elif xvar == 'Delta_Sigma3':
-                    plt.plot(station[xvar],station[yvar],color='grey',alpha=0.3,linewidth=1)
-                    plt.plot(station[xvar].rolling(20).min(),station[yvar],color=xcolor,linewidth=1)
-                else:
-                    plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
+        for station in data_list:
+            station = station.sort_index()
+            plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
+            #plt.plot(station[xvar],station[yvar],linewidth=1,label=station['SN'].iloc[0])  #plot every station, SN in different color
 
-                #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])   #plotting station and SN for debugging
-                #plot measured values unsmoothed
-            #plot 0 level vertical line
-            plt.axvline(0, color = 'black',alpha=0.3)
-
-
-        else:
-            for station in data_list:
-                station = station.sort_index()
-                plt.plot(station[xvar],station[yvar],color=xcolor,linewidth=1)
-                #plt.plot(station[xvar],station[yvar],linewidth=1,label=station['SN'].iloc[0])  #plot every station, SN in different color
-
-                #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])   #plotting station and SN for debugging
-
-
-        #plot background station
+            #plt.title(station['Station'].iloc[0]+', '+station['SN'].iloc[0])   #plotting station and SN for debugging
         if isinstance(background,pd.DataFrame):
             for device in bg_list:
                 plt.plot(device[xvar],device[yvar],color='black',linewidth=1)
-                #plt.plot(device[xvar],device[yvar],linewidth=1,linestyle='-',color='black',label=device['SN'].iloc[0])  #plot every station, SN in different color
+                #plt.plot(device[xvar],device[yvar],linewidth=1,linestyle='--',label=device['SN'].iloc[0])  #plot every station, SN in different color
 
+
+    if (xvar == 'Delta_potemperature') | (xvar == 'Delta_Sigma3') | (xvar == 'Delta_delta3He') | (xvar == 'Delta_Neph_outl(volts)') | (xvar == 'Delta_Neph_smoo(volts)') | (xvar == 'Delta_PSAL'):
+        plt.axvline(0, color = 'black',alpha=0.3)
     plt.gca().invert_yaxis()
     plt.ylabel(get_var(yvar)[0])
     plt.xlabel(get_var(xvar)[0])
@@ -467,7 +444,6 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
         plt.savefig(path_save, dpi=300)
 
     plt.show()
-
 
 def time_plot(data,station,depth_min,path_save='None'):
     """
@@ -702,7 +678,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
         CT = gsw.conversions.CT_from_pt(SA, pt_grid)
         return gsw.density.sigma3(SA, CT)
 
-    plt.figure(figsize=(7,6))
+    plt.figure(figsize=(8,6))
 
     data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
@@ -728,7 +704,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, station in enumerate(station_list):
                 # create the T-S Diagram
-                plt.scatter(station['PSAL'], station['potemperature'],s=2, label=station['Station'].iloc[0], color=colors[i])
+                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i])
 
         plt.legend(markerscale=5, ncol=2, loc='lower left')
 
@@ -754,7 +730,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, cast in enumerate(all_casts):
                 # create the T-S Diagram
-                plt.scatter(cast['PSAL'], cast['potemperature'],s=2, label=cast['Station'].iloc[0], color=colors[i])
+                plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
 
         plt.legend(markerscale=5, ncol=2,loc='lower left')
 
@@ -784,6 +760,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     plt.xlabel(get_var('PSAL')[0])
 
     plt.tight_layout()
+    plt.show()
 
 def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
     """
@@ -920,7 +897,7 @@ def plot_contourf(data, var, xvar, depth_min, da_bathy=None, vent_loc=None):
         vmin = 0
         vmax = data[var].max()
 
-    fig,ax = plt.subplots(figsize=(10,5))
+    fig,ax = plt.subplots(figsize=(12,6))
 
     #plot data
     contourf = ax.tricontourf(data[xvar],data['DEPTH'],data[var],levels=50,cmap=get_var(var)[2],vmin=vmin,vmax=vmax)
