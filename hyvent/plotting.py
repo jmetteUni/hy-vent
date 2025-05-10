@@ -135,7 +135,7 @@ def plot_section(profile_data,key,xvar,yvar,zvar,depth,levels,path_save='None'):
     else:
         station = profile_data
 
-    station = station[station['DEPTH']>depth]
+    station = station[station[yvar]>depth]
     if station.empty:
         print('Station '+key+' has no values lower then '+str(depth))
         return
