@@ -839,7 +839,7 @@ def calc_flux(zmax, depth_vent, ref_station, const=None):
     ref_station : pandas dataframe
         Dataframe containing the potential density anomaly and depth of a CTD station. This density profile is used to calculate the buoyancy frequency N^2.
     const : dictionary, optional
-        Dictionary of physical constants needed for the calculation. Should be in the form of "const = {'rho0' : 1000, 'cp' :  3890, 'g' : 9.8, 'alpha' : 1.3 * 10**(-4)}". If none is provided, the default values are used, which are taken from supplemental material of Wegener, G.(2024).. The default is None.
+        Dictionary of physical constants needed for the calculation. Should be in the form of "const = {'rho0' : 1000, 'cp' :  3890, 'g' : 9.8, 'alpha' : 1.3 * 10**(-4)}". If none is provided, the default values are used, which are taken from supplemental material of Wegener, G.(2024). The default is None.
 
     Returns
     -------
