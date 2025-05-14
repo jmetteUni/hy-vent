@@ -445,6 +445,86 @@ def depth_plot(data,xvar,yvar,depth_min,background='None',path_save='None'):
 
     plt.show()
 
+def station_plot(data,btl_data,depth_min,background='None',path_save='None'):
+    """
+    This function plots multiple variable of one CTD stations against depth.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe with the data of one CTD station with variables as columns.
+    btl_data : pandas dataframe
+        Dataframe with the corresponding bottle data of one CTD station with variables as columns.
+    xvar : list
+        List of variables to plot as x-variables. Must be a column key in data and background. If xvar is "delta3He" it is plotted as a scatterplot, else as a lineplot.
+    yvar : string
+        Variable to plot as y-variable. Must be a column key in data and background. Should be a type of depth or pressure coordinate and is plotted inverted.
+    depth_min : int
+        Minimal cutoff depth to plot.
+    path_save : string, optional
+        Path to save the plot as a png with dpi=300. The default is 'None'.
+
+    Returns
+    -------
+    None.
+
+    """
+    from hyvent.misc import get_var
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+
+    station = data[data['DEPTH']>depth_min]
+    btl_station = btl_data[btl_data['DepSM_mean']>depth_min]
+
+    fig, ax = plt.subplots(figsize=(6,8))
+    plt.tight_layout()
+    plt.rcParams['axes.autolimit_mode'] = 'data'
+    #plt.rcParams['axes.autolimit_mode'] = 'round_numbers'
+
+    var = 'Sigma3'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    depth, = ax.plot(station[var], station['DEPTH'], color = color, label = label)
+    ax.set_xlabel(label)
+    #ax.yaxis.label.set_color(color)
+
+    twin1 = ax.twiny()
+    var = 'potemperature'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    temp, = twin1.plot(station[var], station['DEPTH'], color = color, label = label)
+    twin1.set_xlabel(label)
+    #twin1.yaxis.label.set_color(color)
+
+    twin2 = ax.twiny()
+    twin2.spines.top.set_position(("axes", 1.1))
+    var = 'dORP'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    orp, = twin2.plot(station[var], station['DEPTH'], color = color, label = label)
+    twin2.set_xlabel(label)
+    #twin2.yaxis.label.set_color(color)
+
+    twin3 = ax.twiny()
+    twin3.spines.top.set_position(("axes", 1.2))
+    var = 'delta3He'
+    color = get_var(var)[1]
+    label = get_var(var)[0]
+    dens = twin3.scatter(btl_station[var], btl_station['DepSM_mean'] ,color = color, label = label)
+    twin3.set_xlabel(label)
+    #twin3.yaxis.label.set_color(color)
+
+    plt.gca().invert_yaxis()
+    fig.legend(bbox_to_anchor=(0.35,1), bbox_transform=ax.transAxes)
+
+    #plt.locator_params(axis='x', nbins=8)
+    plt.tight_layout()
+    if path_save != 'None':
+        plt.savefig(path_save, dpi=300)
+
+    plt.show()
+
 def time_plot(data,station,depth_min,path_save='None'):
     """
     This function plots four quantities (dpeht, potential temperature, dORP, Sigma3) of one CTD station against time.
@@ -512,7 +592,7 @@ def time_plot(data,station,depth_min,path_save='None'):
     ax.invert_yaxis()
 
     ax.set_xlabel('Time')
-    fig.legend(bbox_to_anchor=(1,0.3), bbox_transform=ax.transAxes)
+    fig.legend(bbox_to_anchor=(1,0.35), bbox_transform=ax.transAxes)
     plt.tight_layout()
     if path_save != 'None':
         plt.savefig(path_save, dpi=300)

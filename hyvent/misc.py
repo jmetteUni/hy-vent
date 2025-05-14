@@ -167,7 +167,7 @@ def get_var(var):
 #ORP
     elif var == 'dORP':
         color = 'tab:purple'
-        label = '$dE/dt$ in mV/sec'
+        label = '$dE_h/dt$ in mV s$^{-1}$'
         cmap = 'Purples_r'
         cmap = truncate_colormap(cmap)
     elif var == 'upoly0':
@@ -190,23 +190,23 @@ def get_var(var):
 #density
     elif var == 'Sigma0':
         color = 'tab:olive'
-        label = '$\sigma_0$ in kg/m$^3$'
+        label = '$\sigma_0$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Sigma3':
         color = 'tab:olive'
-        label = r'$\sigma_{3000}$ in kg/m$^3$'
+        label = r'$\sigma_{3000}$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Delta_Sigma3':
         color = 'tab:olive'
-        label = r'$\Delta$$\sigma_{3000}$ in kg/m$^3$'
+        label = r'$\Delta$$\sigma_{3000}$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Rho' or var == 'density':
         color = 'tab:olive'
-        label = '$\rho$ in kg/m$^3$'
+        label = '$\rho$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'delta_podensity':
         color = 'tab:olive'
-        label = 'Potential Density Anomaly in kg/m$^3$'
+        label = 'Potential Density Anomaly in kg m$^{-3}$'
         cmap = 'YlGn_r'
 #depth
     elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
