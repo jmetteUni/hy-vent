@@ -166,9 +166,10 @@ def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'
     fig.set_tight_layout(True)
 
     lons, lats, elev = bathy
-    contours = plt.contourf(lons,lats,elev,levels=40,alpha=0.7)
+    contours = plt.contourf(lons,lats,-elev,levels=40,alpha=0.7,cmap='viridis_r')
     contourlines = plt.contour(lons,lats,elev,levels = 40,colors='black',linestyles='solid',linewidths=0.5,alpha=0.3)
-    plt.colorbar(contours,label='Depth in m')
+    cbar = plt.colorbar(contours,label='Depth in m')
+    cbar.ax.invert_yaxis()
 
     plt.scatter(parse("6° 15.32'W"),parse("82° 53.83'N"),color='red',marker='*',s=100,label='Aurora Vent Site')
 
