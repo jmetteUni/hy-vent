@@ -370,7 +370,6 @@ def read_mapr(mapr_path):
     for sheet in sheets:
         mapr[sheet] = mapr_all[sheet].iloc[3:,1:14]     #select only data
         #mapr[sheet] = mapr[sheet].iloc[:,[0,1,2,3,4,5,10,11,12]] # only quantities with physical units
-
         column_names[sheet] = mapr[sheet].loc[3,:]      #keys/quantities & units from first row,
         column_names[sheet] = column_names[sheet].str.split('\n',expand=True)
         column_names[sheet] = column_names[sheet][0]+column_names[sheet][1]
