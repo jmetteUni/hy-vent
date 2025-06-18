@@ -368,6 +368,7 @@ def read_mapr(mapr_path):
     column_names = dict()
 
     for sheet in sheets:
+        print(sheet)
         mapr[sheet] = mapr_all[sheet].iloc[3:,1:14]     #select only data
         #mapr[sheet] = mapr[sheet].iloc[:,[0,1,2,3,4,5,10,11,12]] # only quantities with physical units
         column_names[sheet] = mapr[sheet].loc[3,:]      #keys/quantities & units from first row,
@@ -396,8 +397,6 @@ def read_he(he_path):
 
     Returns
     -------
-    he_data : pandas dataframe
-        Pandas dataframe with station, bottle number, Ne/He, delta3He and delta22Ne as columns.
     he_data_full : pandas dataframe
         Pandas dataframe with all quantities as columns.
     """
@@ -417,9 +416,8 @@ def read_he(he_path):
     #he_data['datetime'] = pd.to_datetime(he_data['jultime'],unit='D',origin='julian')
     he_data_full['station'] = 'PS137_0'+he_data_full['station'].astype(str)+'_01'
     he_data_full.rename({'bottle':'Bottle'},axis=1,inplace=True)
-    he_data = he_data_full[['station','Bottle','Ne/He','delta3He', 'delta22Ne']]
 
-    return he_data, he_data_full
+    return he_data_full
 
 def read_gebco(gebcopath,lonE,lonW,latS,latN): # hillshade_path
     """
