@@ -339,7 +339,7 @@ def read_btl(btl_path):
 
     return btl_data
 
-def read_mapr(mapr_path):
+def read_mapr(mapr_path, raw=False):
     """
     Reads in MAPR data from NOAA PMEL MAPR sensor excels sheets
     to a dictionary with the filename as the key and a pandas dataframe per
@@ -350,6 +350,8 @@ def read_mapr(mapr_path):
     ----------
     mapr_path : string
         Path to the directory where the data is stored in one sensor and station per file.
+    raw : bool, optional
+        Flag which controls if metadata is stripped and the format is reduced to a table containing only relevant data. If raw = True, the original format and metadata is kept. This is intended to produce readible raw data files for archiving. The defaul is False.
 
     Returns
     -------
@@ -369,16 +371,19 @@ def read_mapr(mapr_path):
 
     for sheet in sheets:
         print(sheet)
-        mapr[sheet] = mapr_all[sheet].iloc[3:,1:14]     #select only data
-        #mapr[sheet] = mapr[sheet].iloc[:,[0,1,2,3,4,5,10,11,12]] # only quantities with physical units
-        column_names[sheet] = mapr[sheet].loc[3,:]      #keys/quantities & units from first row,
-        column_names[sheet] = column_names[sheet].str.split('\n',expand=True)
-        column_names[sheet] = column_names[sheet][0]+column_names[sheet][1]
-        mapr[sheet].columns = column_names[sheet]
-        mapr[sheet].rename({'date/time(dd/mm/yyyy hh:mm:ss)':'datetime'},axis=1,inplace=True)
-        #mapr[sheet]['datetime'] = pd.to_datetime(mapr[sheet]['datetime'])
-        mapr[sheet] = mapr[sheet].drop(3,axis=0)
-        mapr[sheet]['datetime'] = pd.to_datetime(mapr[sheet]['datetime'])
+        if raw == False:
+            mapr[sheet] = mapr_all[sheet].iloc[3:,1:14]     #select only data
+            #mapr[sheet] = mapr[sheet].iloc[:,[0,1,2,3,4,5,10,11,12]] # only quantities with physical units
+            column_names[sheet] = mapr[sheet].loc[3,:]      #keys/quantities & units from first row,
+            column_names[sheet] = column_names[sheet].str.split('\n',expand=True)
+            column_names[sheet] = column_names[sheet][0]+column_names[sheet][1]
+            mapr[sheet].columns = column_names[sheet]
+            mapr[sheet].rename({'date/time(dd/mm/yyyy hh:mm:ss)':'datetime'},axis=1,inplace=True)
+            #mapr[sheet]['datetime'] = pd.to_datetime(mapr[sheet]['datetime'])
+            mapr[sheet] = mapr[sheet].drop(3,axis=0)
+            mapr[sheet]['datetime'] = pd.to_datetime(mapr[sheet]['datetime'])
+        else:
+            mapr[sheet] = mapr_all[sheet]
         print('Read '+sheet+ ' successfully')
 
     #mapr['PS137_OFOBS59-1_74'] = mapr['PS137_OFOBS59-1_74'][mapr['PS137_OFOBS59-1_74']['date/time']<pd.to_datetime('2023-07-26 04:50:00')]
