@@ -252,6 +252,110 @@ def posidata_SO301(posi_path):  #position data as one csv sheet, Ranger output
 
     return(posi)
 
+def posidata_M210(posi_path):
+    """
+    This function reads in position data of the ship and from four underwater acoustic position transponders for the cruise M210. The data was exported from the DSHIP system. The position data is grouped by transponder and NaN values as well as not needed data is removed.
+
+    Parameters
+    ----------
+    posi_path : string
+        Path to the data file.
+
+    Returns
+    -------
+    transp_list : dict
+        Dictionary containing key-value pairs for four different transponders as pandas dataframes and one key-value pair with unit information.
+    """
+    import numpy as np
+    import pandas as pd
+    from latlonparser import parse
+
+    dship = pd.read_csv(posi_path, sep=';', encoding='iso-8859-1')       #reads posi data
+
+    #remove all rows with all nan
+    dship_nonan = dship
+    dship_units = dship.iloc[1]
+    dship_nonan = dship_nonan.replace(' ',np.nan)
+    dship_nonan = dship_nonan.replace('#',np.nan)
+    dship_nonan = dship_nonan[2:]
+    dship_nonan = dship_nonan.dropna(axis=1, how='all')
+
+    #sort transponders into dict
+    transp_list = dict()
+    transp_list['transp0'] =  dship_nonan[['date time', 'SYS.DISP.ActName','SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+     'POSI.PTSAG.0.Depth_BUC',
+     'POSI.PTSAG.0.position_latitude',
+     'POSI.PTSAG.0.NS',
+     'POSI.PTSAG.0.position_longitude',
+     'POSI.PTSAG.0.EW',
+     'POSI.PTSAG.0.raw_time',
+     'POSI.PTSAG.0.transponder_No']]
+
+    transp_list['transp1'] =  dship_nonan[['date time', 'SYS.DISP.ActName','SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+     'POSI.PTSAG.1.Depth_BUC',
+     'POSI.PTSAG.1.position_latitude',
+     'POSI.PTSAG.1.NS',
+     'POSI.PTSAG.1.position_longitude',
+     'POSI.PTSAG.1.EW',
+     'POSI.PTSAG.1.raw_time',
+     'POSI.PTSAG.1.transponder_No']]
+
+    transp_list['transp2'] =  dship_nonan[['date time', 'SYS.DISP.ActName','SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+     'POSI.PTSAG.2.Depth_BUC',
+     'POSI.PTSAG.2.position_latitude',
+     'POSI.PTSAG.2.NS',
+     'POSI.PTSAG.2.position_longitude',
+     'POSI.PTSAG.2.EW',
+     'POSI.PTSAG.2.transponder_No']]
+
+    transp_list['transp3'] =  dship_nonan[['date time', 'SYS.DISP.ActName','SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+     'POSI.PTSAG.3.Depth_BUC',
+     'POSI.PTSAG.3.position_latitude',
+     'POSI.PTSAG.3.NS',
+     'POSI.PTSAG.3.position_longitude',
+     'POSI.PTSAG.3.EW',
+     'POSI.PTSAG.3.transponder_No']]
+
+    transp_list['transp4'] =  dship_nonan[['date time', 'SYS.DISP.ActName','SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+     'POSI.PTSAG.4.Depth_BUC',
+     'POSI.PTSAG.4.position_latitude',
+     'POSI.PTSAG.4.NS',
+     'POSI.PTSAG.4.position_longitude',
+     'POSI.PTSAG.4.EW',
+     'POSI.PTSAG.4.transponder_No']]
+
+    #rename and convert columns
+    for key in transp_list:
+        transp = transp_list[key]
+        transp.columns = transp.columns.str.replace('POSI.PTSAG.','')
+        no = key[-1]
+        transp.columns = transp.columns.str.replace(no,'')
+        transp.columns = transp.columns.str.replace('.','')
+        transp = transp.rename(columns={'date time':'Datetime','SYSDISPActName':'Station','SYSSTRDPT':'Water_depth','SYSSTRPosLat':'Ship_lat','SYSSTRPosLon':'Ship_lon','Depth_BUC':'Depth','position_latitude':'Instr_lat','position_longitude':'Instr_lon','transponder_No':'Transp_no'})
+
+        #drop nan rows
+        transp = transp.dropna(subset=['Depth','Instr_lat','Instr_lon'], how='all')
+        #convert datatypes
+        transp['Depth'] = transp['Depth'].astype(float)
+        transp['Datetime'] = pd.to_datetime(transp['Datetime'])
+        transp['Water_depth'] = transp['Water_depth'].astype(float)
+        try:
+            transp['Ship_lat'] = transp['Ship_lat'].astype(str).apply(lambda x: parse(x))
+        except:
+            transp['Ship_lat'] = np.nan
+        try:
+            transp['Ship_lon'] = transp['Ship_lon'].astype(str).apply(lambda x: parse(x))
+        except:
+            transp['Ship_lon'] = np.nan
+        transp['Instr_lat'] = transp['Instr_lat'].astype(str).apply(lambda x: parse(x))
+        transp['Instr_lon'] = transp['Instr_lon'].astype(str).apply(lambda x: parse(x))
+        transp['Transp_no'] = transp['Transp_no'].astype(int)
+
+        transp_list[key] = transp
+    transp_list['units'] = dship_units
+
+    return transp_list
+
 def read_btl(btl_path):
     """
     Reads in bottle data from SeaBird CTD processing software which ends with ".btl"
