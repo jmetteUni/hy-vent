@@ -268,7 +268,7 @@ def posidata_M210(posi_path):
     """
     import numpy as np
     import pandas as pd
-    from latlonparser import parse
+    from lat_lon_parser import parse
 
     dship = pd.read_csv(posi_path, sep=';', encoding='iso-8859-1')       #reads posi data
 
