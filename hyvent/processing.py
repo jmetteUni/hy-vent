@@ -122,7 +122,7 @@ def derive_mapr(data, data_for_mean, station_list):
 
     return data_der
 
-def process_MAPR(data, resample=None):
+def process_MAPR(data, resample='S'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -131,7 +131,7 @@ def process_MAPR(data, resample=None):
     data : pandas dataframe
         Dataframe of one or multiple MAPR operations with variables as columns. Need columns with station and serial number designation.
     resample : string, optional
-        String which is used in the pandas resample function to resample the time resolution. Normally should be None for no resampling or 'S' for resampling to 1 second intervals.
+        String which is used in the pandas resample function to resample the time resolution. Normally should be None for no resampling or 'S' for resampling to 1 second intervals. Default is 'S'.
 
     Returns
     -------
