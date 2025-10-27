@@ -6,7 +6,7 @@ Created on Fri Aug 16 13:30:29 2024
 @author: jmette@uni-bremen.de
 """
 
-def keys_to_data(data,datatype):
+def keys_to_data(data,datatype,project_name=None):
     """
 
     Adds meta information which is stored in the key of the "data" dictionary
@@ -28,6 +28,8 @@ def keys_to_data(data,datatype):
         String which describes the type of data. Can be "cnv" for full CTD
         profiles, "btl" for SeaBird bottle file data or "mapr" for NOAA PMEL
         MAPR data.
+    project_name : string, optional
+        Designates the project name. If this is not 'None', it is assumed that the project name is not included in the keys of the data sets. Therefore it is added in the beginning of each key. The default is 'None'.
 
     Returns
     -------
@@ -38,7 +40,13 @@ def keys_to_data(data,datatype):
 
     if datatype == 'cnv':
         for key in data:
-            new_key = str.split(key,'_')
+            #check and eventually add project name
+            if project_name != None:
+                new_key = project_name+'_'+key
+            else:
+                new_key = key
+            new_key = new_key.replace('-','_')
+            new_key = str.split(new_key,'_')
             cruise = new_key[0]
             station = new_key[1]+'_'+new_key[2]
 
@@ -49,7 +57,13 @@ def keys_to_data(data,datatype):
 
     if datatype == 'btl':
         for key in data:
-            new_key = str.split(key,'_')
+            #check and eventually add project name
+            if project_name != None:
+                new_key = project_name+'_'+key
+            else:
+                new_key = key
+            new_key = new_key.replace('-','_')
+            new_key = str.split(new_key,'_')
             cruise = new_key[0]
             station = new_key[1]+'_'+new_key[2]
 
@@ -60,7 +74,13 @@ def keys_to_data(data,datatype):
 
     if datatype == 'mapr':
         for key in data:
-            new_key = str.split(key,'_')
+            #check and eventually add project name
+            if project_name != None:
+                new_key = project_name+'_'+key
+            else:
+                new_key = key
+            new_key = new_key.replace('-','_')
+            new_key = str.split(new_key,'_')
             cruise = new_key[0]
             sn = new_key[2]
             operation = new_key[1][:-4]
