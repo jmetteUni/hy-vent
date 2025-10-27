@@ -83,7 +83,7 @@ def calc_mean_profile(data, var, station_list):
 
 def derive_mapr(data, data_for_mean, station_list):
     """
-    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations). The function also removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)").
+    This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations).
 
     Parameters
     ----------
@@ -101,11 +101,8 @@ def derive_mapr(data, data_for_mean, station_list):
 
     """
     from hyvent.processing import calc_mean_profile
-    from hyvent.quality_control import qc_IQR
     import pandas as pd
     import gsw
-    import numpy as np
-    from scipy.signal import savgol_filter
 
     var = 'PSAL'
 
@@ -120,8 +117,35 @@ def derive_mapr(data, data_for_mean, station_list):
     data_der['Rho'] = gsw.density.rho(data_der['SA'],data_der['CT'],data_der['PRES'])
     data_der['Sigma3'] = gsw.density.sigma3(data_der['SA'],data_der['CT'])
 
+    data_der = data_der.sort_values(by='datetime',ascending=True)
+    del data_der['PSAL_mean']
+
+    return data_der
+
+def process_MAPR(data, resample=None):
+    """
+    The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe of one or multiple MAPR operations with variables as columns. Need columns with station and serial number designation.
+    resample : string, optional
+        String which is used in the pandas resample function to resample the time resolution. Normally should be None for no resampling or 'S' for resampling to 1 second intervals.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe with the processed data
+    """
+
+    from hyvent.qc import qc_IQR
+    import numpy as np
+    import pandas as pd
+    from scipy.signal import savgol_filter
+
     #remove outliers and smooth turbidity below 100m
-    data_list = [d for _, d in data_der.groupby(['Station','SN'])]
+    data_list = [d for _, d in data.groupby(['Station','SN'])]
     for data in data_list:
         data_part = data.copy(deep=True)
         data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(data_part['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
@@ -131,12 +155,15 @@ def derive_mapr(data, data_for_mean, station_list):
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
 
-    data_der = pd.concat(data_list)
+    data = pd.concat(data_list)
 
-    data_der.sort_values(by='datetime',ascending=True,inplace=True)
-    del data_der['PSAL_mean']
+    #resampling to 1second intervals
+    data = data.resample(resample).interpolate()
 
-    return data_der
+    data = data.sort_values(by='datetime',ascending=True)
+
+    return data
+
 
 def derive_CTD(data):
     """
