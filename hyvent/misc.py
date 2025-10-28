@@ -82,14 +82,17 @@ def keys_to_data(data,datatype,project_name=None):
             new_key = new_key.replace('-','_')
             new_key = str.split(new_key,'_')
             cruise = new_key[0]
-            sn = new_key[2]
-            operation = new_key[1][:-4]
-            station = new_key[1][-4:]
-            station = str.split(station,'-')
-            station = '0'+station[0]+'_0'+station[1]
+            station = new_key[1]
+            cast = new_key[2]
+            sn = new_key[3]
+            operation = new_key[4]
+
+            #these lines are needed for PS137 file names with 2digit station and 1digit cast numbers
+            #station = str.split(station,'-')
+            #station = '0'+station[0]+'_0'+station[1]
 
             data[key]['Cruise'] = cruise
-            data[key]['Station'] = station
+            data[key]['Station'] = station+'_'+cast
             data[key]['SN'] = sn
             data[key]['Operation'] = operation
 
