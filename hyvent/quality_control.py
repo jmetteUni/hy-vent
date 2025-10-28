@@ -150,15 +150,32 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
 
     if isinstance(data,pd.DataFrame):
         station = data.copy(deep=True)
-        # define the condition
+        station = station.reset_index(drop=True)
+
+        # Define condition
         condition = station['Press(dB)'] >= pres_limit
 
-        # create a rolling window of 10 values
+        # Rolling mean to find sequences of 10 consecutive True values
         rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
 
-        # get the indices of the first row of each group of 10 consecutive values that meet the condition
-        indices = rolling_condition[rolling_condition == 1].index
-        station_part = station.iloc[indices[0]:indices[-1]+window_limit]
+        # Indices where all 10 consecutive values meet the condition
+        valid_indices = rolling_condition[rolling_condition == 1].index
+
+        if len(valid_indices) > 0:
+            # Find the first and last valid index block
+            start_index = valid_indices[0] - (window_limit - 1)  # include the first full window
+            if start_index < 0:
+                start_index = 0
+
+            end_index = valid_indices[-1] + 1  # include up to the last valid window
+            if end_index > len(station):
+                end_index = len(station)
+
+            # Trim the dataset
+            station_part = station.iloc[start_index:end_index].copy()
+        else:
+            # No segment meets the requirement — return empty DataFrame
+            print('No values removed.')
 
         if plot == True:
             plt.figure()
@@ -172,15 +189,30 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
     elif isinstance(data,dict):
         for key in data:
             station = data[key].copy(deep=True)
-            # define the condition
+            # Define condition
             condition = station['Press(dB)'] >= pres_limit
 
-            # create a rolling window of 10 values
+            # Rolling mean to find sequences of 10 consecutive True values
             rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
 
-            # get the indices of the first row of each group of 10 consecutive values that meet the condition
-            indices = rolling_condition[rolling_condition == 1].index
-            station_part = station.iloc[indices[0]:indices[-1]+10]
+            # Indices where all 10 consecutive values meet the condition
+            valid_indices = rolling_condition[rolling_condition == 1].index
+
+            if len(valid_indices) > 0:
+                # Find the first and last valid index block
+                start_index = valid_indices[0] - (window_limit - 1)  # include the first full window
+                if start_index < 0:
+                    start_index = 0
+
+                end_index = valid_indices[-1] + 1  # include up to the last valid window
+                if end_index > len(station):
+                    end_index = len(station)
+
+                # Trim the dataset
+                station_part = station.iloc[start_index:end_index].copy()
+            else:
+                # No segment meets the requirement — return empty DataFrame
+                print('No values removed.')
 
             if plot == True:
                 plt.figure()
