@@ -122,7 +122,7 @@ def derive_mapr(data, data_for_mean, station_list):
 
     return data_der
 
-def process_MAPR(data, resample='S'):
+def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='S'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -130,6 +130,18 @@ def process_MAPR(data, resample='S'):
     ----------
     data : pandas dataframe
         Dataframe of one or multiple MAPR operations with variables as columns. Need columns with station and serial number designation.
+    lat : float
+        Approximate latitude of the measurement for correcting the depth calculation.
+    fs : float, optional
+        Sample frequency of the MAPR in Hz. Default is 1/5.
+    window_size : int, optional
+        Size for the sliding window over which the gradient for dORP is computed in seconds. For a size of 30s and fs=1/5Hz size results in 6 measurements. Default is 30.
+    iqr_threshold: float, optional
+        Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 5.
+    savgol_window_length : int, optional
+        The length of the filter window (i.e., the number of coefficients) for the savgol_filter function. If mode is 'interp', window_length must be less than or equal to the size of x. Default is 70.
+    savgol_polyorder : int, optional
+        The order of the polynomial used to fit the samples in the savgol_filter funcion. polyorder must be less than window_length. Default is 3.
     resample : string, optional
         String which is used in the pandas resample function to resample the time resolution. Normally should be None for no resampling or 'S' for resampling to 1 second intervals. Default is 'S'.
 
@@ -139,23 +151,38 @@ def process_MAPR(data, resample='S'):
         Dataframe with the processed data
     """
 
-    from hyvent.qc import qc_IQR
+    from hyvent.quality_control import qc_IQR, cut_prepost_deploy
+    from hyvent.processing import corr_mapr_depth
     import numpy as np
     import pandas as pd
     from scipy.signal import savgol_filter
 
-    #remove outliers and smooth turbidity below 100m
     data_list = [d for _, d in data.groupby(['Station','SN'])]
     for data in data_list:
+        #clears internal readingsys
+        data = data[data['Press(counts)']!=0]
+        data = data[data['Press(counts)']!=8224]
+        #calculates dORP as the change per second (/30) over a forward sliding window over 30 seconds (6*5sec sample freqeuency)
+        periods = window_size*fs
+        data['dORP'] = data['ORP(mv)'].diff(periods=periods)/window_size
+        #correct depth by mean pre-dployment pressure
+        data['Depth_corr(m)'] = corr_mapr_depth(data, lat)
+        #cuts pre and post deployment
+        data = cut_prepost_deploy(data, plot=True)
+
+        #remove outliers and smooth turbidity below 100m
         data_part = data.copy(deep=True)
-        data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(data_part['DEPTH']<100,np.nan)      #mask all vlaues in Neph above 100m
-        data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', 5)     #remove outliers
-        data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].interpolate()
+        data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(data_part['Depth_corr(m)']<100,np.nan)      #mask all vlaues in Neph above 100m
+        data_part['Neph_outl(volts)'] = qc_IQR(data_part, 'Neph(volts)', iqr_threshold)     #remove outliers
+        data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].infer_objects(copy=False).interpolate()
         data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 70, 3)       #smooth
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
 
     data = pd.concat(data_list)
+
+    #rename columns
+    data = data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth_corr(m)':'DEPTH','ORP(mv)':'ORP(mV)'})
 
     #resampling to 1second intervals
     data = data.resample(resample).interpolate()
