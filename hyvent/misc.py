@@ -95,6 +95,9 @@ def keys_to_data(data,datatype,project_name=None):
             data[key]['Station'] = station+'_'+cast
             data[key]['SN'] = sn
             data[key]['Operation'] = operation
+            
+            #cast columns to python string (throws error in process_mapr)
+            #data[key][['Cruise','Station','SN','Operation']] = data[key][['Cruise','Station','SN','Operation']].astype('string')
 
     return data
 
