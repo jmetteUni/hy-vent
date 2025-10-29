@@ -122,7 +122,7 @@ def derive_mapr(data, data_for_mean, station_list):
 
     return data_der
 
-def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='S'):
+def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -168,7 +168,7 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
         #correct depth by mean pre-dployment pressure
         data['Depth_corr(m)'] = corr_mapr_depth(data, lat)
         #cuts pre and post deployment
-        data = cut_prepost_deploy(data, plot=True)
+        data = cut_prepost_deploy(data)
 
         #remove outliers and smooth turbidity below 100m
         data_part = data.copy(deep=True)
@@ -178,14 +178,17 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
         data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 70, 3)       #smooth
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
+        
+        #resampling to 1second intervals
+        data = data.set_index('datetime')
+        data = data.resample(resample).asfreq()
+        data = data.infer_objects(copy=False).interpolate()
 
     data = pd.concat(data_list)
 
     #rename columns
     data = data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth_corr(m)':'DEPTH','ORP(mv)':'ORP(mV)'})
-
-    #resampling to 1second intervals
-    data = data.resample(resample).interpolate()
+ 
 
     data = data.sort_values(by='datetime',ascending=True)
 
