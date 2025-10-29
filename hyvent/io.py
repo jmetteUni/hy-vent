@@ -29,7 +29,6 @@ def read_cnv(path):
     from seabird.cnv import fCNV
     import os
     import datetime as dt
-    import numpy as np
 
     file_list = []                  #get all cnv filenames
     for file in os.listdir(path):
@@ -50,6 +49,10 @@ def read_cnv(path):
         cnv_data[key]['datetime'] = cnv_data[key]['basedate']+pd.to_timedelta(cnv_data[key]['timeQ'],unit='seconds')
         del cnv_data[key]['basedate']
         print('Read '+file+' sucessfully')
+        
+    # infer datetypes
+    for key in cnv_data:
+        cnv_data[key] = cnv_data[key].infer_objects(copy=False)
 
     return cnv_data
 
@@ -440,6 +443,10 @@ def read_btl(btl_path):
         file = file.rstrip('.btl')
         btl_data[file] = df_output
         print('Read '+file+' successfully!')
+    
+    # infer datetypes
+    for key in btl_data:
+        btl_data[key] = btl_data[key].infer_objects(copy=False)
 
     return btl_data
 
@@ -502,6 +509,10 @@ def read_mapr(mapr_path, raw=False, error_sheets = None):
     #mapr['PS137_OFOBS59-1_74'] = mapr['PS137_OFOBS59-1_74'][mapr['PS137_OFOBS59-1_74']['date/time']<pd.to_datetime('2023-07-26 04:50:00')]
     #what for? -> check times
 
+    # infer datetypes
+    for key in mapr:
+        mapr[key] = mapr[key].infer_objects(copy=False)
+    
     return mapr
 
 def read_he(he_path):
