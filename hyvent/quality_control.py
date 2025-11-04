@@ -229,9 +229,9 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
 
     return data
 
-def despike_pressure(series, window, threshold, neg_threshold=-30):
+def despike_pressure(series, window, threshold):
     """
-    Despike a pandas pressure series using a rolling median + MAD (Median Absolute Deviation) method. Spikes are replaced with np.nan. Before the despiking, all values below a threshold are also set to NaN.
+    Despike a pandas pressure series using a rolling median + MAD (Median Absolute Deviation) method. Spikes are replaced with np.nan.
 
     Parameters
     ----------
@@ -241,8 +241,6 @@ def despike_pressure(series, window, threshold, neg_threshold=-30):
         Sliding window size (should be odd).
     threshold : float
         Number of MADs from the rolling median to consider a spike.
-    neg_threshold : float, optional
-        Values below that threshold are set to NaN, as they are assumed to be on deck. Default is -30, assuming the unit is decibar.
 
     Returns
     -------
@@ -253,7 +251,6 @@ def despike_pressure(series, window, threshold, neg_threshold=-30):
     import numpy as np
 
     s = series.copy()
-    s[s<-30] = np.nan
 
     roll_median = s.rolling(window, center=True, min_periods=1).median()
     roll_mad = (s - roll_median).abs().rolling(window, center=True, min_periods=1).median()
