@@ -122,7 +122,7 @@ def derive_mapr(data, data_for_mean, station_list):
 
     return data_der
 
-def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
+def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -134,6 +134,8 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
         Approximate latitude of the measurement for correcting the depth calculation.
     fs : float, optional
         Sample frequency of the MAPR in Hz. Default is 1/5.
+    neg_threshold : flaot, optional
+        Pressure values below that threshold are set to NaN. Default is 30 assuming the unit as decibar.
     window_size : int, optional
         Size for the sliding window over which the gradient for dORP is computed in seconds. For a size of 30s and fs=1/5Hz size results in 6 measurements. Default is 30.
     iqr_threshold: float, optional
@@ -162,6 +164,7 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
         #clears internal readingsys
         data = data[data['Press(counts)']!=0]
         data = data[data['Press(counts)']!=8224]
+        data['Press(dB)'][data['Press(dB)']<neg_threshold] = np.nan
         #calculates dORP as the change per second (/30) over a forward sliding window over 30 seconds (6*5sec sample freqeuency)
         periods = window_size*fs
         data['dORP'] = data['ORP(mv)'].diff(periods=periods)/window_size
@@ -178,7 +181,7 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
         data_part['Neph_smoo(volts)'] = savgol_filter(data_part['Neph_outl(volts)'], 70, 3)       #smooth
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']     #write processed columns back to data_partframe
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
-        
+
         #resampling to 1second intervals
         data = data.set_index('datetime')
         data = data.resample(resample).asfreq()
@@ -188,7 +191,7 @@ def process_MAPR(data, lat, fs=1/5, window_size=30, iqr_threshold=5, savgol_wind
 
     #rename columns
     data = data.rename(columns={'Press(dB)':'PRES','Temp(°C)':'TEMP','Depth_corr(m)':'DEPTH','ORP(mv)':'ORP(mV)'})
- 
+
 
     data = data.sort_values(by='datetime',ascending=True)
 
