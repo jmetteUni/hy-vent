@@ -228,3 +228,40 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
         print('Could not cut dataset, must be pd.DataFrame or dict.')
 
     return data
+
+def despike_pressure(series, window, threshold, neg_threshold=-30):
+    """
+    Despike a pandas pressure series using a rolling median + MAD (Median Absolute Deviation) method. Spikes are replaced with np.nan. Before the despiking, all values below a threshold are also set to NaN.
+
+    Parameters
+    ----------
+    series : pd.Series
+        Input time series data.
+    window : int
+        Sliding window size (should be odd).
+    threshold : float
+        Number of MADs from the rolling median to consider a spike.
+    neg_threshold : float, optional
+        Values below that threshold are set to NaN, as they are assumed to be on deck. Default is -30, assuming the unit is decibar.
+
+    Returns
+    -------
+    pd.Series
+        Despiked series with np.nan replacing spikes.
+    """
+    import pandas as pd
+    import numpy as np
+
+    s = series.copy()
+    s[s<-30] = np.nan
+
+    roll_median = s.rolling(window, center=True, min_periods=1).median()
+    roll_mad = (s - roll_median).abs().rolling(window, center=True, min_periods=1).median()
+    roll_mad[roll_mad == 0] = np.nan  # prevent divide-by-zero
+
+    deviation = (s - roll_median).abs() / roll_mad
+    spikes = deviation > threshold
+
+    s[spikes] = np.nan
+
+    return s
