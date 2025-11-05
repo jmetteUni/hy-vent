@@ -169,7 +169,7 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, d
         data = data[data['Press(counts)']!=0]
         data = data[data['Press(counts)']!=8224]
         data.loc[data['Press(dB)']<neg_threshold, 'Press(dB)'] = np.nan
-        data['Press(dB)'] = despike_pressure(data['Press(dB)'], despike_window_size, despike_threshold, control_plot=True)
+        data['Press(dB)'] = despike_pressure(data['Press(dB)'], despike_window_size, despike_threshold)
         #calculates dORP as the change per second (/30) over a forward sliding window over 30 seconds (6*5sec sample freqeuency)
         periods = orp_window_size*fs
         data['dORP'] = data['ORP(mv)'].diff(periods=periods)/orp_window_size
