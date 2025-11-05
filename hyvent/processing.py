@@ -122,7 +122,7 @@ def derive_mapr(data, data_for_mean, station_list):
 
     return data_der
 
-def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
+def process_MAPR(data, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, despike_threshold=15, orp_window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -135,8 +135,12 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_thresh
     fs : float, optional
         Sample frequency of the MAPR in Hz. Default is 1/5.
     neg_threshold : flaot, optional
-        Pressure values below that threshold are set to NaN. Default is 30 assuming the unit as decibar.
-    window_size : int, optional
+        Pressure values below that threshold are set to NaN. Default is -30 assuming the unit as decibar.
+    despike_window_size : int, optional
+        Size for the rolling median filter to despike the pressure data. Default is 15.
+    despike_threshold : float, optional
+        Threshold for the rolling median filter to despike the pressure data. Defaul is 15.
+    orp_window_size : int, optional
         Size for the sliding window over which the gradient for dORP is computed in seconds. For a size of 30s and fs=1/5Hz size results in 6 measurements. Default is 30.
     iqr_threshold: float, optional
         Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 5.
@@ -164,11 +168,11 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_thresh
         #clears internal readingsys
         data = data[data['Press(counts)']!=0]
         data = data[data['Press(counts)']!=8224]
-        data['Press(dB)'][data['Press(dB)']<neg_threshold] = np.nan
-        data['Press(dB)'] = despike_pressure(data['Press(dB)'],15,15)
+        data.loc[data['Press(dB)']<neg_threshold, 'Press(dB)'] = np.nan
+        data['Press(dB)'] = despike_pressure(data['Press(dB)'], despike_window_size, despike_threshold, control_plot=True)
         #calculates dORP as the change per second (/30) over a forward sliding window over 30 seconds (6*5sec sample freqeuency)
-        periods = window_size*fs
-        data['dORP'] = data['ORP(mv)'].diff(periods=periods)/window_size
+        periods = orp_window_size*fs
+        data['dORP'] = data['ORP(mv)'].diff(periods=periods)/orp_window_size
         #correct depth by mean pre-dployment pressure
         data['Depth_corr(m)'] = corr_mapr_depth(data, lat)
         #cuts pre and post deployment
