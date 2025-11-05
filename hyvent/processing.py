@@ -153,7 +153,7 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_thresh
         Dataframe with the processed data
     """
 
-    from hyvent.quality_control import qc_IQR, cut_prepost_deploy
+    from hyvent.quality_control import qc_IQR, cut_prepost_deploy, despike_pressure
     from hyvent.processing import corr_mapr_depth
     import numpy as np
     import pandas as pd
@@ -165,6 +165,7 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=30, window_size=30, iqr_thresh
         data = data[data['Press(counts)']!=0]
         data = data[data['Press(counts)']!=8224]
         data['Press(dB)'][data['Press(dB)']<neg_threshold] = np.nan
+        data['Press(dB)'] = despike_pressure(data['Press(dB)'],15,15)
         #calculates dORP as the change per second (/30) over a forward sliding window over 30 seconds (6*5sec sample freqeuency)
         periods = window_size*fs
         data['dORP'] = data['ORP(mv)'].diff(periods=periods)/window_size
