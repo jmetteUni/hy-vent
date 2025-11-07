@@ -217,20 +217,22 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         # resampling to 1second intervals
         data = data.set_index('datetime')
         data = data.resample(resample).asfreq()
-        data = data.infer_objects(copy=False).interpolate()
+        #select numeric columns and interpolate
+        numeric_cols = data.select_dtypes(include=['number']).columns
+        data[numeric_cols] = data[numeric_cols].interpolate()
+        #forward fill non numeric columns
+        data[['Cruise','Station','Operation','SN']] = data[['Cruise','Station','Operation','SN']].ffill()
+        #reset index to keep datetime as a column
+        data = data.reset_index()
 
         # writes data in to list
         data_list[idx] = data
 
     data_proc = pd.concat(data_list)
 
-    # rename columns
-    data_proc = data_proc.rename(columns={'Press(dB)': 'PRES', 'Temp(°C)': 'TEMP',
-                                          'Depth_corr(m)': 'DEPTH', 'ORP(mv)': 'ORP(mV)'})
-
     data_proc = data_proc.sort_values(by='datetime', ascending=True)
 
-    return data
+    return data_proc
 
 
 def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
