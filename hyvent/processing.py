@@ -217,12 +217,13 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         # resampling to 1second intervals
         data = data.set_index('datetime')
         data = data.resample(resample).asfreq()
-        #select numeric columns and interpolate
+        # select numeric columns and interpolate
         numeric_cols = data.select_dtypes(include=['number']).columns
         data[numeric_cols] = data[numeric_cols].interpolate()
-        #forward fill non numeric columns
-        data[['Cruise','Station','Operation','SN']] = data[['Cruise','Station','Operation','SN']].ffill()
-        #reset index to keep datetime as a column
+        # forward fill non numeric columns
+        data[['Cruise', 'Station', 'Operation', 'SN']] = data[[
+            'Cruise', 'Station', 'Operation', 'SN']].ffill()
+        # reset index to keep datetime as a column
         data = data.reset_index()
 
         # writes data in to list
