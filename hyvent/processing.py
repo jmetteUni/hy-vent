@@ -142,7 +142,7 @@ def derive_mapr(data, data_for_mean, station_list):
     return data_der
 
 
-def process_MAPR(data, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, despike_threshold=15, orp_window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
+def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, despike_threshold=15, orp_window_size=30, iqr_threshold=5, savgol_window_length=70, savgol_polyorder=3, resample='s'):
     """
     The function removes outliers ("Neph_outl(volts)") and additionally smoothes the turbdity data ("Neph_smoo(volts)"). Optionally the data is resampled to a different time interval.
 
@@ -183,7 +183,7 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, d
     import pandas as pd
     from scipy.signal import savgol_filter
 
-    data_list = [d for _, d in data.groupby(['Station', 'SN'])]
+    data_list = [d for _, d in data_in.groupby(['Station', 'SN'])]
     for idx, data in enumerate(data_list):
         # clears internal readingsys
         data = data[data['Press(counts)'] != 0]
@@ -222,15 +222,89 @@ def process_MAPR(data, lat, fs=1/5, neg_threshold=-30, despike_window_size=15, d
         # writes data in to list
         data_list[idx] = data
 
-    data = pd.concat(data_list)
+    data_proc = pd.concat(data_list)
 
     # rename columns
-    data = data.rename(columns={'Press(dB)': 'PRES', 'Temp(°C)': 'TEMP',
-                       'Depth_corr(m)': 'DEPTH', 'ORP(mv)': 'ORP(mV)'})
+    data_proc = data_proc.rename(columns={'Press(dB)': 'PRES', 'Temp(°C)': 'TEMP',
+                                          'Depth_corr(m)': 'DEPTH', 'ORP(mv)': 'ORP(mV)'})
 
-    data = data.sort_values(by='datetime', ascending=True)
+    data_proc = data_proc.sort_values(by='datetime', ascending=True)
 
     return data
+
+
+def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
+    """
+    This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: "seaTurbMtr") is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: "ORP_raw_v6") is used to calculate the gradient per second over 30 seconds averaged.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Dataframe of one or multiple CTD operations with variables as columns. Need columns with station designation.
+    iqr_threshold : float, optional
+        Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 10.
+    box_plots : boolean, optional
+        Boolian which controlles if box plots for the IQR outlier removal are produced or not. Default is False
+    control_plot : boolean, optional
+        Boolian which controlles if control plots for turbidity processing are produced or not. Default is False.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Dataframe with the processed data
+    """
+
+    from hyvent.quality_control import qc_IQR
+    from scipy.signal import savgol_filter
+
+    import pandas as pd
+    import numpy as np
+
+    # iqr_threshold = 10   #for turbidity IQR outlier removal for cruise M210
+
+    data_list = [d for _, d in data_in.groupby(['Station'])]
+    for idx, data in enumerate(data_list):
+        # remove outliers and smooth turbidity below 100m
+        data = data.rename(columns={'seaTurbMtr': 'Neph(volts)'})
+        data_part = data.copy(deep=True)
+
+        data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(
+            # mask all vlaues in Neph above 100m
+            data_part['DEPTH'] < 100, np.nan)
+        data_part['Neph_outl(volts)'] = qc_IQR(
+            # remove outliers
+            data_part, ['Neph(volts)'], iqr_threshold, boxplots=box_plots)
+        data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].infer_objects(
+            copy=False).interpolate()
+        data_part['Neph_smoo(volts)'] = savgol_filter(
+            data_part['Neph_outl(volts)'], 30, 3)  # smooth
+        # write processed columns back to data_partframe
+        data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']
+        data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
+
+        # control plot for turbidity processing
+        if control_plot == True:
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(data['Neph(volts)'], label='original data')
+            plt.plot(data['Neph_outl(volts)'], label='outlier removed')
+            plt.plot(data['Neph_smoo(volts)'], label='outl. rem. & smoothed')
+            plt.ylabel('Turbidity in NTU')
+            # plt.ylim(data['Neph_outl(volts)'].min(),data['Neph_outl(volts)'].max())
+            plt.xlabel('Index')
+            plt.legend()
+
+        # calculate dORP from raw voltage values
+        data['dORP'] = data['ORP_raw_v6'].diff(periods=30)/30
+
+        # writes data to list
+        data_list[idx] = data
+
+    data_proc = pd.concat(data_list)
+
+    data_proc = data_proc.sort_values(by='datetime', ascending=True)
+
+    return data_proc
 
 
 def derive_CTD(data):
