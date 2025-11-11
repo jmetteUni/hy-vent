@@ -10,7 +10,7 @@ Created on Wed Sep 11 12:52:37 2024
 def corr_mapr_depth(data, lat):
     """
 
-    Calculates a corrected depth based on the 200 first pressure values larger then 5 dbar which are assumed as measured before deploying. The new, corrected depth is calculated with Gibbs Seawater Toolbox (gsw.conversions.z_from_p()) with the pressure corrected by the mean of the pre-deployment values and written to the dataframe as a new column.
+    Calculates a corrected depth based on the 200 first pressure values larger then 5 dbar which are assumed as measured before deploying. The new, corrected depth is calculated with Gibbs Seawater Toolbox (gsw.conversions.z_from_p()) with the pressure corrected by the mean of the pre-deployment values and written to the dataframe as a new column. If there are less then 10 pre-deployment values, no correction is applied and the original Depth is copied to the new column.
 
 
     Parameters
@@ -32,17 +32,23 @@ def corr_mapr_depth(data, lat):
     p_deck = data[:200]  # take first 200 measurements which are negative
     # exclude values which are already in water measured
     p_deck = p_deck[p_deck['Press(dB)'] < 5]
+    key = data['Station'].iloc[0]+'_'+data['SN'].iloc[0]
     if len(p_deck) < 50:  # warn if only a few measurements are pre-deplyoment
-        print('Warning: Less then 50 values used for deck reference pressure!')
-    p_deck_mean = p_deck['Press(dB)'].mean()
-    # print('Mean deck pressure: '+str(p_deck_mean)+' dB')
-    data['Depth_corr(m)'] = -data.apply(lambda x: gsw.conversions.z_from_p(
-        # calculates the corrected depth
-        x['Press(dB)']-p_deck_mean, lat), axis=1)
+        print('Warning: Less then 50 values in '+key+' used for deck reference pressure!')
 
-    # select only the corrected depth column
-    depth_corr = data['Depth_corr(m)']
+    #if there are more then 10 values, apply correction
+    if len(p_deck) > 10:
+        p_deck_mean = p_deck['Press(dB)'].mean()
+        # print('Mean deck pressure: '+str(p_deck_mean)+' dB')
+        data['Depth_corr(m)'] = -data.apply(lambda x: gsw.conversions.z_from_p(
+            # calculates the corrected depth
+            x['Press(dB)']-p_deck_mean, lat), axis=1)
 
+        # select only the corrected depth column
+        depth_corr = data['Depth_corr(m)']
+    else:
+        print('Less then 10 deck pressure values in '+key+', no correction applied')
+        depth_corr = data['Depth(m)']
     return depth_corr
 
 
