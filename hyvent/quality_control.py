@@ -231,7 +231,7 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
 
 def despike_pressure(series, window, threshold, control_plot=False):
     """
-    Despike a pandas pressure series using a rolling median + MAD (Median Absolute Deviation) method. Spikes are replaced with np.nan.
+    Despike a pandas pressure series using a rolling median + MAD (Median Absolute Deviation) method. Spikes are replaced with np.nan and then interpolated.
 
     Parameters
     ----------
@@ -271,9 +271,7 @@ def despike_pressure(series, window, threshold, control_plot=False):
         plt.legend()
 
     s[spikes] = np.nan
-
-
-
-
+    #interpolate nans
+    s = s.interpolate()
 
     return s
