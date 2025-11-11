@@ -40,21 +40,26 @@ def read_cnv(path):
     cnv_data = dict()  # read cnv file into pandas dataframe with fCNV package
     for file in file_list:
         key = file.rstrip('.cnv')
-        cnv_data[key] = fCNV(path+file).as_DataFrame()
-        cnv_data[key]['basedate'] = dt.datetime(
-            2000, 1, 1)  # create datetime object column
-        if cnv_data[key]['timeQ'].isna().any() == True:
-            cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(
-                axis=0)  # interpolates nan values
-            if cnv_data[key]['timeQ'].duplicated().any() == True:
-                # average rows with the same timestamp, NaNs already filled
-                cnv_data[key] = cnv_data[key].groupby(
-                    'timeQ').mean().reset_index()
+        if '_1Hz' in key:
+            key = key.replace('_1Hz', '')
+        try:
+            cnv_data[key] = fCNV(path+file).as_DataFrame()
+            cnv_data[key]['basedate'] = dt.datetime(
+                2000, 1, 1)  # create datetime object column
+            if cnv_data[key]['timeQ'].isna().any() == True:
+                cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(
+                    axis=0)  # interpolates nan values
+                if cnv_data[key]['timeQ'].duplicated().any() == True:
+                    # average rows with the same timestamp, NaNs already filled
+                    cnv_data[key] = cnv_data[key].groupby(
+                        'timeQ').mean().reset_index()
 
-        cnv_data[key]['datetime'] = cnv_data[key]['basedate'] + \
-            pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
-        del cnv_data[key]['basedate']
-        print('Read '+file+' sucessfully')
+            cnv_data[key]['datetime'] = cnv_data[key]['basedate'] + \
+                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
+            del cnv_data[key]['basedate']
+            print('Read '+file+' sucessfully')
+        except:
+            print('Error reading '+file+', skipping...')
 
     # infer datetypes
     for key in cnv_data:
@@ -580,6 +585,11 @@ def read_mapr(mapr_path, raw=False, error_sheets=None):
                 else:
                     mapr[sheet] = mapr_all[sheet]
                 print('Read '+sheet + ' successfully')
+                # to check for proper datetimes
+                # if (mapr[sheet]['datetime'].is_monotonic_increasing and mapr[sheet]['datetime'].is_unique)==False:
+                #     print('Monotonic: '+mapr[sheet]['datetime'].is_monotonic_increasing)
+                #     print('Unique: '+mapr[sheet]['datetime'].is_unique())
+
             except:
                 print('Error while reading sheet '+sheet+', skipping')
 
