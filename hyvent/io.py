@@ -527,7 +527,7 @@ def read_btl(btl_path):
     return btl_data
 
 
-def read_mapr(mapr_path, raw=False, error_sheets=None):
+def read_mapr(mapr_path, raw=False, error_sheets=[]):
     """
     Reads in MAPR data from NOAA PMEL MAPR sensor excels sheets
     to a dictionary with the filename as the key and a pandas dataframe per
@@ -541,7 +541,7 @@ def read_mapr(mapr_path, raw=False, error_sheets=None):
     raw : bool, optional
         Flag which controls if metadata is stripped and the format is reduced to a table containing only relevant data. If raw = True, the original format and metadata is kept. This is intended to produce readible raw data files for archiving. The defaul is False.
     error_sheets : list, optional
-        If the excel document contains single sheets with errornous data, the corresponding sheet names can be given to the function as string in this list and are skipped. This can be expecially helpfull as pandas seems to read one additional errornous sheet called 'MAPR_files module'.
+        If the excel document contains single sheets with errornous data, the corresponding sheet names can be given to the function as string in this list and are skipped. This can be expecially helpfull as pandas seems to read one additional errornous sheet called 'MAPR_files module'. Default is an empty list.
 
     Returns
     -------
