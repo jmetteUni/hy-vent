@@ -495,21 +495,21 @@ def read_btl(btl_path):
 
         for i in range(n_bottles):
             index = i*4
-            date = df['Date'][index+1]
-            time = df['Date'][index+2]
-            lat = df['Latitude'][index+1]
-            long = df['Longitude'][index+1]
-            bottle = df['Bottle'][index+1]
+            date = df.loc[index+1,'Date']
+            time = df.loc[index+2,'Date']
+            lat = df.loc[index+1,'Latitude']
+            long = df.loc[index+1,'Longitude']
+            bottle = df.loc[index+1,'Bottle']
             for column in columns:
-                df_output[column+'_mean'][i+1] = df[column][index+1]
-                df_output[column+'_sd'][i+1] = df[column][index+2]
-                df_output[column+'_min'][i+1] = df[column][index+3]
-                df_output[column+'_max'][i+1] = df[column][index+4]
-                df_output['Date'][i+1] = date
-                df_output['Time'][i+1] = time
-                df_output['Latitude'][i+1] = lat
-                df_output['Longitude'][i+1] = long
-                df_output['Bottle'][i+1] = bottle
+                df_output.loc[i+1,column+'_mean'] = df.loc[index+1,column]
+                df_output.loc[i+1,column+'_sd'] = df.loc[index+2,column]
+                df_output.loc[i+1,column+'_min'] = df.loc[index+3,column]
+                df_output.loc[i+1,column+'_max'] = df.loc[index+4,column]
+                df_output.loc[i+1,'Date'] = date
+                df_output.loc[i+1,'Time'] = time
+                df_output.loc[i+1,'Latitude'] = lat
+                df_output.loc[i+1,'Longitude'] = long
+                df_output.loc[i+1,'Bottle'] = bottle
 
         df_output = df_output.iloc[:, :-4]
         df_output['datetime'] = pd.to_datetime(
