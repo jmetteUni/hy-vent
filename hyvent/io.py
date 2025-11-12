@@ -311,11 +311,9 @@ def posidata_SO301(posi_path):  # position data as one csv sheet, Ranger output
                        # reads posi data
                        encoding='iso-8859-1', skiprows=3, names=['datetime', 'CTD_depth', 'CTD_lat', 'CTD_lon'])
     posi['datetime'] = pd.to_datetime(
-        posi['date/time'])  # creates datetime object
-    for row, element in posi.iterrows():  # parses to decimal degrees
-        # takes long, not possible to vectorize parse()?
-        posi['Lat'][row] = parse(str(posi['Lat'][row]))
-        posi['Lon'][row] = parse(str(posi['Lon'][row]))
+        posi['datetime'])  # creates datetime object
+    posi['CTD_lat'] = posi['CTD_lat'].astype(str).apply(lambda x: parse(x))
+    posi['CTD_lon'] = posi['CTD_lon'].astype(str).apply(lambda x: parse(x))
 
     return (posi)
 
