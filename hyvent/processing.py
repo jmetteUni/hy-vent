@@ -194,6 +194,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         # clears internal readingsys
         data = data[data['Press(counts)'] != 0]
         data = data[data['Press(counts)'] != 8224]
+        data = data[data['datetime'].notna()]
         data.loc[data['Press(dB)'] < neg_threshold, 'Press(dB)'] = np.nan
         data['Press(dB)'] = despike_pressure(data['Press(dB)'],
                                              despike_window_size, despike_threshold)
@@ -203,7 +204,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         # correct depth by mean pre-dployment pressure
         data['Depth_corr(m)'] = corr_mapr_depth(data, lat)
         # cuts pre and post deployment
-        data = cut_prepost_deploy(data)
+        data = cut_prepost_deploy(data,window_limit=60)
 
         # remove outliers and smooth turbidity below 100m
         data_part = data.copy(deep=True)
@@ -220,6 +221,16 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
 
+        #check consistency of timestamps
+        if data['datetime'].is_unique==False:
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(data.index,data['datetime'])
+            plt.title(data['Station'].iloc[0]+data['SN'].iloc[0])
+            plt.figure()
+            plt.plot(data.index,data['Press(dB)'])
+            plt.title(data['Station'].iloc[0]+data['SN'].iloc[0])
+            print('Datetime is not unique, error in '+data['Station'].iloc[0]+data['SN'].iloc[0])
         # resampling to 1second intervals
         data = data.set_index('datetime')
         data = data.resample(resample).asfreq()
@@ -304,7 +315,9 @@ def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
             plt.legend()
 
         # calculate dORP from raw voltage values
-        data['dORP'] = data['ORP_raw_v6'].diff(periods=30)/30
+        # for raw values
+        # data['dORP'] = data['ORP_raw_v6'].diff(periods=30)/30
+        data['dORP'] = data['upoly0'].diff(periods=30)/30
 
         # writes data to list
         data_list[idx] = data
