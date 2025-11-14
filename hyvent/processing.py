@@ -277,8 +277,8 @@ def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
         data = data.rename(columns={'seaTurbMtr': 'Neph(volts)'})
         data_part = data.copy(deep=True)
 
+        # mask all vlaues in Neph above 100m
         data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(
-            # mask all vlaues in Neph above 100m
             data_part['DEPTH'] < 100, np.nan)
         data_part['Neph_outl(volts)'] = qc_IQR(
             # remove outliers
