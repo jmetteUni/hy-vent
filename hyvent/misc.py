@@ -49,16 +49,24 @@ def keys_to_data(data,datatype,project_name=None):
             new_key = new_key.replace('-','_')
             new_key = str.split(new_key,'_')
             cruise = new_key[0]
-            station = new_key[1]+'_'+new_key[2]
+            station = new_key[1]
+            if len(station) == 2:
+                station = '0'+station
+            cast = new_key[2]
+            if len(cast) == 1:
+                cast = '0'+cast
+
+            n = len(data[key])
 
             new_cols = pd.DataFrame({
-                'Cruise': [cruise],
-                'Station': [station],
-                'SN': 'SBE9',
-                'Operation': 'profile'
+                'Cruise': [cruise]*n,
+                'Station': [station + '_' + cast]*n,
+                'SN': ['SBE9']*n,
+                'Operation': ['profile']*n
             })
 
             data[key] = pd.concat([data[key], new_cols], axis=1)
+
 
     if datatype == 'btl':
         for key in data:
@@ -70,13 +78,20 @@ def keys_to_data(data,datatype,project_name=None):
             new_key = new_key.replace('-','_')
             new_key = str.split(new_key,'_')
             cruise = new_key[0]
-            station = new_key[1]+'_'+new_key[2]
+            station = new_key[1]
+            if len(station) == 2:
+                station = '0'+station
+            cast = new_key[2]
+            if len(cast) == 1:
+                cast = '0'+cast
+
+            n = len(data[key])
 
             new_cols = pd.DataFrame({
-                'Cruise': [cruise],
-                'Station': [station],
-                'SN': 'SBE32',
-                'Operation': 'water sample'
+                'Cruise': [cruise]*n,
+                'Station': [station + '_' + cast]*n,
+                'SN': ['SBE32']*n,
+                'Operation': ['water sample']*n
             })
 
             data[key] = pd.concat([data[key], new_cols], axis=1)
@@ -91,20 +106,26 @@ def keys_to_data(data,datatype,project_name=None):
             new_key = new_key.replace('-','_')
             new_key = str.split(new_key,'_')
             cruise = new_key[0]
+            cruise = new_key[0]
             station = new_key[1]
+            if len(station) == 2:
+                station = '0'+station
             cast = new_key[2]
+            if len(cast) == 1:
+                cast = '0'+cast
             sn = new_key[3]
             operation = new_key[4]
 
             #these lines are needed for PS137 file names with 2digit station and 1digit cast numbers
             #station = str.split(station,'-')
             #station = '0'+station[0]+'_0'+station[1]
+            n = len(data[key])
 
             new_cols = pd.DataFrame({
-                'Cruise': [cruise],
-                'Station': [station + '_' + cast],
-                'SN': [sn],
-                'Operation': [operation]
+                'Cruise': [cruise]*n,
+                'Station': [station + '_' + cast]*n,
+                'SN': [sn]*n,
+                'Operation': [operation]*n
             })
 
             data[key] = pd.concat([data[key], new_cols], axis=1)
