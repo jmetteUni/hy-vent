@@ -37,6 +37,7 @@ def keys_to_data(data,datatype,project_name=None):
         Updated dictionary with additional columns in the pandas dataframes.
 
     """
+    import pandas as pd
 
     if datatype == 'cnv':
         for key in data:
@@ -50,10 +51,14 @@ def keys_to_data(data,datatype,project_name=None):
             cruise = new_key[0]
             station = new_key[1]+'_'+new_key[2]
 
-            data[key]['Cruise'] = cruise
-            data[key]['Station'] = station
-            data[key]['SN'] = 'SBE9'
-            data[key]['Operation'] = 'profile'
+            new_cols = pd.DataFrame({
+                'Cruise': [cruise],
+                'Station': [station],
+                'SN': 'SBE9',
+                'Operation': 'profile'
+            })
+
+            data[key] = pd.concat([data[key], new_cols], axis=1)
 
     if datatype == 'btl':
         for key in data:
@@ -67,10 +72,14 @@ def keys_to_data(data,datatype,project_name=None):
             cruise = new_key[0]
             station = new_key[1]+'_'+new_key[2]
 
-            data[key]['Cruise'] = cruise
-            data[key]['Station'] = station
-            data[key]['SN'] = 'SBE32'
-            data[key]['Operation'] = 'water sample'
+            new_cols = pd.DataFrame({
+                'Cruise': [cruise],
+                'Station': [station],
+                'SN': 'SBE32',
+                'Operation': 'water sample'
+            })
+
+            data[key] = pd.concat([data[key], new_cols], axis=1)
 
     if datatype == 'mapr':
         for key in data:
@@ -91,11 +100,15 @@ def keys_to_data(data,datatype,project_name=None):
             #station = str.split(station,'-')
             #station = '0'+station[0]+'_0'+station[1]
 
-            data[key]['Cruise'] = cruise
-            data[key]['Station'] = station+'_'+cast
-            data[key]['SN'] = sn
-            data[key]['Operation'] = operation
-            
+            new_cols = pd.DataFrame({
+                'Cruise': [cruise],
+                'Station': [station + '_' + cast],
+                'SN': [sn],
+                'Operation': [operation]
+            })
+
+            data[key] = pd.concat([data[key], new_cols], axis=1)
+
             #cast columns to python string (throws error in process_mapr)
             #data[key][['Cruise','Station','SN','Operation']] = data[key][['Cruise','Station','SN','Operation']].astype('string')
 
