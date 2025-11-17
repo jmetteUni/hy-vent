@@ -301,7 +301,7 @@ def posidata_SO301(posi_path):  # position data as one csv sheet, Ranger output
     Returns
     -------
     posi : pandas dataframe
-        Pandas Dataframe with datetime, Poalrstern latitude, Polarstern longitude, CTD latitude, CTD longitude and CTD depth as columns.
+        Pandas Dataframe with datetime, instrument latitude,instrument longitude and intrument depth as columns.
     """
 
     import pandas as pd
@@ -309,11 +309,11 @@ def posidata_SO301(posi_path):  # position data as one csv sheet, Ranger output
 
     posi = pd.read_csv(posi_path, sep=';', float_precision='high',
                        # reads posi data
-                       encoding='iso-8859-1', skiprows=3, names=['datetime', 'CTD_depth', 'CTD_lat', 'CTD_lon'])
+                       encoding='iso-8859-1', skiprows=3, names=['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon'])
     posi['datetime'] = pd.to_datetime(
         posi['datetime'])  # creates datetime object
-    posi['CTD_lat'] = posi['CTD_lat'].astype(str).apply(lambda x: parse(x))
-    posi['CTD_lon'] = posi['CTD_lon'].astype(str).apply(lambda x: parse(x))
+    posi['Instr_lat'] = posi['Instr_lat'].astype(str).apply(lambda x: parse(x))
+    posi['Instr_lon'] = posi['Instr_lon'].astype(str).apply(lambda x: parse(x))
 
     return (posi)
 
