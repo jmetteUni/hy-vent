@@ -253,7 +253,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
     return data_proc
 
 
-def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
+def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, control_plot=False):
     """
     This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: "seaTurbMtr") is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: "ORP_raw_v6") is used to calculate the gradient per second over 30 seconds averaged.
 
@@ -261,6 +261,8 @@ def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
     ----------
     data : pandas dataframe
         Dataframe of one or multiple CTD operations with variables as columns. Need columns with station designation.
+    var_dORP: string or list of strings, optional
+        Variable (or multiple variables if multiple sensors were used) for calculating dORP. Consider that the resulting unit is directly dependent on the unit of the input variables. Default is "upoly0".
     iqr_threshold : float, optional
         Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 10.
     box_plots : boolean, optional
@@ -314,10 +316,12 @@ def process_CTD(data_in, iqr_threshold=10, box_plots=False, control_plot=False):
             plt.xlabel('Index')
             plt.legend()
 
-        # calculate dORP from raw voltage values
-        # for raw values
-        # data['dORP'] = data['ORP_raw_v6'].diff(periods=30)/30
-        data['dORP'] = data['upoly0'].diff(periods=30)/30
+        # calculate dORP for one or multiple variables dependent on var_dORP input
+        if isinstance(var_dORP, str)==True:
+            data['dORP'] = data['upoly0'].diff(periods=30)/30
+        if isinstance(var_dORP, list)==True:
+            for var in var_dORP:
+                data['dORP_'+var] = data[var].diff(periods=30/30)
 
         # writes data to list
         data_list[idx] = data
