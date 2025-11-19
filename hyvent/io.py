@@ -43,7 +43,7 @@ def read_cnv(path):
         if '_1Hz' in key:
             key = key.replace('_1Hz', '')
         try:
-            cnv_data[key] = fCNV(path+file).as_DataFrame()
+            cnv_data[key] = fCNV(os.path.join(path,file)).as_DataFrame()
             cnv_data[key]['basedate'] = dt.datetime(
                 2000, 1, 1)  # create datetime object column
             if cnv_data[key]['timeQ'].isna().any() == True:
@@ -177,14 +177,17 @@ def read_from_csv(csv_path, datatype):
     cnv_data = dict()
     for file in file_list:
         if file.endswith("cnv.csv"):
+            in_path = os.path.join(csv_path,file)
             cnv_data[file.rstrip('_cnv.csv')] = pd.read_csv(
-                csv_path+file)  # ,encoding='iso-8859-1' sometimes needed
+                in_path)  # ,encoding='iso-8859-1' sometimes needed
         if file.endswith("btl.csv"):
+            in_path = os.path.join(csv_path,file)
             cnv_data[file.rstrip('_btl.csv')] = pd.read_csv(
-                csv_path+file)  # ,encoding='iso-8859-1' sometimes needed
+                in_path)  # ,encoding='iso-8859-1' sometimes needed
         if file.endswith("mapr.csv"):
+            in_path = os.path.join(csv_path,file)
             cnv_data[file.rstrip('_mapr.csv')] = pd.read_csv(
-                csv_path+file)  # ,encoding='iso-8859-1' sometimes needed
+                in_path)  # ,encoding='iso-8859-1' sometimes needed
         print('Read '+file+' sucessfully')
 
     for key in cnv_data:
@@ -252,8 +255,7 @@ def posidata_PS137(posi_path):
     posi = pd.DataFrame()  # initializes dataframe
 
     for file in file_list:  # reads in position data
-        posi_sheets = pd.read_csv(
-            posi_path+'/'+file, sep='\t', float_precision='high')
+        posi_sheets = pd.read_csv(os.path.join(posi_path,file), sep='\t', float_precision='high')
         posi_sheets['datetime'] = pd.to_datetime(
             # creates datetime object column
             posi_sheets['Date']+' '+posi_sheets['Time'], dayfirst=True)
@@ -465,7 +467,7 @@ def read_btl(btl_path):
             file_list.sort()
 
     for file in file_list:
-        f = open(btl_path+file, 'r', encoding='latin-1')
+        f = open(os.path.join(btl_path,file), 'r', encoding='latin-1')
         first_data_line = 0
         while True:
             line = f.readline()
@@ -473,7 +475,7 @@ def read_btl(btl_path):
                 f.close()
                 break
             first_data_line = first_data_line+1
-        df = pd.read_fwf(btl_path+file, skiprows=first_data_line,)
+        df = pd.read_fwf(os.path.join(btl_path,file), skiprows=first_data_line,)
         df = df[1:]
         n_bottles = int(len(df)/4)
         columns = list(df.columns)
