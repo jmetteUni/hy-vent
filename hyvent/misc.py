@@ -252,9 +252,21 @@ def get_var(var):
         color = 'tab:olive'
         label = '$\sigma_0$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
+    elif var == 'Sigma1':
+        color = 'tab:olive'
+        label = '$\sigma_1$ in kg m$^{-3}$'
+        cmap = 'YlGn_r'
+    elif var == 'Sigma2':
+        color = 'tab:olive'
+        label = '$\sigma_2$ in kg m$^{-3}$'
+        cmap = 'YlGn_r'
     elif var == 'Sigma3':
         color = 'tab:olive'
         label = r'$\sigma_{3000}$ in kg m$^{-3}$'
+        cmap = 'YlGn_r'
+    elif var == 'Sigma4':
+        color = 'tab:olive'
+        label = '$\sigma_4$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Delta_Sigma3':
         color = 'tab:olive'
