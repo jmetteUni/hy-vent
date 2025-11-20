@@ -333,7 +333,7 @@ def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, c
     return data_proc
 
 
-def derive_CTD(data):
+def derive_CTD(data,ref_sigma=[0,3]):
     """
     This function calculates the derived properties absolute salinity, conservative temperature, density and density anomaly of CTD data with the Gibbs Seawater Toolbox and appends them as columns.
 
@@ -341,6 +341,8 @@ def derive_CTD(data):
     ----------
     data : pandas dataframe or dictionary
         Dataset as one dataframe or a dictonary with dataframes as values. Must contain practical salinity ("PSAL"), pressure ("PRES"), longitude ("LONGITUDE"), latitude ("LATITUDE") and potential temperature ("potemperature")
+    ref_sigma : int or list of ints, optional
+        Reference level for the potential temperature anomaly calulation, where 0 gives sigma0, 1 gives sigma1, etc up to sigma 4. Default is [0,3]
 
     Returns
     -------
@@ -350,7 +352,15 @@ def derive_CTD(data):
     """
     import gsw
     import pandas as pd
-    import numpy as np
+
+    #gsw sigma funtions sorted in dict
+    sigma_funcs = {
+    0: gsw.density.sigma0,
+    1: gsw.density.sigma1,
+    2: gsw.density.sigma2,
+    3: gsw.density.sigma3,
+    4: gsw.density.sigma4
+}
 
     if isinstance(data, pd.DataFrame):
 
@@ -359,8 +369,8 @@ def derive_CTD(data):
         data['CT'] = gsw.conversions.CT_from_pt(
             data['SA'], data['potemperature'])
         data['Rho'] = gsw.density.rho(data['SA'], data['CT'], data['PRES'])
-        data['Sigma3'] = gsw.density.sigma3(data['SA'], data['CT'])
-        data['Sigma0'] = gsw.density.sigma0(data['SA'], data['CT'])
+        for level in ref_sigma:
+            data['Sigma'+str(level)] = sigma_funcs[level](data['SA'], data['CT'])
         # data['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     elif isinstance(data, dict):
@@ -372,8 +382,8 @@ def derive_CTD(data):
                 data[key]['SA'], data[key]['potemperature'])
             data[key]['Rho'] = gsw.density.rho(
                 data[key]['SA'], data[key]['CT'], data[key]['PRES'])
-            data[key]['Sigma3'] = gsw.density.sigma3(
-                data[key]['SA'], data[key]['CT'])
+            for level in ref_sigma:
+                  data['Sigma'+str(level)] = sigma_funcs[level](data['SA'], data['CT'])
             # data[key]['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     else:
