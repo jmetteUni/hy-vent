@@ -293,7 +293,11 @@ def get_var(var):
         color = 'black'
         label = 'Distance to vent in m'
         cmap = 'None'
-
+#time
+    elif var == 'datetime' or var == 'timeQ':
+        color = 'black'
+        label = 'Time'
+        cmap = 'None'
 
 
     else:
