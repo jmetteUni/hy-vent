@@ -238,7 +238,7 @@ def get_var(var):
     elif var == 'PSAL' or var == 'PSAL_mean':
         color = 'cyan'
         label = 'Practical Salinity in 1'
-        cmap = 'None'
+        cmap = 'Blues'
     elif var == 'SA':
         color = 'cyan'
         label = 'Absolute Salinity in ?'
@@ -262,7 +262,7 @@ def get_var(var):
         cmap = 'YlGn_r'
     elif var == 'Rho' or var == 'density':
         color = 'tab:olive'
-        label = '$\rho$ in kg m$^{-3}$'
+        label = r'$\rho$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'delta_podensity':
         color = 'tab:olive'
@@ -293,6 +293,8 @@ def get_var(var):
         color = 'black'
         label = 'Distance to vent in m'
         cmap = 'None'
+
+
 
     else:
         print('Properties for variable '+var+' not defined yet.')
