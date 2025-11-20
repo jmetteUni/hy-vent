@@ -995,8 +995,10 @@ def plot_contourf(data, var, xvar, yvar, ymin, da_bathy=None, vent_loc=None):
     ax.set_ylabel(get_var(yvar)[0])
     if xvar == 'CTD_lat':
         ax.set_xlabel('Latitude')
-    if xvar == 'CTD_lon':
+    elif xvar == 'CTD_lon':
         ax.set_xlable('Longitude')
+    else:
+        ax.set_xlabel(get_var(xvar)[0])
     fig.colorbar(contourf, label=get_var(var)[0])
 
     #plot vent location
