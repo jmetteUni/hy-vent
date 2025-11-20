@@ -926,7 +926,7 @@ def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
 
     plt.show()
 
-def plot_contourf(data, var, xvar, yvar, ymin, da_bathy=None, vent_loc=None):
+def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, vent_loc=None):
     """
     This funtion plots interpolated crossections along an x coordinate and depth.
 
@@ -942,6 +942,8 @@ def plot_contourf(data, var, xvar, yvar, ymin, da_bathy=None, vent_loc=None):
         Key of datafame column to use as an y coordinate.
     ymin : int
         Minimal cutoff to plot for the y variable.
+    ymax : int, OPTIONAL
+        Maximum cutoff to plot for the y variable.For None the maximum of the data will bes used. Default is None.
     da_bathy : xarray dataarray, OPTIONAL
         Bathymetry data with longitude and latitude coordinates and elevation as an xarray dataarray. Default is None.
     vent_loc : tuple of three float, OPTIONAL
@@ -968,8 +970,13 @@ def plot_contourf(data, var, xvar, yvar, ymin, da_bathy=None, vent_loc=None):
         bathy_track = bathy_track.rename(columns={'lon':'CTD_lon','lat':'CTD_lat'})
         bathy_track = bathy_track.sort_values(by=xvar)
 
+    #set ymax if not defined
+    if ymax == None:
+        ymax = data[yvar].max()
+
     #subset data by depth and remove nan in var
     data = data[data[yvar]>ymin]
+    data = data[data[yvar]<ymax]
     data = data.dropna(subset=[var,xvar,yvar])
     data = data.sort_values(by=xvar)
 
