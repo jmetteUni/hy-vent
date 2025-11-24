@@ -34,9 +34,10 @@ def corr_mapr_depth(data, lat):
     p_deck = p_deck[p_deck['Press(dB)'] < 5]
     key = data['Station'].iloc[0]+'_'+data['SN'].iloc[0]
     if len(p_deck) < 50:  # warn if only a few measurements are pre-deplyoment
-        print('Warning: Less then 50 values in '+key+' used for deck reference pressure!')
+        print('Warning: Less then 50 values in ' +
+              key+' used for deck reference pressure!')
 
-    #if there are more then 10 values, apply correction
+    # if there are more then 10 values, apply correction
     if len(p_deck) > 10:
         p_deck_mean = p_deck['Press(dB)'].mean()
         # print('Mean deck pressure: '+str(p_deck_mean)+' dB')
@@ -47,7 +48,8 @@ def corr_mapr_depth(data, lat):
         # select only the corrected depth column
         depth_corr = data['Depth_corr(m)']
     else:
-        print('Less then 10 deck pressure values in '+key+', no correction applied')
+        print('Less then 10 deck pressure values in ' +
+              key+', no correction applied')
         depth_corr = data['Depth(m)']
     return depth_corr
 
@@ -204,7 +206,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         # correct depth by mean pre-dployment pressure
         data['Depth_corr(m)'] = corr_mapr_depth(data, lat)
         # cuts pre and post deployment
-        data = cut_prepost_deploy(data,window_limit=60)
+        data = cut_prepost_deploy(data, window_limit=60)
 
         # remove outliers and smooth turbidity below 100m
         data_part = data.copy(deep=True)
@@ -221,16 +223,17 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
         data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']
         data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
 
-        #check consistency of timestamps
-        if data['datetime'].is_unique==False:
+        # check consistency of timestamps
+        if data['datetime'].is_unique == False:
             import matplotlib.pyplot as plt
             plt.figure()
-            plt.plot(data.index,data['datetime'])
+            plt.plot(data.index, data['datetime'])
             plt.title(data['Station'].iloc[0]+data['SN'].iloc[0])
             plt.figure()
-            plt.plot(data.index,data['Press(dB)'])
+            plt.plot(data.index, data['Press(dB)'])
             plt.title(data['Station'].iloc[0]+data['SN'].iloc[0])
-            print('Datetime is not unique, error in '+data['Station'].iloc[0]+data['SN'].iloc[0])
+            print('Datetime is not unique, error in ' +
+                  data['Station'].iloc[0]+data['SN'].iloc[0])
         # resampling to 1second intervals
         data = data.set_index('datetime')
         data = data.resample(resample).asfreq()
@@ -317,9 +320,9 @@ def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, c
             plt.legend()
 
         # calculate dORP for one or multiple variables dependent on var_dORP input
-        if isinstance(var_dORP, str)==True:
+        if isinstance(var_dORP, str) == True:
             data['dORP'] = data['upoly0'].diff(periods=30)/30
-        if isinstance(var_dORP, list)==True:
+        if isinstance(var_dORP, list) == True:
             for var in var_dORP:
                 data['dORP_'+var] = data[var].diff(periods=30/30)
 
@@ -333,7 +336,7 @@ def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, c
     return data_proc
 
 
-def derive_CTD(data,ref_sigma=[0,3]):
+def derive_CTD(data, ref_sigma=[0, 3]):
     """
     This function calculates the derived properties absolute salinity, conservative temperature, density and density anomaly of CTD data with the Gibbs Seawater Toolbox and appends them as columns.
 
@@ -353,14 +356,14 @@ def derive_CTD(data,ref_sigma=[0,3]):
     import gsw
     import pandas as pd
 
-    #gsw sigma funtions sorted in dict
+    # gsw sigma funtions sorted in dict
     sigma_funcs = {
-    0: gsw.density.sigma0,
-    1: gsw.density.sigma1,
-    2: gsw.density.sigma2,
-    3: gsw.density.sigma3,
-    4: gsw.density.sigma4
-}
+        0: gsw.density.sigma0,
+        1: gsw.density.sigma1,
+        2: gsw.density.sigma2,
+        3: gsw.density.sigma3,
+        4: gsw.density.sigma4
+    }
 
     if isinstance(data, pd.DataFrame):
 
@@ -370,7 +373,8 @@ def derive_CTD(data,ref_sigma=[0,3]):
             data['SA'], data['potemperature'])
         data['Rho'] = gsw.density.rho(data['SA'], data['CT'], data['PRES'])
         for level in ref_sigma:
-            data['Sigma'+str(level)] = sigma_funcs[level](data['SA'], data['CT'])
+            data['Sigma'+str(level)
+                 ] = sigma_funcs[level](data['SA'], data['CT'])
         # data['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     elif isinstance(data, dict):
@@ -383,7 +387,8 @@ def derive_CTD(data,ref_sigma=[0,3]):
             data[key]['Rho'] = gsw.density.rho(
                 data[key]['SA'], data[key]['CT'], data[key]['PRES'])
             for level in ref_sigma:
-                  data['Sigma'+str(level)] = sigma_funcs[level](data['SA'], data['CT'])
+                data['Sigma'+str(level)
+                     ] = sigma_funcs[level](data['SA'], data['CT'])
             # data[key]['Nsquared'] = np.append(gsw.stability.Nsquared(data['SA'],data['CT'],data['PRES'])[0], np.nan)
 
     else:
