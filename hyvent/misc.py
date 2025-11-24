@@ -260,6 +260,7 @@ def get_var(var):
         color = 'tab:olive'
         label = '$\sigma_2$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
+        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
     elif var == 'Sigma3':
         color = 'tab:olive'
         label = r'$\sigma_{3000}$ in kg m$^{-3}$'
