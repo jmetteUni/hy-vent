@@ -926,7 +926,7 @@ def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
 
     plt.show()
 
-def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, vent_loc=None):
+def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour_var=None, vent_loc=None):
     """
     This funtion plots interpolated crossections along an x coordinate and depth.
 
@@ -946,8 +946,10 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, vent_lo
         Maximum cutoff to plot for the y variable.For None the maximum of the data will bes used. Default is None.
     da_bathy : xarray dataarray, OPTIONAL
         Bathymetry data with longitude and latitude coordinates and elevation as an xarray dataarray. Default is None.
+    contour_var : string, OPTIONAL
+        Variable which will be plotted additionally as contourlines. Default is None.
     vent_loc : tuple of three float, OPTIONAL
-        Longitude, latitude and depth of a position of interest to mark in the plot. Default is None..
+        Longitude, latitude and depth of a position of interest to mark in the plot. Default is None.
 
     Returns
     -------
@@ -993,11 +995,14 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, vent_lo
     #plot data
     contourf = ax.tricontourf(data[xvar],data[yvar],data[var],levels=50,cmap=get_var(var)[2],vmin=vmin,vmax=vmax)
     #plot sample locations
-    ax.scatter(data[xvar],data[yvar],color='black',s=0.1,alpha=1,label='CTD track')
+    ax.scatter(data[xvar],data[yvar],color='black',s=0.05,alpha=0.2,label='CTD track')
     if da_bathy != None:
         #plot bathy
         ax.plot(bathy_track[xvar],-bathy_track['Band1'].rolling(1000).mean(),color='black',label='Bathymetry')
 
+    if contour_var != None:
+        contours = ax.tricontour(data[xvar],data[yvar],data[contour_var],levels=100,colors='black')
+        ax.clabel(contours, contours.levels,fontsize=10)
 
     ax.set_ylabel(get_var(yvar)[0])
     if xvar == 'CTD_lat':
@@ -1020,6 +1025,6 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, vent_lo
     plt.legend(markerscale=20)
     plt.xlim((data[xvar].min(),data[xvar].max()))
     plt.tight_layout()
-    plt.show()
+    #plt.show()
 
 
