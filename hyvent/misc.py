@@ -311,7 +311,14 @@ def get_var(var):
         color = 'black'
         label = 'Time'
         cmap = 'None'
-
+    elif 'lat' in var:
+        color = 'black'
+        label = 'Latitude'
+        cmap = None
+    elif 'lon' in var:
+        color = 'black'
+        label = 'Longitude'
+        cmap = None
 
     else:
         print('Properties for variable '+var+' not defined yet.')
