@@ -302,15 +302,21 @@ def get_var(var):
         label = '$\Delta$ $\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
-    elif var == 'Dist_vent':
-        color = 'black'
-        label = 'Distance to vent in m'
-        cmap = 'None'
 #time
     elif var == 'datetime' or var == 'timeQ':
         color = 'black'
         label = 'Time'
         cmap = 'None'
+#Distance
+    elif var == 'Dist':
+        color = 'black'
+        label = 'Distance in m'
+        cmap = None
+    elif var == 'Dist_vent':
+        color = 'black'
+        label = 'Distance to vent in m'
+        cmap = 'None'
+#coordinates
     elif 'lat' in var:
         color = 'black'
         label = 'Latitude'
