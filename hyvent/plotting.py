@@ -756,7 +756,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     def calculate_density(pt_grid, psal_grid, p, lon, lat):
         SA = gsw.conversions.SA_from_SP(psal_grid, p, lon, lat)
         CT = gsw.conversions.CT_from_pt(SA, pt_grid)
-        return gsw.density.sigma3(SA, CT)
+        return gsw.density.sigma2(SA, CT)
 
     plt.figure(figsize=(8,6))
 
@@ -771,7 +771,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
     #plt.figure(figsize=(8, 6))
     # add constant density lines
-    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/10), colors='black')
+    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/20), colors='black')
     plt.clabel(contours, inline=True, fontsize=10)
 
     #iterate through stations
@@ -926,7 +926,7 @@ def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
 
     plt.show()
 
-def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour_var=None, vent_loc=None):
+def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, track=True, vent_loc=None):
     """
     This funtion plots interpolated crossections along an x coordinate and depth.
 
@@ -946,8 +946,8 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour
         Maximum cutoff to plot for the y variable.For None the maximum of the data will bes used. Default is None.
     da_bathy : xarray dataarray, OPTIONAL
         Bathymetry data with longitude and latitude coordinates and elevation as an xarray dataarray. Default is None.
-    contour_var : string, OPTIONAL
-        Variable which will be plotted additionally as contourlines. Default is None.
+    track : bool, OPTIONAL
+        Boolean which controls if the instruments track is plotted. Default is True.
     vent_loc : tuple of three float, OPTIONAL
         Longitude, latitude and depth of a position of interest to mark in the plot. Default is None.
 
@@ -959,8 +959,6 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour
     import matplotlib.pyplot as plt
     from hyvent.misc import get_var
     import xarray as xa
-    import pandas as pd
-
 
     if da_bathy != None:
         #prepare bathy
@@ -995,14 +993,12 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour
     #plot data
     contourf = ax.tricontourf(data[xvar],data[yvar],data[var],levels=50,cmap=get_var(var)[2],vmin=vmin,vmax=vmax)
     #plot sample locations
-    ax.scatter(data[xvar],data[yvar],color='black',s=0.05,alpha=0.2,label='CTD track')
+    if track == True:
+        ax.scatter(data[xvar],data[yvar],color='black',s=0.05,alpha=0.2,label='CTD track')
+        plt.legend(markerscale=20)
+    #plot bathy
     if da_bathy != None:
-        #plot bathy
         ax.plot(bathy_track[xvar],-bathy_track['Band1'].rolling(1000).mean(),color='black',label='Bathymetry')
-
-    if contour_var != None:
-        contours = ax.tricontour(data[xvar],data[yvar],data[contour_var],levels=100,colors='black')
-        ax.clabel(contours, contours.levels,fontsize=10)
 
     ax.set_ylabel(get_var(yvar)[0])
     if xvar == 'CTD_lat':
@@ -1022,9 +1018,10 @@ def plot_contourf(data, var, xvar, yvar, ymin, ymax=None, da_bathy=None, contour
 
     ax.invert_yaxis()
 
-    plt.legend(markerscale=20)
     plt.xlim((data[xvar].min(),data[xvar].max()))
     plt.tight_layout()
+
+    return fig, ax, data
     #plt.show()
 
 
