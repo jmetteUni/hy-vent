@@ -720,7 +720,7 @@ def plot_ts_zoom(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     plt.tight_layout()
     plt.show()
 
-def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
+def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, highlight_isopycnal=None):
     """
     This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
 
@@ -737,9 +737,12 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     p_ref : int
         Reference pressure used for calculating the isopycnals of the potential density anomaly in dbar.
     lon : float
-        Longitude of the samples.
+        Reference longitude for calculating isopycnals.
     lat : float
-        Latitude of the samples.
+        Reference latitude for calculating isopycnals.
+    highlight_isopycnal : float
+        Isopycnal which is highlighted in red and center of all isopycnals
+
 
     Returns
     -------
@@ -772,7 +775,10 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     #plt.figure(figsize=(8, 6))
     # add constant density lines
     contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/20), colors='black')
-    plt.clabel(contours, inline=True, fontsize=10)
+    plt.clabel(contours, inline=True, inline_spacing=15, fontsize=10)
+
+    if highlight_isopycnal != None:
+        plt.contour(psal_grid, pt_grid, density,levels=[highlight_isopycnal], colors='red',label=r'$\sigma_2$=36.987 kgm$^{-3}$')
 
     #iterate through stations
     if c_var == 'Station':
@@ -784,7 +790,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, station in enumerate(station_list):
                 # create the T-S Diagram
-                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i])
+                plt.scatter(station['PSAL'], station['potemperature'],s=5, label=station['Station'].iloc[0], color=colors[i],zorder=3)
 
         plt.legend(markerscale=5, ncol=2, loc='lower left')
 
@@ -810,7 +816,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
         for i, cast in enumerate(all_casts):
                 # create the T-S Diagram
-                plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i])
+                plt.scatter(cast['PSAL'], cast['potemperature'],s=5, label=cast['Station'].iloc[0], color=colors[i],zorder=3)
 
         plt.legend(markerscale=5, ncol=2,loc='lower left')
 
@@ -823,10 +829,11 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
 
     else:
         # create the T-S Diagram
-        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis_r',s=5)
+        plt.scatter(data['PSAL'], data['potemperature'], c=data[c_var], cmap='viridis',s=5,zorder=3)
 
         cbar = plt.colorbar()
-        cbar.set_label(get_var(c_var)[0])
+        #cbar.set_label(get_var(c_var)[0])
+        cbar.set_label('Turbidity [NTU]')
 
         #format x axis without exponetial
         from matplotlib.ticker import ScalarFormatter
@@ -840,7 +847,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     plt.xlabel(get_var('PSAL')[0])
 
     plt.tight_layout()
-    plt.show()
+
 
 def plot3Ddistr(data, var, depth_min, bathy=None ,vent_loc=None):
     """
