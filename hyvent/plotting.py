@@ -761,7 +761,7 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, highlight_isopycnal=
         CT = gsw.conversions.CT_from_pt(SA, pt_grid)
         return gsw.density.sigma2(SA, CT)
 
-    plt.figure(figsize=(8,6))
+    plt.figure(figsize=(6,5))
 
     data = data[(data['DEPTH']>min_dep) & (data['DEPTH']<max_dep)]
 
