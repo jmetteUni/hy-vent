@@ -626,8 +626,9 @@ def read_he(he_path):
     except:
         he_data_full = pd.read_csv(he_path, encoding="ISO-8859-1")
 
-    del he_data_full['Unnamed: 54']
-    del he_data_full['Unnamed: 55']
+    # del he_data_full['Unnamed: 54']
+    # del he_data_full['Unnamed: 55']
+
     he_data_full.replace('kommt noch', np.nan, inplace=True)
     # he_data_full['%fname'].iloc[65] = np.nan
     # he_data['datetime'] = pd.to_datetime(he_data['jultime'],unit='D',origin='julian')
