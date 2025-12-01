@@ -64,7 +64,7 @@ def keys_to_data(data,datatype,project_name=None):
                 'SN': ['SBE9']*n,
                 'Operation': ['profile']*n
             })
-
+            data[key] = data[key].reset_index(drop=True)
             data[key] = pd.concat([data[key], new_cols], axis=1)
 
 
@@ -94,7 +94,8 @@ def keys_to_data(data,datatype,project_name=None):
                 'Operation': ['water sample']*n
             })
 
-            data[key] = pd.concat([data[key], new_cols], axis=1)
+            data[key] = data[key].reset_index(drop=True)
+            data[key] = pd.concat([data[key], new_cols], axis=1,join='inner')
 
     if datatype == 'mapr':
         for key in data:
@@ -127,7 +128,7 @@ def keys_to_data(data,datatype,project_name=None):
                 'SN': [sn]*n,
                 'Operation': [operation]*n
             })
-
+            data[key] = data[key].reset_index(drop=True)
             data[key] = pd.concat([data[key], new_cols], axis=1)
 
             #cast columns to python string (throws error in process_mapr)
