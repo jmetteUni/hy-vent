@@ -632,8 +632,15 @@ def read_he(he_path):
     he_data_full.replace('kommt noch', np.nan, inplace=True)
     # he_data_full['%fname'].iloc[65] = np.nan
     # he_data['datetime'] = pd.to_datetime(he_data['jultime'],unit='D',origin='julian')
-    he_data_full['station'] = 'PS137_0' + \
-        he_data_full['station'].astype(str)+'_01'
+    # he_data_full['station'] = 'PS137_0' + he_data_full['station'].astype(str)+'_01'
+    he_data_full['station'] = he_data_full['station'].astype(str)
+    for index, row in he_data_full.iterrows():
+        if len(row['station']) == 1:
+            he_data_full.loc[index,'station'] = '00'+he_data_full.loc[index,'station']
+        if len(row['station']) == 2:
+            he_data_full.loc[index,'station'] = '0'+he_data_full.loc[index,'station']
+    he_data_full['station'] = he_data_full['station']+'_01'
+
     he_data_full.rename({'bottle': 'Bottle'}, axis=1, inplace=True)
 
     return he_data_full
