@@ -720,7 +720,7 @@ def plot_ts_zoom(data, c_var, min_dep, max_dep, p_ref, lon, lat):
     plt.tight_layout()
     plt.show()
 
-def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, highlight_isopycnal=None):
+def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, step_isopycnal, highlight_isopycnal=None):
     """
     This function plots data of a CTD cast as a T-S diagram with potential temperature and practical salinity. The samples can be filtered by a depth range. For the isopycnal calculation a reference density, longitude and latitude is used.
 
@@ -740,6 +740,8 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, highlight_isopycnal=
         Reference longitude for calculating isopycnals.
     lat : float
         Reference latitude for calculating isopycnals.
+    step_isopycnal : float
+        Stepsize controlling the density for the isopycnals in the figure.
     highlight_isopycnal : float
         Isopycnal which is highlighted in red and center of all isopycnals
 
@@ -772,9 +774,15 @@ def plot_ts(data, c_var, min_dep, max_dep, p_ref, lon, lat, highlight_isopycnal=
 
     density = calculate_density(pt_grid, psal_grid, p_ref, lon, lat)
 
+    # add constant density lines with rounded levels
+    # step_isopycnal = 0.005 # choose step size (1.0 for integers, 0.5 for half steps, etc.)
+    min_density = np.floor(np.min(density))
+    max_density = np.ceil(np.max(density))
+    levels = np.arange(min_density, max_density + step_isopycnal, step_isopycnal)
+
     #plt.figure(figsize=(8, 6))
     # add constant density lines
-    contours = plt.contour(psal_grid, pt_grid, density, levels=np.arange(np.min(density), np.max(density), (np.max(density)-np.min(density))/20), colors='black')
+    contours = plt.contour(psal_grid, pt_grid, density, levels=levels, colors='black')
     plt.clabel(contours, inline=True, inline_spacing=15, fontsize=10)
 
     if highlight_isopycnal != None:
