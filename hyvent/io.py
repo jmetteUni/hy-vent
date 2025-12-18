@@ -7,7 +7,7 @@ Created on Tue Apr 23 18:10:45 2024
 """
 
 
-def read_cnv(path):
+def read_cnv(path,suffix=None):
     """
     Reads in data from SeaBird CTD processing software which ends with ".cnv"
     to a dictionary with the filename as the key and a pandas dataframe per
@@ -24,6 +24,8 @@ def read_cnv(path):
     cnv_data : dictionary
         Dictionary where the keys are unique station identifiers and
         values are data in pandas dataframes.
+    suffix : string, optional
+        Suffix at the end of the filename, to filter the files which are read in. Default is None
 
     """
     import pandas as pd
@@ -33,15 +35,20 @@ def read_cnv(path):
 
     file_list = []  # get all cnv filenames
     for file in os.listdir(path):
-        if file.endswith(".cnv"):
-            file_list.append(file)
-            file_list.sort()
+        if suffix != None:
+            if file.endswith(suffix+".cnv"):
+                file_list.append(file)
+                file_list.sort()
+        else:
+            if file.endswith(".cnv"):
+                file_list.append(file)
+                file_list.sort()
 
     cnv_data = dict()  # read cnv file into pandas dataframe with fCNV package
     for file in file_list:
         key = file.rstrip('.cnv')
-        if '_1Hz' in key:
-            key = key.replace('_1Hz', '')
+        if suffix in key:
+            key = key.replace(suffix, '')
         try:
             cnv_data[key] = fCNV(os.path.join(path,file)).as_DataFrame()
             cnv_data[key]['basedate'] = dt.datetime(
@@ -541,7 +548,7 @@ def read_mapr(mapr_path, raw=False, error_sheets=[]):
     raw : bool, optional
         Flag which controls if metadata is stripped and the format is reduced to a table containing only relevant data. If raw = True, the original format and metadata is kept. This is intended to produce readible raw data files for archiving. The defaul is False.
     error_sheets : list, optional
-        If the excel document contains single sheets with errornous data, the corresponding sheet names can be given to the function as string in this list and are skipped. This can be expecially helpfull as pandas seems to read one additional errornous sheet called 'MAPR_files module'. Default is an empty list.
+        If the excel document contains single sheets with errornous data, the corresponding sheet names can be given to the function as string in this list and are skipped. This can be expecially helpfull as pandas seems to read sometimes one additional errornous sheet called 'MAPR_files module'. Default is an empty list.
 
     Returns
     -------
@@ -584,6 +591,8 @@ def read_mapr(mapr_path, raw=False, error_sheets=[]):
                         mapr[sheet]['datetime'])
                 else:
                     mapr[sheet] = mapr_all[sheet]
+                    #remove empty columns
+                    mapr[sheet] = mapr[sheet].iloc[:,:14]
                 print('Read '+sheet + ' successfully')
                 # to check for proper datetimes
                 # if (mapr[sheet]['datetime'].is_monotonic_increasing and mapr[sheet]['datetime'].is_unique)==False:
