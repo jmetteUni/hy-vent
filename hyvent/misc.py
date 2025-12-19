@@ -202,64 +202,64 @@ def get_var(var):
 #temperature
     if var == 'potemperature':
         color = 'red'
-        label = '$\Theta$ in $^{\circ}$C'
+        label = r'$\Theta$ in $^{\circ}$C'
         cmap = 'Reds'
     elif var == 'CT':
         color = 'red'
-        label = 'Conservative Temperature in $^{\circ}$C'
+        label = r'Conservative Temperature in $^{\circ}$C'
         cmap = 'Reds'
     elif var == 'TEMP':
         color = 'red'
-        label = 'Temperature in $^{\circ}$C'
+        label = r'Temperature in $^{\circ}$C'
         cmap = 'Reds'
     elif var == 'Delta_potemperature':
         color = 'red'
-        label = '$\Delta$$\Theta$ in $^{\circ}$C'
+        label = r'$\Delta$$\Theta$ in $^{\circ}$C'
         cmap = 'Reds'
 #turbidity
     elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
         color = 'blue'
-        label = 'Turbidity in NTU'
+        label = r'Turbidity in NTU'
         cmap = 'Blues'
     elif var == 'Delta_Neph(volts)' or var == 'Delta_Neph_outl(volts)' or var == 'Delta_Neph_smoo(volts)':
         color = 'blue'
-        label = '$\Delta$ Turbidity in NTU'
+        label = r'$\Delta$ Turbidity in NTU'
         cmap = 'Blues'
 #ORP
     elif var == 'dORP':
         color = 'tab:purple'
-        label = '$dE_h/dt$ in mV s$^{-1}$'
+        label = r'$dE_h/dt$ in mV s$^{-1}$'
         cmap = 'Purples_r'
         cmap = truncate_colormap(cmap)
     elif var == 'upoly0':
         color = 'tab:purple'
-        label = '$E$ in mV'
+        label = r'$E$ in mV'
         cmap = 'Purples_r'
 #salinity
     elif var == 'PSAL' or var == 'PSAL_mean':
         color = 'cyan'
-        label = 'Practical Salinity in 1'
+        label = r'Practical Salinity in 1'
         cmap = 'Blues'
     elif var == 'SA':
         color = 'cyan'
-        label = 'Absolute Salinity in ?'
+        label = r'Absolute Salinity in ?'
         cmap = 'None'
     elif var == 'Delta_PSAL':
         color = 'cyan'
-        label = 'Practical Salinity in 1'
+        label = r'Practical Salinity in 1'
         cmap = 'None'
 #density
     elif var == 'Sigma0':
         color = 'tab:olive'
-        label = '$\sigma_0$ in kg m$^{-3}$'
+        label = r'$\sigma_0$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Sigma1':
         color = 'tab:olive'
-        label = '$\sigma_1$ in kg m$^{-3}$'
+        label = r'$\sigma_1$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Sigma2':
         color = 'tab:olive'
-        label = '$\sigma_2$ in kg m$^{-3}$'
+        label = r'$\sigma_2$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
     elif var == 'Sigma3':
@@ -268,7 +268,7 @@ def get_var(var):
         cmap = 'YlGn_r'
     elif var == 'Sigma4':
         color = 'tab:olive'
-        label = '$\sigma_4$ in kg m$^{-3}$'
+        label = r'$\sigma_4$ in kg m$^{-3}$'
         cmap = 'YlGn_r'
     elif var == 'Delta_Sigma3':
         color = 'tab:olive'
@@ -280,51 +280,51 @@ def get_var(var):
         cmap = 'YlGn_r'
     elif var == 'delta_podensity':
         color = 'tab:olive'
-        label = 'Potential Density Anomaly in kg m$^{-3}$'
+        label = r'Potential Density Anomaly in kg m$^{-3}$'
         cmap = 'YlGn_r'
 #depth
     elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
         color = 'black'
-        label = 'Depth in m'
+        label = r'Depth in m'
         cmap = 'None'
 #pressure
     elif var == 'PRES':
         color = 'black'
-        label = 'Pressure in dbar'
+        label = r'Pressure in dbar'
         cmap = 'None'
 #helium
     elif var == 'delta3He':
         color = 'orange'
-        label = '$\delta^3$He in %'
+        label = r'$\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
     elif var == 'Delta_delta3He':
         color = 'orange'
-        label = '$\Delta$ $\delta^3$He in %'
+        label = r'$\Delta$ $\delta^3$He in %'
         cmap = 'Oranges'
         cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
 #time
     elif var == 'datetime' or var == 'timeQ':
         color = 'black'
-        label = 'Time'
+        label = r'Time'
         cmap = 'None'
 #Distance
     elif var == 'Dist':
         color = 'black'
-        label = 'Distance in m'
+        label = r'Distance in m'
         cmap = None
     elif var == 'Dist_vent':
         color = 'black'
-        label = 'Distance to vent in m'
+        label = r'Distance to vent in m'
         cmap = 'None'
 #coordinates
     elif 'lat' in var:
         color = 'black'
-        label = 'Latitude'
+        label = r'Latitude'
         cmap = None
     elif 'lon' in var:
         color = 'black'
-        label = 'Longitude'
+        label = r'Longitude'
         cmap = None
 
     else:
