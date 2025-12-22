@@ -172,14 +172,55 @@ def add_castno(data, window_size=1000):
 
         return data_cast
 
-def get_var(var):
+def truncate_colormap(cmap, minval=0.0, maxval=0.8, n=100):
     """
-    Returns porperties such as plot color and axis label for a given variable.
+    Function to truncate matplotlib colormaps, to exclude the close to white part for better visibility.
+
+    Parameters
+    ----------
+    cmap : string
+        Base colormap to truncate.
+    minval : float, optional
+        Minimum vlaue of the colormap. The default is 0.0.
+    maxval : float, optional
+        Maximum value of the colormap. The default is 0.8.
+    n : int, optional
+        Number of segments in the colormap. The default is 100.
+
+    Returns
+    -------
+    new_cmap : LinearSegmentedColormap
+        New, truncated colormap to use for plotting.
+
+    """
+    import matplotlib.pyplot as plt
+    import matplotlib.colors as colors
+    import numpy as np
+
+    cmap = plt.get_cmap(cmap)
+    new_cmap = colors.LinearSegmentedColormap.from_list(
+        f"trunc({cmap.name},{minval:.2f},{maxval:.2f})",
+        cmap(np.linspace(minval, maxval, n)),
+    )
+    return new_cmap
+
+def get_var(var, config_path, units_as='in'):
+    """
+    Returns plot properties for a given variable using an external YAML config.
 
     Parameters
     ----------
     var : string
         Variable, for which properies should be returned. Must be defined in the function.
+    config_path : string
+        Path to the config YAML file.
+    units_as : string, optional
+        String which controls how the units are presented. Can be 'in' (in Hz), '[]' ([Hz], '()' ((Hz)) or None (displays only the symbol and no unit). The default is 'in'.
+
+    Raises
+    ------
+    ValueError
+        Error if the variable was not found in the config file.
 
     Returns
     -------
@@ -187,150 +228,53 @@ def get_var(var):
         Axis label for the variable.
     color : string
         Color to be used for plotting the variable.
+    cmap : string or LinearSegmentedColormap
+        Either a string which denotes the colormap to use (can also be empty, if none is specified in the config file) or a truncated colormap to use for plotting the variable.
+
     """
-    import matplotlib.pyplot as plt
-    import matplotlib.colors as colors
-    import numpy as np
+    import yaml
 
-    def truncate_colormap(cmap, minval=0, maxval=0.8, n=100):
-        cmap = plt.get_cmap(cmap)
-        new_cmap = colors.LinearSegmentedColormap.from_list(
-            'trunc({n},{a:.2f},{b:.2f})'.format(n=cmap.name, a=minval, b=maxval),
-            cmap(np.linspace(minval, maxval, n)))
-        return new_cmap
+    with open(config_path, "r") as f:
+        config = yaml.safe_load(f)
 
-#temperature
-    if var == 'potemperature':
-        color = 'red'
-        label = r'$\Theta$ in $^{\circ}$C'
-        cmap = 'Reds'
-    elif var == 'CT':
-        color = 'red'
-        label = r'Conservative Temperature in $^{\circ}$C'
-        cmap = 'Reds'
-    elif var == 'TEMP':
-        color = 'red'
-        label = r'Temperature in $^{\circ}$C'
-        cmap = 'Reds'
-    elif var == 'Delta_potemperature':
-        color = 'red'
-        label = r'$\Delta$$\Theta$ in $^{\circ}$C'
-        cmap = 'Reds'
-#turbidity
-    elif var == 'Neph(volts)' or var == 'Neph_outl(volts)' or var == 'Neph_smoo(volts)':
-        color = 'blue'
-        label = r'Turbidity in NTU'
-        cmap = 'Blues'
-    elif var == 'Delta_Neph(volts)' or var == 'Delta_Neph_outl(volts)' or var == 'Delta_Neph_smoo(volts)':
-        color = 'blue'
-        label = r'$\Delta$ Turbidity in NTU'
-        cmap = 'Blues'
-#ORP
-    elif var == 'dORP':
-        color = 'tab:purple'
-        label = r'$dE_h/dt$ in mV s$^{-1}$'
-        cmap = 'Purples_r'
-        cmap = truncate_colormap(cmap)
-    elif var == 'upoly0':
-        color = 'tab:purple'
-        label = r'$E$ in mV'
-        cmap = 'Purples_r'
-#salinity
-    elif var == 'PSAL' or var == 'PSAL_mean':
-        color = 'cyan'
-        label = r'Practical Salinity in 1'
-        cmap = 'Blues'
-    elif var == 'SA':
-        color = 'cyan'
-        label = r'Absolute Salinity in ?'
-        cmap = 'None'
-    elif var == 'Delta_PSAL':
-        color = 'cyan'
-        label = r'Practical Salinity in 1'
-        cmap = 'None'
-#density
-    elif var == 'Sigma0':
-        color = 'tab:olive'
-        label = r'$\sigma_0$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'Sigma1':
-        color = 'tab:olive'
-        label = r'$\sigma_1$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'Sigma2':
-        color = 'tab:olive'
-        label = r'$\sigma_2$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
-    elif var == 'Sigma3':
-        color = 'tab:olive'
-        label = r'$\sigma_{3000}$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'Sigma4':
-        color = 'tab:olive'
-        label = r'$\sigma_4$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'Delta_Sigma3':
-        color = 'tab:olive'
-        label = r'$\Delta$$\sigma_{3000}$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'Rho' or var == 'density':
-        color = 'tab:olive'
-        label = r'$\rho$ in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-    elif var == 'delta_podensity':
-        color = 'tab:olive'
-        label = r'Potential Density Anomaly in kg m$^{-3}$'
-        cmap = 'YlGn_r'
-#depth
-    elif var == 'DEPTH' or var == 'Depth_corr(m)' or var == 'DepSM_mean':
-        color = 'black'
-        label = r'Depth in m'
-        cmap = 'None'
-#pressure
-    elif var == 'PRES':
-        color = 'black'
-        label = r'Pressure in dbar'
-        cmap = 'None'
-#helium
-    elif var == 'delta3He':
-        color = 'orange'
-        label = r'$\delta^3$He in %'
-        cmap = 'Oranges'
-        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
-    elif var == 'Delta_delta3He':
-        color = 'orange'
-        label = r'$\Delta$ $\delta^3$He in %'
-        cmap = 'Oranges'
-        cmap = truncate_colormap(cmap, minval=0.2, maxval=1)
-#time
-    elif var == 'datetime' or var == 'timeQ':
-        color = 'black'
-        label = r'Time'
-        cmap = 'None'
-#Distance
-    elif var == 'Dist':
-        color = 'black'
-        label = r'Distance in m'
-        cmap = None
-    elif var == 'Dist_vent':
-        color = 'black'
-        label = r'Distance to vent in m'
-        cmap = 'None'
-#coordinates
-    elif 'lat' in var:
-        color = 'black'
-        label = r'Latitude'
-        cmap = None
-    elif 'lon' in var:
-        color = 'black'
-        label = r'Longitude'
-        cmap = None
+    for entry in config.values():
 
-    else:
-        print('Properties for variable '+var+' not defined yet.')
+        if "vars" in entry and var in entry["vars"]:
+            matched = True
+        elif "match" in entry and entry["match"] in var:
+            matched = True
+        else:
+            matched = False
 
-    return label,color,cmap
+        if not matched:
+            continue
+
+        color = entry["color"]
+        symbol = entry.get("symbol", "")
+        unit = entry.get("unit", "")
+        cmap = entry.get("cmap")
+
+        # Build label automatically
+        if units_as == 'in':
+            label = f"{symbol} in {unit}"
+        elif units_as == '()':
+            label = f"{symbol} ({unit})"
+        elif units_as == '[]':
+            label = f"{symbol} [{unit}]"
+        elif units_as == None:
+            label = symbol
+
+        # Handle truncated colormaps
+        if isinstance(cmap, dict):
+            cmap = truncate_colormap(
+                cmap["name"],
+                cmap["truncate"]["minval"],
+                cmap["truncate"]["maxval"],
+            )
+
+        return label, color, cmap
+
+    raise ValueError(f"Properties for variable '{var}' not defined.")
 
 def dist(lon1, lat1, lon2, lat2, dep1='None', dep2='None'):
     """
