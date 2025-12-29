@@ -449,7 +449,7 @@ def read_btl(btl_path):
     Parameters
     ----------
     btl_path : string
-        Path to the directory where the data is stored in one station per file.
+        Path to the directory where the data is stored ideally in one station per file.
 
     Returns
     -------
