@@ -12,7 +12,7 @@ def read_cnv(path,suffix=None):
     Reads in data from SeaBird CTD processing software which ends with ".cnv"
     to a dictionary with the filename as the key and a pandas dataframe per
     station as the value. It exspects one file per station in the given
-    directory.
+    directory.This function uses the seabird package by castelao: https://github.com/castelao/seabird
 
     Parameters
     ----------
@@ -444,7 +444,7 @@ def read_btl(btl_path):
     Reads in bottle data from SeaBird CTD processing software which ends with ".btl"
     to a dictionary with the filename as the key and a pandas dataframe per
     station as the value. It exspects one file per station in the given
-    directory.
+    directory. This function uses the seabird package by castelao: https://github.com/castelao/seabird
 
     Parameters
     ----------
@@ -523,7 +523,7 @@ def read_btl(btl_path):
             # creates datetime object column
             df_output['Date']+' '+df_output['Time'], dayfirst=True)
         df_output['Bottle'] = df_output['Bottle'].astype(int)
-        file = file.rstrip('.btl')
+        file = file.replace('.btl','')
         btl_data[file] = df_output
         print('Read '+file+' successfully!')
 
