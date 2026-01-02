@@ -441,6 +441,7 @@ def posidata_M210(posi_path):
 
 def read_btl(btl_path):
     """
+    [Depreciated, new read_btl using a different seabird package]
     Reads in bottle data from SeaBird CTD processing software which ends with ".btl"
     to a dictionary with the filename as the key and a pandas dataframe per
     station as the value. It exspects one file per station in the given
@@ -533,6 +534,90 @@ def read_btl(btl_path):
 
     return btl_data
 
+def read_btl_iow(btl_path, stats_as_columns=True):
+    """
+    Reads in bottle data from SeaBird CTD processing software which ends with ".btl"
+    to a dictionary with the filename as the key and a pandas dataframe per
+    station as the value. It exspects one file per station in the given
+    directory. This function uses the seabirdfilehandler module: https://git.io-warnemuende.de/CTD-Software/SeabirdFileHandler .
+
+    Parameters
+    ----------
+    btl_path : string
+        Path to the directory where the data is stored ideally in one station per file.
+    stats_as_columns : Boolean, Optional
+        Parameter which controls if statistical values for each bottle closure are displayed as additional columns for every parameter or as additional rows with a statistics column (as in the btl file). Default is True.
+
+    Returns
+    -------
+    btl_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+
+    """
+    from seabirdfilehandler import BottleFile
+    import os
+    import pandas as pd
+
+    btl_data = dict()
+
+    # get all filenames of the btl files sheets
+    file_list = []
+    for file in os.listdir(btl_path):
+        if file.endswith(".btl"):
+            file_list.append(file)
+            file_list.sort()
+
+    #iterate over filenames and read data into dict
+    for file in file_list:
+        #key for dict
+        key = file.replace('.btl','')
+        #load data
+        data = BottleFile(os.path.join(btl_path,file)).create_dataframe()
+        #remove empty column from two-row header
+        del data['Position']
+
+        #append statistics data as columns
+        if stats_as_columns==True:
+            if 'Statistic' in data.columns:
+                # subset columns which have not meaningful statistics
+                if 'Longitude' in data.columns:
+                    data_static = data[['Bottle','Date','Time','Longitude','Latitude']]
+                    data = data.drop(['Bottle','Date','Time','Longitude','Latitude'],axis=1)
+                else:
+                    data_static = data[['Bottle','Date','Time']]
+                    data = data.drop(['Bottle','Date','Time'],axis=1)
+                #subset every 4th column to account for less rows
+                data_static = data_static.iloc[::4, :]
+                data_static = data_static.reset_index(drop=True)
+                #split by statistic
+                data_mean = data[data['Statistic']=='avg']
+                data_sdev = data[data['Statistic']=='sdev']
+                data_min = data[data['Statistic']=='min']
+                data_max = data[data['Statistic']=='max']
+                for df in [data_mean,data_sdev,data_min,data_max]:
+                    #append statistic to column names
+                    stat = '_'+df['Statistic'].unique()
+                    del df['Statistic']
+                    df.columns = df.columns+stat
+                #reset index for concat
+                data_mean = data_mean.reset_index(drop=True)
+                data_sdev = data_sdev.reset_index(drop=True)
+                data_min  = data_min.reset_index(drop=True)
+                data_max  = data_max.reset_index(drop=True)
+                #concat back to one df
+                data = pd.concat([data_static,data_mean,data_sdev,data_min,data_max],axis=1)
+
+        #create datetime object column
+        data['datetime'] = pd.to_datetime(data['Date']+' '+data['Time'], dayfirst=True)
+        #write data into dictionary
+        btl_data[key] = data
+        #infer data types
+        btl_data[key] = btl_data[key].infer_objects(copy=False)
+        print('Read '+file+' successfully!')
+
+
+    return btl_data
 
 def read_mapr(mapr_path, raw=False, error_sheets=[]):
     """
