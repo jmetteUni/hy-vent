@@ -98,6 +98,7 @@ def read_cnv_iow(path,suffix=None):
     from seabirdfilehandler import CnvFile
     import os
     import datetime as dt
+    import pandas as pd
 
     file_list = []  # get all cnv filenames
     for file in os.listdir(path):
@@ -127,14 +128,13 @@ def read_cnv_iow(path,suffix=None):
                     cnv_data[key] = cnv_data[key].groupby(
                         'timeQ').mean().reset_index()
 
-            cnv_data[key]['datetime'] = cnv_data[key]['basedate'] + \
-                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
+            cnv_data[key]['datetime'] = cnv_data[key]['basedate'] +                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
             del cnv_data[key]['basedate']
             print('Read '+file+' sucessfully')
         except:
             print('Error reading '+file+', skipping...')
 
-    infer datetypes
+    #infer datetypes
     for key in cnv_data:
         cnv_data[key] = cnv_data[key].infer_objects(copy=False)
 
