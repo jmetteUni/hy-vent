@@ -597,9 +597,9 @@ def read_btl_iow(btl_path, stats_as_columns=True):
                 data_max = data[data['Statistic']=='max']
                 for df in [data_mean,data_sdev,data_min,data_max]:
                     #append statistic to column names
-                    if df['Statistic'].unique() =='avg'
+                    if df['Statistic'].unique() =='avg':
                         stat = '_mean'
-                    else
+                    else:
                         stat = '_'+df['Statistic'].unique()
                     del df['Statistic']
                     df.columns = df.columns+stat
