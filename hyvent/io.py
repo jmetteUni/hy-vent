@@ -9,7 +9,7 @@ Created on Tue Apr 23 18:10:45 2024
 
 def read_cnv(path,suffix=None):
     """
-    Reads in data from SeaBird CTD processing software which ends with ".cnv"
+    [Depreceated, replaced by read_cnv_iow] Reads in data from SeaBird CTD processing software which ends with ".cnv"
     to a dictionary with the filename as the key and a pandas dataframe per
     station as the value. It exspects one file per station in the given
     directory.This function uses the seabird package by castelao: https://github.com/castelao/seabird
@@ -74,6 +74,71 @@ def read_cnv(path,suffix=None):
 
     return cnv_data
 
+def read_cnv_iow(path,suffix=None):
+    """
+    Reads in data from SeaBird CTD processing software which ends with ".cnv"
+    to a dictionary with the filename as the key and a pandas dataframe per
+    station as the value. It exspects one file per station in the given
+    directory.This function uses the seabird file handler package: https://git.io-warnemuende.de/CTD-Software/SeabirdFileHandler .
+
+    Parameters
+    ----------
+    path : string
+        Path to the directory where the data is stored in one station per file.
+
+    Returns
+    -------
+    cnv_data : dictionary
+        Dictionary where the keys are unique station identifiers and
+        values are data in pandas dataframes.
+    suffix : string, optional
+        Suffix at the end of the filename, to filter the files which are read in. Default is None
+
+    """
+    from seabirdfilehandler import CnvFile
+    import os
+    import datetime as dt
+
+    file_list = []  # get all cnv filenames
+    for file in os.listdir(path):
+        if suffix != None:
+            if file.endswith(suffix+".cnv"):
+                file_list.append(file)
+                file_list.sort()
+        else:
+            if file.endswith(".cnv"):
+                file_list.append(file)
+                file_list.sort()
+
+    cnv_data = dict()  # read cnv file into pandas dataframe with fCNV package
+    for file in file_list:
+        key = file.rstrip('.cnv')
+        if suffix in key:
+            key = key.replace(suffix, '')
+        try:
+            cnv_data[key] = CnvFile(os.path.join(path,file)).create_dataframe()
+            cnv_data[key]['basedate'] = dt.datetime(
+                2000, 1, 1)  # create datetime object column
+            if cnv_data[key]['timeQ'].isna().any() == True:
+                cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(
+                    axis=0)  # interpolates nan values
+                if cnv_data[key]['timeQ'].duplicated().any() == True:
+                    # average rows with the same timestamp, NaNs already filled
+                    cnv_data[key] = cnv_data[key].groupby(
+                        'timeQ').mean().reset_index()
+
+            cnv_data[key]['datetime'] = cnv_data[key]['basedate'] + \
+                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
+            del cnv_data[key]['basedate']
+            print('Read '+file+' sucessfully')
+        except:
+            print('Error reading '+file+', skipping...')
+
+    infer datetypes
+    for key in cnv_data:
+        cnv_data[key] = cnv_data[key].infer_objects(copy=False)
+
+    return cnv_data
 
 # writes all stations to individual csv sheets
 def write_to_csv(data_in, out_path, datatype):
