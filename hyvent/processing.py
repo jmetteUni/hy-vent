@@ -256,7 +256,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
     return data_proc
 
 
-def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, control_plot=False):
+def process_CTD(data_in, var_dORP='upoly0', var_Turb='seaTurbMtr', iqr_threshold=10, box_plots=False, control_plot=False):
     """
     This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: "seaTurbMtr") is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: "ORP_raw_v6") is used to calculate the gradient per second over 30 seconds averaged.
 
@@ -264,8 +264,10 @@ def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, c
     ----------
     data : pandas dataframe
         Dataframe of one or multiple CTD operations with variables as columns. Need columns with station designation.
-    var_dORP: string or list of strings, optional
+    var_dORP: list of strings, optional
         Variable (or multiple variables if multiple sensors were used) for calculating dORP. Consider that the resulting unit is directly dependent on the unit of the input variables. Default is "upoly0".
+    var_Turb: list of strings, optional
+        Variable (or multiple variables if multiple sensors were used) for calculating the processed turbidity. Default is "seaTTurbMtr" for the Seapint Turbidity Meter.
     iqr_threshold : float, optional
         Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 10.
     box_plots : boolean, optional
@@ -289,39 +291,76 @@ def process_CTD(data_in, var_dORP='upoly0', iqr_threshold=10, box_plots=False, c
 
     data_list = [d for _, d in data_in.groupby(['Station'])]
     for idx, data in enumerate(data_list):
-        # remove outliers and smooth turbidity below 100m
-        data = data.rename(columns={'seaTurbMtr': 'Neph(volts)'})
-        data_part = data.copy(deep=True)
 
-        # mask all vlaues in Neph above 100m
-        data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(
-            data_part['DEPTH'] < 100, np.nan)
-        data_part['Neph_outl(volts)'] = qc_IQR(
-            # remove outliers
-            data_part, ['Neph(volts)'], iqr_threshold, boxplots=box_plots)
-        data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].infer_objects(
-            copy=False).interpolate()
-        data_part['Neph_smoo(volts)'] = savgol_filter(
-            data_part['Neph_outl(volts)'], 30, 3)  # smooth
-        # write processed columns back to data_partframe
-        data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']
-        data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
+        # process Turb for one variable dependent on var_Turb input
+        if isinstance(var_Turb, str) == True:
+            # remove outliers and smooth turbidity below 100m
+            data = data.rename(columns={var_Turb: 'Neph(volts)'})
+            data_part = data.copy(deep=True)
 
-        # control plot for turbidity processing
-        if control_plot == True:
-            import matplotlib.pyplot as plt
-            plt.figure()
-            plt.plot(data['Neph(volts)'], label='original data')
-            plt.plot(data['Neph_outl(volts)'], label='outlier removed')
-            plt.plot(data['Neph_smoo(volts)'], label='outl. rem. & smoothed')
-            plt.ylabel('Turbidity in NTU')
-            # plt.ylim(data['Neph_outl(volts)'].min(),data['Neph_outl(volts)'].max())
-            plt.xlabel('Index')
-            plt.legend()
+            # mask all vlaues in Neph above 100m
+            data_part['Neph(volts)'] = data_part['Neph(volts)'].mask(
+                data_part['DEPTH'] < 100, np.nan)
+            data_part['Neph_outl(volts)'] = qc_IQR(
+                # remove outliers
+                data_part, ['Neph(volts)'], iqr_threshold, boxplots=box_plots)
+            data_part['Neph_outl(volts)'] = data_part['Neph_outl(volts)'].infer_objects(
+                copy=False).interpolate()
+            data_part['Neph_smoo(volts)'] = savgol_filter(
+                data_part['Neph_outl(volts)'], 30, 3)  # smooth
+            # write processed columns back to data_partframe
+            data['Neph_outl(volts)'] = data_part['Neph_outl(volts)']
+            data['Neph_smoo(volts)'] = data_part['Neph_smoo(volts)']
+
+            # control plot for turbidity processing
+            if control_plot == True:
+                import matplotlib.pyplot as plt
+                plt.figure()
+                plt.plot(data['Neph(volts)'], label='original data')
+                plt.plot(data['Neph_outl(volts)'], label='outlier removed')
+                plt.plot(data['Neph_smoo(volts)'], label='outl. rem. & smoothed')
+                plt.ylabel('Turbidity in NTU')
+                # plt.ylim(data['Neph_outl(volts)'].min(),data['Neph_outl(volts)'].max())
+                plt.xlabel('Index')
+                plt.legend()
+
+        # process Turb for multiple variables dependent on var_Turb input
+        if isinstance(var_Turb, list) == True:
+            for var in var_Turb:
+                # remove outliers and smooth turbidity below 100m
+                data = data.rename(columns={var: 'Neph(volts)_'+var})
+                data_part = data.copy(deep=True)
+
+                # mask all vlaues in Neph above 100m
+                data_part['Neph(volts)_'+var] = data_part['Neph(volts)_'+var].mask(
+                    data_part['DEPTH'] < 100, np.nan)
+                data_part['Neph_outl(volts)_'+var] = qc_IQR(
+                    # remove outliers
+                    data_part, ['Neph(volts)_'+var], iqr_threshold, boxplots=box_plots)
+                data_part['Neph_outl(volts)_'+var] = data_part['Neph_outl(volts)_'+var].infer_objects(
+                    copy=False).interpolate()
+                data_part['Neph_smoo(volts)_'+var] = savgol_filter(
+                    data_part['Neph_outl(volts)_'+var], 30, 3)  # smooth
+                # write processed columns back to data_partframe
+                data['Neph_outl(volts)_'+var] = data_part['Neph_outl(volts)_'+var]
+                data['Neph_smoo(volts)_'+var] = data_part['Neph_smoo(volts)_'+var]
+
+                # control plot for turbidity processing
+                if control_plot == True:
+                    import matplotlib.pyplot as plt
+                    plt.figure()
+                    plt.title(var+' processing')
+                    plt.plot(data['Neph(volts)_'+var], label='original data')
+                    plt.plot(data['Neph_outl(volts)_'+var], label='outlier removed')
+                    plt.plot(data['Neph_smoo(volts)_'+var], label='outl. rem. & smoothed')
+                    plt.ylabel('Turbidity in NTU')
+                    # plt.ylim(data['Neph_outl(volts)_'+var].min(),data['Neph_outl(volts)_'+var].max())
+                    plt.xlabel('Index')
+                    plt.legend()
 
         # calculate dORP for one or multiple variables dependent on var_dORP input
         if isinstance(var_dORP, str) == True:
-            data['dORP'] = data['upoly0'].diff(periods=30)/30
+            data['dORP'] = data[var_dORP].diff(periods=30/30)
         if isinstance(var_dORP, list) == True:
             for var in var_dORP:
                 data['dORP_'+var] = data[var].diff(periods=30/30)
