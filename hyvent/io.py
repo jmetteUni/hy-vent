@@ -523,7 +523,7 @@ def posidata_SO311(posi_path):  # position data as one csv sheet, Ranger output
 
     #posi = pd.read_csv(posi_path, sep=';', float_precision='high',encoding='iso-8859-1', skiprows=3, names=['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon'])
 
-    posi = pd.read_csv(posi_path, encoding='iso-8859-1', sep='\t')
+    posi = pd.read_csv(posi_path, encoding='iso-8859-1', sep='\t', low_memory=False)
     posi = posi.drop(index=[0,1],axis=1)
     posi = posi[['date time','Ranger2.PSONLLD.2412.depth','Ranger2.PSONLLD.2412.position_latitude','Ranger2.PSONLLD.2412.position_longitude']]
     posi.columns = ['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon']
