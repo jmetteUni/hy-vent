@@ -525,8 +525,15 @@ def posidata_SO311(posi_path):  # position data as one csv sheet, Ranger output
 
     posi = pd.read_csv(posi_path, encoding='iso-8859-1', sep='\t', low_memory=False)
     posi = posi.drop(index=[0,1],axis=1)
-    posi = posi[['date time','Ranger2.PSONLLD.2412.depth','Ranger2.PSONLLD.2412.position_latitude','Ranger2.PSONLLD.2412.position_longitude']]
+    #subset columns for variable transponder ID
+    cols = ['date time'] + [
+        c for c in posi.columns
+        if c.startswith('Ranger2.PSONLLD.') and
+           c.endswith(('.depth', '.position_latitude', '.position_longitude'))
+    ]
+    posi = posi[cols]
     posi.columns = ['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon']
+    posi = posi[posi['Instr_depth']!='#']
     posi['datetime'] = pd.to_datetime(
         posi['datetime'])  # creates datetime object
     posi['Instr_lat'] = posi['Instr_lat'].astype(str).apply(lambda x: parse(x))
