@@ -503,6 +503,37 @@ def posidata_M210(posi_path):
 
     return transp_list
 
+def posidata_SO311(posi_path):  # position data as one csv sheet, Ranger output
+    """
+    Reads in comma separated files with data from the Sonardyne Ranger acoustic position tracker on RV Sonne from the cruise SO311 exported from the "D-Ship" portal.
+
+    Parameters
+    ----------
+    posi_path : string
+        Path to the file.
+
+    Returns
+    -------
+    posi : pandas dataframe
+        Pandas Dataframe with datetime, instrument latitude,instrument longitude and intrument depth as columns.
+    """
+
+    import pandas as pd
+    from lat_lon_parser import parse
+
+    #posi = pd.read_csv(posi_path, sep=';', float_precision='high',encoding='iso-8859-1', skiprows=3, names=['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon'])
+
+    posi = pd.read_csv(posi_path, encoding='iso-8859-1', sep='\t')
+    posi = posi.drop(index=[0,1],axis=1)
+    posi = posi[['date time','Ranger2.PSONLLD.2412.depth','Ranger2.PSONLLD.2412.position_latitude','Ranger2.PSONLLD.2412.position_longitude']]
+    posi.columns = ['datetime', 'Instr_depth', 'Instr_lat', 'Instr_lon']
+    posi['datetime'] = pd.to_datetime(
+        posi['datetime'])  # creates datetime object
+    posi['Instr_lat'] = posi['Instr_lat'].astype(str).apply(lambda x: parse(x))
+    posi['Instr_lon'] = posi['Instr_lon'].astype(str).apply(lambda x: parse(x))
+
+    return (posi)
+
 
 def read_btl(btl_path):
     """
