@@ -285,11 +285,12 @@ def read_dshippos(dship_path):
         Pandas Dataframe with date, time, latitude and longitude as columns.
 
     """
-
     import pandas as pd
 
-    dship = pd.read_fwf(dship_path, skiprows=3, names=[
-                        'Date', 'Time', 'Dship_lat', 'Dship_lon'], encoding='iso-8859-1')
+    dship = pd.read_fwf(dship_path, skiprows=3, encoding='iso-8859-1',header=None)
+    #set column names
+    dship.columns=['Date', 'Time', 'Dship_lat', 'Dship_lon']
+    #convert to datetime
     dship['datetime'] = pd.to_datetime(dship['Date']+' '+dship['Time'])
     del dship['Date']
     del dship['Time']
