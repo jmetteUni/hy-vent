@@ -85,15 +85,14 @@ def read_cnv_iow(path,suffix=None):
     ----------
     path : string
         Path to the directory where the data is stored in one station per file.
+    suffix : string, optional
+        Suffix at the end of the filename, to filter the files which are read in. Default is None
 
     Returns
     -------
     cnv_data : dictionary
         Dictionary where the keys are unique station identifiers and
         values are data in pandas dataframes.
-    suffix : string, optional
-        Suffix at the end of the filename, to filter the files which are read in. Default is None
-
     """
     from seabirdfilehandler import CnvFile
     import os
