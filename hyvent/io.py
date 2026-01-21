@@ -113,7 +113,7 @@ def read_cnv_iow(path,suffix=None):
     cnv_data = dict()  # read cnv file into pandas dataframe with fCNV package
     for file in file_list:
         key = file.rstrip('.cnv')
-        if suffix in key:
+        if suffix is not None:
             key = key.replace(suffix, '')
         try:
             cnv_data[key] = CnvFile(os.path.join(path,file)).create_dataframe()
