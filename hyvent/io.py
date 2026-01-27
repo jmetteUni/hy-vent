@@ -479,7 +479,7 @@ def posidata_M210(posi_path):
         transp.columns = transp.columns.str.replace(no, '')
         transp.columns = transp.columns.str.replace('.', '')
         transp = transp.rename(columns={'date time': 'Datetime', 'SYSDISPActName': 'Station', 'SYSSTRDPT': 'Water_depth', 'SYSSTRPosLat': 'Ship_lat',
-                               'SYSSTRPosLon': 'Ship_lon', 'Depth_BUC': 'Depth', 'position_latitude': 'Instr_lat', 'position_longitude': 'Instr_lon', 'transponder_No': 'Transp_no'})
+                               'SYSSTRPosLon': 'Ship_lon', 'Depth_BUC': 'Instr_depth', 'position_latitude': 'Instr_lat', 'position_longitude': 'Instr_lon', 'transponder_No': 'Transp_no'})
 
         # drop nan rows
         transp = transp.dropna(
