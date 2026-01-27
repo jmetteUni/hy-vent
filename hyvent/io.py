@@ -119,6 +119,7 @@ def read_cnv_iow(path,suffix=None):
             cnv_data[key] = CnvFile(os.path.join(path,file)).create_dataframe()
             cnv_data[key]['basedate'] = dt.datetime(
                 2000, 1, 1)  # create datetime object column
+
             if cnv_data[key]['timeQ'].isna().any() == True:
                 cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(
                     axis=0)  # interpolates nan values
@@ -129,6 +130,11 @@ def read_cnv_iow(path,suffix=None):
 
             cnv_data[key]['datetime'] = cnv_data[key]['basedate'] +                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
             del cnv_data[key]['basedate']
+
+            #sometimes depth is as DepSM or as DEPTH from the SBE processing
+            if 'depSM' in cnv_data[key].keys():
+                cnv_data[key] = cnv_data[key].rename(columns={'depSM':'DEPTH'})
+
             print('Read '+file+' sucessfully')
         except:
             print('Error reading '+file+', skipping...')
