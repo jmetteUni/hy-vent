@@ -258,7 +258,7 @@ def process_MAPR(data_in, lat, fs=1/5, neg_threshold=-30, despike_window_size=15
 
 def process_CTD(data_in, var_dORP='upoly0', var_Turb='seaTurbMtr', iqr_threshold=10, box_plots=False, control_plot=False):
     """
-    This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: "seaTurbMtr") is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: "ORP_raw_v6") is used to calculate the gradient per second over 30 seconds averaged.
+    This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: "seaTurbMtr") is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: "ORP_raw_v6") is used to calculate the gradient per second over 30 seconds averaged. It also cuts unuseful data before and after the deplyoments, based on a reference pressure using the function cut_prepost_deploy.
 
     Parameters
     ----------
