@@ -478,15 +478,15 @@ def posidata_M210(posi_path):
         no = key[-1]
         transp.columns = transp.columns.str.replace(no, '')
         transp.columns = transp.columns.str.replace('.', '')
-        transp = transp.rename(columns={'date time': 'Datetime', 'SYSDISPActName': 'Station', 'SYSSTRDPT': 'Water_depth', 'SYSSTRPosLat': 'Ship_lat',
+        transp = transp.rename(columns={'date time': 'datetime', 'SYSDISPActName': 'Station', 'SYSSTRDPT': 'Water_depth', 'SYSSTRPosLat': 'Ship_lat',
                                'SYSSTRPosLon': 'Ship_lon', 'Depth_BUC': 'Instr_depth', 'position_latitude': 'Instr_lat', 'position_longitude': 'Instr_lon', 'transponder_No': 'Transp_no'})
 
         # drop nan rows
         transp = transp.dropna(
-            subset=['Depth', 'Instr_lat', 'Instr_lon'], how='all')
+            subset=['Instr_depth', 'Instr_lat', 'Instr_lon'], how='all')
         # convert datatypes
-        transp['Depth'] = transp['Depth'].astype(float)
-        transp['Datetime'] = pd.to_datetime(transp['Datetime'])
+        transp['Instr_depth'] = transp['Instr_depth'].astype(float)
+        transp['datetime'] = pd.to_datetime(transp['datetime'])
         transp['Water_depth'] = transp['Water_depth'].astype(float)
         try:
             transp['Ship_lat'] = transp['Ship_lat'].astype(
