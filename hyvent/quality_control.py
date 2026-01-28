@@ -43,7 +43,7 @@ def qc_lat_lon_IQR(profile, vars_to_qc, threshold=1.5, boxplots=False):        #
         lower_bound = Q1 - threshold * IQR
         upper_bound = Q3 + threshold * IQR
 
-        df_qc[var] = df[var][(df[var] >= lower_bound) & (df[var] <= upper_bound)]       #selects only the data which meets the conditions
+        df_qc[var] = df[var][(df[var] >= lower_bound) & (df[var] <= upper_bound)]       #selects only the data which meets the conditions.
 
     if boxplots == True:        #boxplot of qc variables
         for var in vars_to_qc:
@@ -185,9 +185,10 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, control_plot=False)
 
         if control_plot == True:
             plt.figure()
-            plt.plot(station[pres_var])
-            plt.plot(station_part[pres_var])
+            plt.plot(station['datetime'],station[pres_var])
+            plt.plot(station_part['datetime'],station_part[pres_var])
             plt.ylabel('Pressure in dbar')
+            plt.title(station['Station'].iloc[0])
             plt.show()
 
         data = station_part
@@ -229,8 +230,8 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, control_plot=False)
 
             if control_plot == True:
                 plt.figure()
-                plt.plot(station[pres_var])
-                plt.plot(station_part[pres_var])
+                plt.plot(station['datetime'],station[pres_var])
+                plt.plot(station_part['datetime'],station_part[pres_var])
                 plt.ylabel('Pressure in dbar')
                 plt.title(key)
                 plt.show()
