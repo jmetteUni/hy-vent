@@ -413,6 +413,8 @@ def posidata_M210(posi_path):
     -------
     transp_list : dict
         Dictionary containing key-value pairs for four different transponders as pandas dataframes and one key-value pair with unit information.
+    dship_units : pandas dataframe
+        Dataframe containing the unit information for each transponder dataframe
     """
     import numpy as np
     import pandas as pd
@@ -507,9 +509,8 @@ def posidata_M210(posi_path):
         transp['Transp_no'] = transp['Transp_no'].astype(int)
 
         transp_list[key] = transp
-    transp_list['units'] = dship_units
 
-    return transp_list
+    return transp_list, dship_units
 
 def posidata_SO311(posi_path):  # position data as one csv sheet, Ranger output
     """
