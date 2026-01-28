@@ -124,7 +124,7 @@ def qc_IQR(profile, var_to_qc, threshold=1.5, boxplots=False):        #qc on no 
 
     return df_qc          #returns the profile with the original vars overwritten by the qc vars
 
-def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
+def cut_prepost_deploy(data, pres_limit=10, window_limit=10, control_plot=False):
     """
     This functions cuts the beginning and end of CTD or MAPR stations of a dataset based on the first and the last occurence of consecutive values below a pressure limit. Plots to control the result cna be printed optionally.
 
@@ -136,7 +136,7 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
         Consecutive values which mark the start and end of a deployment have to be below this limit. The default is 10dbar.
     window_limit : int, optional
         The number of consecutive values which mark the start and end of a deployment. The default is 10.
-    plot : boolean, optional
+    control_plot : boolean, optional
         Controls if a plot with the original pressure data and the cutted pressure data is printed. The default is False.
 
     Returns
@@ -152,8 +152,14 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
         station = data.copy(deep=True)
         station = station.reset_index(drop=True)
 
+        #infer the pressure variable from the data ('Press(dB)' for MAPR, 'PRES' for CTD)
+        if 'Press(dB)' in data.keys():
+            pres_var = 'Press(dB)'
+        if 'PRES' in data.keys():
+            pres_var = 'PRES'
+
         # Define condition
-        condition = station['Press(dB)'] >= pres_limit
+        condition = station[pres_var] >= pres_limit
 
         # Rolling mean to find sequences of 10 consecutive True values
         rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
@@ -177,10 +183,10 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
             # No segment meets the requirement — return empty DataFrame
             print('No values removed.')
 
-        if plot == True:
+        if control_plot == True:
             plt.figure()
-            plt.plot(station['Press(dB)'])
-            plt.plot(station_part['Press(dB)'])
+            plt.plot(station[pres_var])
+            plt.plot(station_part[pres_var])
             plt.ylabel('Pressure in dbar')
             plt.show()
 
@@ -189,8 +195,15 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
     elif isinstance(data,dict):
         for key in data:
             station = data[key].copy(deep=True)
+
+            #infer the pressure variable from the data ('Press(dB)' for MAPR, 'PRES' for CTD)
+            if 'Press(dB)' in station.keys():
+                pres_var = 'Press(dB)'
+            if 'PRES' in station.keys():
+                pres_var = 'PRES'
+
             # Define condition
-            condition = station['Press(dB)'] >= pres_limit
+            condition = station[pres_var] >= pres_limit
 
             # Rolling mean to find sequences of 10 consecutive True values
             rolling_condition = condition.rolling(window=window_limit, min_periods=window_limit).mean()
@@ -214,10 +227,10 @@ def cut_prepost_deploy(data, pres_limit=10, window_limit=10, plot=False):
                 # No segment meets the requirement — return empty DataFrame
                 print('No values removed.')
 
-            if plot == True:
+            if control_plot == True:
                 plt.figure()
-                plt.plot(station['Press(dB)'])
-                plt.plot(station_part['Press(dB)'])
+                plt.plot(station[pres_var])
+                plt.plot(station_part[pres_var])
                 plt.ylabel('Pressure in dbar')
                 plt.title(key)
                 plt.show()
