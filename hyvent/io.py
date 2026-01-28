@@ -131,9 +131,11 @@ def read_cnv_iow(path,suffix=None):
             cnv_data[key]['datetime'] = cnv_data[key]['basedate'] +                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
             del cnv_data[key]['basedate']
 
-            #sometimes depth is as DepSM or as DEPTH from the SBE processing
+            #sometimes depth is as DepSM/prDM or as DEPTH from the SBE processing
             if 'depSM' in cnv_data[key].keys():
                 cnv_data[key] = cnv_data[key].rename(columns={'depSM':'DEPTH'})
+            if 'prDM' in cnv_data[key].keys():
+                cnv_data[key] = cnv_data[key].rename(columns={'prDM':'PRES'})
 
             print('Read '+file+' sucessfully')
         except:
