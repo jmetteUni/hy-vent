@@ -281,7 +281,7 @@ def process_CTD(data_in, var_dORP='upoly0', var_Turb='seaTurbMtr', iqr_threshold
         Dataframe with the processed data
     """
 
-    from hyvent.quality_control import qc_IQR
+    from hyvent.quality_control import qc_IQR, cut_prepost_deploy
     from scipy.signal import savgol_filter
 
     import pandas as pd
@@ -291,6 +291,9 @@ def process_CTD(data_in, var_dORP='upoly0', var_Turb='seaTurbMtr', iqr_threshold
 
     data_list = [d for _, d in data_in.groupby(['Station'])]
     for idx, data in enumerate(data_list):
+
+        #cut prepost deplyoment
+        data = cut_prepost_deploy(data, window_limit=60)
 
         # process Turb for one variable dependent on var_Turb input
         if isinstance(var_Turb, str) == True:
