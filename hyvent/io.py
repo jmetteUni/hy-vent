@@ -433,7 +433,7 @@ def posidata_M210(posi_path):
 
     # sort transponders into dict
     transp_list = dict()
-    transp_list['transp0'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+    transp_list['t0'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
                                           'POSI.PTSAG.0.Depth_BUC',
                                           'POSI.PTSAG.0.position_latitude',
                                           'POSI.PTSAG.0.NS',
@@ -442,7 +442,7 @@ def posidata_M210(posi_path):
                                           'POSI.PTSAG.0.raw_time',
                                           'POSI.PTSAG.0.transponder_No']]
 
-    transp_list['transp1'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+    transp_list['t1'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
                                           'POSI.PTSAG.1.Depth_BUC',
                                           'POSI.PTSAG.1.position_latitude',
                                           'POSI.PTSAG.1.NS',
@@ -451,7 +451,7 @@ def posidata_M210(posi_path):
                                           'POSI.PTSAG.1.raw_time',
                                           'POSI.PTSAG.1.transponder_No']]
 
-    transp_list['transp2'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+    transp_list['t2'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
                                           'POSI.PTSAG.2.Depth_BUC',
                                           'POSI.PTSAG.2.position_latitude',
                                           'POSI.PTSAG.2.NS',
@@ -459,7 +459,7 @@ def posidata_M210(posi_path):
                                           'POSI.PTSAG.2.EW',
                                           'POSI.PTSAG.2.transponder_No']]
 
-    transp_list['transp3'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+    transp_list['t3'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
                                           'POSI.PTSAG.3.Depth_BUC',
                                           'POSI.PTSAG.3.position_latitude',
                                           'POSI.PTSAG.3.NS',
@@ -467,7 +467,7 @@ def posidata_M210(posi_path):
                                           'POSI.PTSAG.3.EW',
                                           'POSI.PTSAG.3.transponder_No']]
 
-    transp_list['transp4'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
+    transp_list['t4'] = dship_nonan[['date time', 'SYS.DISP.ActName', 'SYS.STR.DPT', 'SYS.STR.PosLat', 'SYS.STR.PosLon',
                                           'POSI.PTSAG.4.Depth_BUC',
                                           'POSI.PTSAG.4.position_latitude',
                                           'POSI.PTSAG.4.NS',
