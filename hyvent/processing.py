@@ -293,7 +293,7 @@ def process_CTD(data_in, var_dORP='upoly0', var_Turb='seaTurbMtr', iqr_threshold
     for idx, data in enumerate(data_list):
 
         #cut prepost deplyoment
-        data = cut_prepost_deploy(data, window_limit=10,control_plot=True)
+        data = cut_prepost_deploy(data, window_limit=10)
 
         # process Turb for one variable dependent on var_Turb input
         if isinstance(var_Turb, str) == True:
