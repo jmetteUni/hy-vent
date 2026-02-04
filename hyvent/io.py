@@ -117,19 +117,28 @@ def read_cnv_iow(path,suffix=None):
             key = key.replace(suffix, '')
         try:
             cnv_data[key] = CnvFile(os.path.join(path,file)).create_dataframe()
-            cnv_data[key]['basedate'] = dt.datetime(
-                2000, 1, 1)  # create datetime object column
 
-            if cnv_data[key]['timeQ'].isna().any() == True:
-                cnv_data[key]['timeQ'] = cnv_data[key]['timeQ'].interpolate(
+            #check if timeQ is present
+            if 'timeQ' in cnv_data[key].keys():
+                time_var = 'timeQ'
+            elif 'timeS' in cnv_data[key].keys():
+                time_var = 'timeS'
+                print('No NMEA time variable detected, no datetime calculation possible!')
+            else:
+                print('No time variable detecte, no datetime calculation possible!')
+
+            #check for nan or duplicated timestamps
+            if cnv_data[key][time_var].isna().any() == True:
+                cnv_data[key][time_var] = cnv_data[key][time_var].interpolate(
                     axis=0)  # interpolates nan values
-                if cnv_data[key]['timeQ'].duplicated().any() == True:
+                if cnv_data[key][time_var].duplicated().any() == True:
                     # average rows with the same timestamp, NaNs already filled
-                    cnv_data[key] = cnv_data[key].groupby(
-                        'timeQ').mean().reset_index()
+                    cnv_data[key] = cnv_data[key].groupby(time_var).mean().reset_index()
 
-            cnv_data[key]['datetime'] = cnv_data[key]['basedate'] +                pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
-            del cnv_data[key]['basedate']
+            if time_var == 'timeQ':
+                cnv_data[key]['basedate'] = dt.datetime(2000, 1, 1)  # create datetime object column
+                cnv_data[key]['datetime'] = cnv_data[key]['basedate'] + pd.to_timedelta(cnv_data[key]['timeQ'], unit='seconds')
+                del cnv_data[key]['basedate']
 
             #sometimes depth is as DepSM/prDM or as DEPTH from the SBE processing
             if 'depSM' in cnv_data[key].keys():
