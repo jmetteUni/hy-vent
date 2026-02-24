@@ -263,7 +263,6 @@ def despike_pressure(series, window, threshold, control_plot=False):
     pd.Series
         Despiked series with np.nan replacing spikes.
     """
-    import pandas as pd
     import numpy as np
 
     s = series.copy()
@@ -289,3 +288,63 @@ def despike_pressure(series, window, threshold, control_plot=False):
     s = s.interpolate()
 
     return s
+
+def check_timestamps(data, f_s = 1.0):
+    """
+    Checks for consistent timestamps if they are strictly monotonic increasing. Single errors, which are likely due to bitflips are corrected, assuming a regular frequency in the timestamps. It corrects errors of the following nature:
+
+    12:01:24
+    12:01:25
+    12:01:27
+    12:01:28
+    12:01:29
+
+    The function operates on subsets by station, so a 'Station' column is required. The function prints the result of the checks to the console
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Data containing a 'datetime' and a 'Station' column.
+
+    f_s : float, optional
+        Frequency of the timestamps in Hz. The default is 1 Hz.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Corrected data.
+    """
+    import pandas as pd
+
+    data_list = [d for _, d in data.groupby(['Station'])]
+    for station in data_list:
+        # Compute time difference
+        station["time_diff"] = station["datetime"].diff()
+
+        # Define conditions to catch single errors which are likely due to bitflips:
+        diff_before = station["time_diff"] == pd.Timedelta(seconds=2*1/f_s)
+        diff_after = station["time_diff"].shift(-1) == pd.Timedelta(seconds=0)
+
+        # Rows where both conditions hold
+        mask = diff_before & diff_after
+
+        # Print results
+        n_errors = len(mask[mask==True])
+        print('Station '+station['Station'].iloc[0]+':')
+        print(str(n_errors)+' single timestamp errors found and corrected.')
+
+        # Subtract one period from those datetime values
+        station.loc[mask, "datetime"] -= pd.Timedelta(seconds=1/f_s)
+
+        # check if strictly monotonic increasing
+        is_strict = (station['datetime'].diff().dropna() > pd.Timedelta(0)).all()
+        # Print results
+        if is_strict == True:
+            print('Datetime is strictly monotonic increasing.')
+        if is_strict == False:
+            print('Dateim is NOT strictly monotonic increasing, still datetime errors present!')
+
+    # update original data with new values from station df
+    data.update(station)
+
+    return data
