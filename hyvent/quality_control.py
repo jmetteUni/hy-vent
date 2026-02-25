@@ -342,7 +342,7 @@ def check_timestamps(data, f_s = 1.0):
         if is_strict == True:
             print('Datetime is strictly monotonic increasing.')
         if is_strict == False:
-            print('Dateim is NOT strictly monotonic increasing, still datetime errors present!')
+            print('Datetime is NOT strictly monotonic increasing, still datetime errors present!')
 
     # update original data with new values from station df
     data.update(station)
