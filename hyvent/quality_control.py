@@ -346,7 +346,8 @@ def check_timestamps(data, f_s = 1.0):
         is_strict = (station['datetime'].diff().dropna() > pd.Timedelta(0)).all()
         # Print results
         if is_strict == False:
-            n_still_errors = len(station['datetime'].duplicated())
+            still_errors = station[station['datetime'].duplicated(keep=False)]
+            n_still_errors = len(still_errors)
             print('Datetime is NOT strictly monotonic increasing, still '+str(n_still_errors)+' datetime errors present!')
 
     # update original data with new values from station df
