@@ -322,27 +322,32 @@ def check_timestamps(data, f_s = 1.0):
         station["time_diff"] = station["datetime"].diff()
 
         # Define conditions to catch single errors which are likely due to bitflips:
-        diff_before = station["time_diff"] == pd.Timedelta(seconds=2*1/f_s)
-        diff_after = station["time_diff"].shift(-1) == pd.Timedelta(seconds=0)
+        diff_jump = station["time_diff"] == pd.Timedelta(seconds=2*1/f_s)
+        diff_dup = station["time_diff"] == pd.Timedelta(seconds=0)
 
+        # Correct case 1: first jump, then duplicate
         # Rows where both conditions hold
-        mask = diff_before & diff_after
+        mask1 = diff_dup.shift(-1) & diff_jump
+        # Subtract one period from those datetime values
+        station.loc[mask1, "datetime"] -= pd.Timedelta(seconds=1/f_s)
+
+        # Correct case 2: first duplicate, then jump
+        # Rows where both conditions hold
+        mask2 = diff_dup & diff_jump.shift(-1)
+        # Subtract one period from those datetime values
+        station.loc[mask2, "datetime"] += pd.Timedelta(seconds=1/f_s)
 
         # Print results
-        n_errors = len(mask[mask==True])
+        n_errors = len(mask2[mask2==True]) + len(mask2[mask2==True])
         print('Station '+station['Station'].iloc[0]+':')
         print(str(n_errors)+' single timestamp errors found and corrected.')
-
-        # Subtract one period from those datetime values
-        station.loc[mask, "datetime"] -= pd.Timedelta(seconds=1/f_s)
 
         # check if strictly monotonic increasing
         is_strict = (station['datetime'].diff().dropna() > pd.Timedelta(0)).all()
         # Print results
-        if is_strict == True:
-            print('Datetime is strictly monotonic increasing.')
         if is_strict == False:
-            print('Datetime is NOT strictly monotonic increasing, still datetime errors present!')
+            n_still_errors = len(station['datetime'].duplicated())
+            print('Datetime is NOT strictly monotonic increasing, still '+str(n_still_errors)+' datetime errors present!')
 
     # update original data with new values from station df
     data.update(station)
