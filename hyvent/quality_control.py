@@ -363,3 +363,67 @@ def _check_timestamps(data, f_s = 1.0, control_print = False):
     data_proc = pd.concat(data_list)
 
     return data_proc
+
+def elapsed_timestamp(data, f_s = 1.0, results_print = False):
+    """
+    If duplicated timestamps are found in a station, this function calculates a new timestamp from elapsed time measurement of the CTD 'timeS' and ommits NMEA based timestamp. In this case the intial NMEA timestamp is still used as the start. The function operates on subsets by station, so a 'Station' column is required. The function optionally prints the result of the checks to the console.
+
+    Parameters
+    ----------
+    data : pandas dataframe
+        Data containing a 'datetime' and a 'Station' column.
+    f_s : float, optional
+        Frequency of the timestamps in Hz. The default is 1 Hz.
+    results_print : boolean, optional
+        Controls weather a results summary is printed to the console. The default is False.
+
+    Returns
+    -------
+    data : pandas dataframe
+        Corrected data.
+
+    """
+    import pandas as pd
+
+    data_list = [d for _, d in data.groupby(['Station'])]
+    for idx, station in enumerate(data_list):
+
+        # Get number of false timestamps
+        no_errors = station['datetime'].duplicated().sum()
+        if no_errors != 0:
+
+            # calculate new timestamp column form elapsed time
+            station['datetime_new'] = station.iloc[0]['datetime'] + pd.to_timedelta(station['timeS'], unit='seconds') - pd.to_timedelta(station.iloc[0]['timeS'], unit='seconds')
+            # Round to seconds because sometimes timesamps at the end have more digits
+            station['datetime_new'] = station['datetime_new'].dt.round(freq='s')
+
+            old_end = station.iloc[-1]['datetime']
+            new_end = station.iloc[-1]['datetime_new']
+
+            if pd.to_timedelta(5, unit='seconds') < abs(old_end-new_end):
+                print(station.iloc[0]['Station']+':')
+                print('No of duplicated timestamps: '+str(no_errors))
+                print('Warning: divergence between NMEA and elapsed time larger then 5 seconds!')
+
+            no_errors = station['datetime'].duplicated().sum()
+
+            if results_print == True:
+                print(station.iloc[0]['Station']+':')
+                print('No of duplicated timestamps: '+str(no_errors))
+                print('Old end: '+str(old_end))
+                print('New end: '+str(new_end))
+
+            # overwrite old datetime
+            station['datetime'] = station['datetime_new']
+            del station['datetime_new']
+
+            data_list[idx] = station
+
+        else:
+            if results_print == True:
+                print(station.iloc[0]['Station']+':')
+                print('No of duplicated timestamps: '+str(no_errors))
+
+    data_proc = pd.concat(data_list)
+
+    return data_proc
