@@ -289,7 +289,7 @@ def despike_pressure(series, window, threshold, control_plot=False):
 
     return s
 
-def check_timestamps(data, f_s = 1.0):
+def check_timestamps(data, f_s = 1.0, control_print = False):
     """
     Checks for consistent timestamps if they are strictly monotonic increasing. Single errors, which are likely due to bitflips are corrected, assuming a regular frequency in the timestamps. It corrects errors of the following nature:
 
@@ -305,9 +305,10 @@ def check_timestamps(data, f_s = 1.0):
     ----------
     data : pandas dataframe
         Data containing a 'datetime' and a 'Station' column.
-
     f_s : float, optional
         Frequency of the timestamps in Hz. The default is 1 Hz.
+    control_print : boolean, optional
+        Controls weather results are printed to the console. The default is False.
 
     Returns
     -------
@@ -317,8 +318,10 @@ def check_timestamps(data, f_s = 1.0):
     import pandas as pd
 
     data_list = [d for _, d in data.groupby(['Station'])]
-    for station in data_list:
+    for idx, station in enumerate(data_list):
         # Compute time difference
+        station = station.sort_values(by='datetime')
+
         station["time_diff"] = station["datetime"].diff()
 
         # Define conditions to catch single errors which are likely due to bitflips:
@@ -334,23 +337,27 @@ def check_timestamps(data, f_s = 1.0):
         # Correct case 2: first duplicate, then jump
         # Rows where both conditions hold
         mask2 = diff_dup & diff_jump.shift(-1)
-        # Subtract one period from those datetime values
+        # Add one period from those datetime values
         station.loc[mask2, "datetime"] += pd.Timedelta(seconds=1/f_s)
 
         # Print results
-        n_errors = len(mask2[mask2==True]) + len(mask2[mask2==True])
-        print('Station '+station['Station'].iloc[0]+':')
-        print(str(n_errors)+' single timestamp errors found and corrected.')
+        if control_print == True:
 
-        # check if strictly monotonic increasing
-        is_strict = (station['datetime'].diff().dropna() > pd.Timedelta(0)).all()
-        # Print results
-        if is_strict == False:
-            still_errors = station[station['datetime'].duplicated(keep=False)]
-            n_still_errors = len(still_errors)
-            print('Datetime is NOT strictly monotonic increasing, still '+str(n_still_errors)+' datetime errors present!')
+            n_errors = len(mask1[mask1==True]) + len(mask2[mask2==True])
+            print('Station '+station['Station'].iloc[0]+':')
+            print(str(n_errors)+' single timestamp errors found and corrected.')
 
-    # update original data with new values from station df
-    data.update(station)
+            # check if strictly monotonic increasing
+            is_strict = (station['datetime'].diff().dropna() > pd.Timedelta(0)).all()
+            # Print results
+            if is_strict == False:
+                still_errors = station[station['datetime'].duplicated()]
+                n_still_errors = len(still_errors)
+                print('Datetime is NOT strictly monotonic increasing, still '+str(n_still_errors)+' datetime errors present!')
 
-    return data
+        # writes data in to list
+        data_list[idx] = station
+
+    data_proc = pd.concat(data_list)
+
+    return data_proc
