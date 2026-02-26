@@ -289,8 +289,10 @@ def despike_pressure(series, window, threshold, control_plot=False):
 
     return s
 
-def check_timestamps(data, f_s = 1.0, control_print = False):
+def _check_timestamps(data, f_s = 1.0, control_print = False):
     """
+    !This function still needs testing. It works in principle, but may have unintended side effects and you will end up with wrong timestamps.!
+
     Checks for consistent timestamps if they are strictly monotonic increasing. Single errors, which are likely due to bitflips are corrected, assuming a regular frequency in the timestamps. It corrects errors of the following nature:
 
     12:01:24
