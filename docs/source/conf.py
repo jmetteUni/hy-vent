@@ -16,7 +16,7 @@ release = '1.0.0'
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path('..', '..', 'hyvent').resolve()))
+sys.path.insert(0, str(Path('..', '..', 'src', 'hy-vent').resolve()))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

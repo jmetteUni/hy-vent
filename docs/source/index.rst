@@ -16,6 +16,11 @@ documentation for details.
    :caption: Contents:
 
    processing
+   io
+   misc
+   plotting_maps
+   plotting
+   quality_control
 
 Indices and tables
 ==================
