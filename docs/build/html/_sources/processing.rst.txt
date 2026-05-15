@@ -1,5 +1,5 @@
-Input Output
-============
+Processing
+==========
 
 .. automodule:: processing
    :members:
