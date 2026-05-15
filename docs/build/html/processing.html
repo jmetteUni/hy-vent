@@ -1,0 +1,989 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Input Output &#8212; hy-vent 1.0.0 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=55c26ed414f5f8a31ebb" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
+  
+  <!-- So that users can add custom icons -->
+  <script defer src="_static/scripts/fontawesome.js?digest=55c26ed414f5f8a31ebb"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb" />
+
+    <script src="_static/documentation_options.js?v=8d563738"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'processing';</script>
+    <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="hy-vent documentation" href="index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  
+    
+    <script src="_static/searchtools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="searchindex.js"></script>
+  
+  </head>
+  <body data-default-mode="">
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+  
+  
+  
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header id="pst-header" class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">hy-vent 1.0.0 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Input Output
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="#">
+    Input Output
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item pst-sidebar-collapse"><button id="pst-collapse-sidebar-button" aria-expanded="true" aria-controls="pst-primary-sidebar"><svg class="pst-icon svg-inline--fa" role="img" aria-hidden="true" focusable="false" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" d="M3 15.5C2.36232 15.5 1.74874 15.2564 1.28478 14.8189C0.820828 14.3815 0.541576 13.7832 0.504167 13.1467L0.5 13L0.5 3C0.499965 2.36232 0.743605 1.74874 1.18107 1.28478C1.61854 0.820828 2.21676 0.541576 2.85333 0.504167L3 0.5L13 0.5C13.6377 0.499965 14.2513 0.743605 14.7152 1.18107C15.1792 1.61854 15.4584 2.21676 15.4958 2.85333L15.5 3L15.5 13C15.5 13.6377 15.2564 14.2513 14.8189 14.7152C14.3815 15.1792 13.7832 15.4584 13.1467 15.4958L13 15.5L3 15.5ZM3 13.8333L10.5 13.8333L10.5 2.16667L3 2.16667C2.79589 2.16669 2.59889 2.24163 2.44636 2.37726C2.29383 2.5129 2.19638 2.69979 2.1725 2.9025L2.16667 3L2.16667 13C2.16669 13.2041 2.24163 13.4011 2.37726 13.5536C2.5129 13.7062 2.69979 13.8036 2.9025 13.8275L3 13.8333ZM6.65583 10.325L6.5775 10.2558L4.91083 8.58917C4.76735 8.44567 4.68116 8.25476 4.66843 8.05223C4.65569 7.84971 4.71729 7.6495 4.84167 7.48917L4.91083 7.41083L6.5775 5.74417C6.72747 5.59471 6.9287 5.50794 7.14032 5.50148C7.35194 5.49502 7.55809 5.56935 7.7169 5.70937C7.8757 5.8494 7.97525 6.04463 7.99533 6.25539C8.01541 6.46616 7.95451 6.67667 7.825 6.84417L7.75583 6.9225L6.67917 8L7.75583 9.0775C7.89931 9.22099 7.98551 9.41191 7.99824 9.61443C8.01097 9.81695 7.94938 10.0172 7.825 10.1775L7.75583 10.2558C7.61234 10.3993 7.42142 10.4855 7.2189 10.4982C7.01638 10.511 6.81617 10.4494 6.65583 10.325Z"/>
+  </svg>
+  <span class="pst-collapse-sidebar-label">Collapse Sidebar</span>
+  <span class="pst-expand-sidebar-label">Expand Sidebar</span>
+</button></div>
+        <div class="sidebar-primary-item">
+
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"></div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Input Output</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-processing">
+<span id="input-output"></span><h1>Input Output<a class="headerlink" href="#module-processing" title="Link to this heading">#</a></h1>
+<p>Created on Wed Sep 11 12:52:37 2024</p>
+<p>&#64;author: <a class="reference external" href="mailto:jmette&#37;&#52;&#48;uni-bremen&#46;de">jmette<span>&#64;</span>uni-bremen<span>&#46;</span>de</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calcTempAnomaly">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calcTempAnomaly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calcTempAnomaly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calcTempAnomaly" title="Link to this definition">#</a></dt>
+<dd><p>[Depreciated, just for dicumentation] This function calculates a temperature anomaly between a dataset and a background dataset based on nearest common density values. The background curve is extracted from the background dataset by taking all values until the deepest pressure value.</p>
+<section id="parameters">
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>dataset<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data of one station.</p>
+</dd>
+<dt>background<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns<a class="headerlink" href="#returns" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset like the input but with the background temperature and the calculated temperature anomaly as an additional column.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calcTempAnomalyPress">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calcTempAnomalyPress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">No_layers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calcTempAnomalyPress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calcTempAnomalyPress" title="Link to this definition">#</a></dt>
+<dd><p>[Depreciated, just for documentation] This function calculates a temperature anomaly between a dataset and a background dataset based for common vertical pressure layer. The background curve is extracted from the background dataset by taking all values until the deepest pressure value. The number of pressure layer (e.g. resolution) must be specified.</p>
+<section id="id1">
+<h2>Parameters<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>dataset<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data of one station.</p>
+</dd>
+<dt>background<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>No_layers<span class="classifier">int</span></dt><dd><p>Number of pressure layers for which one temperature anomaly is calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id2">
+<h2>Returns<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<blockquote>
+<div><dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset like the input but with the background temperature and the calculated temperature anomaly as an additional column.</p>
+</dd>
+</dl>
+</div></blockquote>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_delta_by_bgfit">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_delta_by_bgfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_delta_by_bgfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_delta_by_bgfit" title="Link to this definition">#</a></dt>
+<dd><p>This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable’s values in the main dataset.</p>
+<section id="id3">
+<h2>Parameters<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Dataset containing one station. Must have the variables depth (“DEPTH”) and datetime (“datetime”).</p>
+</dd>
+<dt>bg<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int</span></dt><dd><p>Minimum depth for the fit’s depth range. It is advisable to set this to the region of interest to produce a good fit.</p>
+</dd>
+<dt>max_dep<span class="classifier">int</span></dt><dd><p>Maximum depth for the fit’s depth range. It is advisable to set this to the region of interest to produce a good fit.</p>
+</dd>
+<dt>fit<span class="classifier">string</span></dt><dd><p>Keyword for the fit method used. Can be “poly” for polynomial fit (np.polyfit) or “uni” for univariate spline fit (scipy.interpolate.UnivariateSpline).</p>
+</dd>
+<dt>param<span class="classifier">int or tuple</span></dt><dd><p>If the poly fit is used: Order of the polynomial fit.
+If the univariate Spline is used: Tuple of k (degree of the smoothing spline) and s (smoothing factor)</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id4">
+<h2>Returns<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe similar to the original dataframe with the background fit and the deviation of the variable as additional columns. Values outside the depth range in these columns are NaN.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_delta_by_dens">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_delta_by_dens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_delta_by_dens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_delta_by_dens" title="Link to this definition">#</a></dt>
+<dd><p>This functions calculates the deviation of a variable from a number of profiles from a background by comparing equal density layers and then substracting the variable from the background. For the background measurement, all measurements until the deepest one (downcast) are used. Values outside a depth range are replaces with NaNs. Optionally a control plot comparing the data and the background is shown.</p>
+<section id="id5">
+<h2>Parameters<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset of one or several profiles.</p>
+</dd>
+<dt>bg<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int</span></dt><dd><p>Minimum depth, above which the calculated deviation is replaced with NaN</p>
+</dd>
+<dt>max_dep<span class="classifier">int</span></dt><dd><p>Maximum depth, below which the calculated deviation is replaced with NaN</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>Boolian which controlles if control plots are produced or not. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id6">
+<h2>Returns<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset like the input but with the calculated deviation as an additional column.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_delta_stafit">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_delta_stafit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lim_above</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lim_below</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_delta_stafit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_delta_stafit" title="Link to this definition">#</a></dt>
+<dd><p>[Not working yet] This functions calculates the deviation of a variable from a polynomial fit of the variable from a different (background) station in a specified depth range. For this, first a polynomial fit of the background variable is calculated in the depth range and then merged with the main dataset based on similar depth values. Then this fit is substracted from the variable’s values in the main dataset. If the variable is “delta3He”, that means only discrete samples, just a mean is calculated in the depth range and substracted from the dataset values.</p>
+<section id="id7">
+<h2>Parameters<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Dataset containing one station. Must have the variables depth (“DEPTH”) and datetime (“datetime”).</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int</span></dt><dd><p>Minimum depth for the fit’s depth range. It is advisable to set this to the region of interest to produce a good fit.</p>
+</dd>
+<dt>max_dep<span class="classifier">int</span></dt><dd><p>Maximum depth for the fit’s depth range. It is advisable to set this to the region of interest to produce a good fit.</p>
+</dd>
+<dt>fit<span class="classifier">string</span></dt><dd><p>Keyword for the fit method used. Can be “poly” for polynomial fit (np.polyfit) or “uni” for univariate spline fit (scipy.interpolate.UnivariateSpline).</p>
+</dd>
+<dt>param<span class="classifier">int or tuple</span></dt><dd><p>If the poly fit is used: Order of the polynomial fit.
+If the univariate Spline is used: Tuple of k (degree of the smoothing spline) and s (smoothing factor)</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Returns<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe similar to the original dataframe with the background fit and the deviation of the variable as additional columns. Values outside the depth range in these columns are NaN.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_flux">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_flux</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">zmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">depth_vent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_station</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">const</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_flux"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_flux" title="Link to this definition">#</a></dt>
+<dd><p>This function calculates the estimates the heatflux of a hydrothermal vent based on the rise height of the plume. The calculation is based on McDougall, T. J. (1990) and implemented as shown in the supplemental material of Wegener, G.(2024).</p>
+<section id="id9">
+<h2>Parameters<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>zmax<span class="classifier">int or float</span></dt><dd><p>Maximum rise height of the plume, as zmax = depth_vent - minimum_plume_depth.</p>
+</dd>
+<dt>depth_vent<span class="classifier">int or float</span></dt><dd><p>Depth of the vent site.</p>
+</dd>
+<dt>ref_station<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe containing the potential density anomaly and depth of a CTD station. This density profile is used to calculate the buoyancy frequency N^2.</p>
+</dd>
+<dt>const<span class="classifier">dictionary, optional</span></dt><dd><p>Dictionary of physical constants needed for the calculation. Should be in the form of “const = {‘rho0’ : 1000, ‘cp’ :  3890, ‘g’ : 9.8, ‘alpha’ : 1.3 * 10**(-4)}”. If none is provided, the default values are used, which are taken from supplemental material of Wegener, G.(2024). The default is None.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>heat_flux<span class="classifier">float</span></dt><dd><p>The estimated heat flux of the vent site.</p>
+</dd>
+<dt>Nsquared<span class="classifier">float</span></dt><dd><p>The buoyancy frequency of the stratification based on the reference station.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_helium_delta">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_helium_delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_helium_delta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_helium_delta" title="Link to this definition">#</a></dt>
+<dd><p>This functions calculates the deviation of a delta3He from the mean of a different (background) station in a specified depth range. For this, the mean of the background variable is calculated and substracted from the variable’s values in the main dataset.</p>
+<section id="id11">
+<h2>Parameters<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Dataset containing one station. Must have the variable depth (“DEPTH”).</p>
+</dd>
+<dt>bg<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int</span></dt><dd><p>Minimum depth for the depth range where the mean is calculated. It is advisable to exclude surface measurements.</p>
+</dd>
+<dt>max_dep<span class="classifier">int</span></dt><dd><p>Maximum depth for the depth range where the mean is calulated.</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>This option controls if a control plot is shown, containing the dataset variable, the background variable and the calculated fit in the specified depth range. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id12">
+<h2>Returns<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe similar to the original dataframe with the bakcground’s mean and the deviation as additional columns. Values outside the depth range in these columns are NaN.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_mean_profile">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_mean_profile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_mean_profile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_mean_profile" title="Link to this definition">#</a></dt>
+<dd><p>This function calculates a mean profile of the data of mutliple stations for a given variable. Values a binned to 1m depth intervals between the minimum and maximum depth present in the data.</p>
+<section id="id13">
+<h2>Parameters<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data of one or multiple CTD stations with variables as columns. One column has to be the station designation.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable to calculate the mean of. Must be a column key in data.</p>
+</dd>
+<dt>station_list<span class="classifier">list of strings</span></dt><dd><p>List of station designations, over which the mean should be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Returns<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>mean_profile<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe containing two columns which are the binned depth and the associated mean of the variable.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.calc_turb_delta">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">calc_turb_delta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_layer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_layer</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#calc_turb_delta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.calc_turb_delta" title="Link to this definition">#</a></dt>
+<dd><p>This functions calculates the deviation of turbidity. This is done by excluding a plume layer and defining a layer above and below the plume, where the mean is calculated and then subtracted.</p>
+<section id="id15">
+<h2>Parameters<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Dataset containing one station. Must have the variable depth (“DEPTH”).</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>upper_layer<span class="classifier">tuple of float</span></dt><dd><p>Upper and lower depth of the layer above the plume, which is is used as the background.</p>
+</dd>
+<dt>lower_layer<span class="classifier">tuple of float</span></dt><dd><p>Upper and lower depth of the layer below the plume, which is is used as the background.</p>
+</dd>
+</dl>
+</section>
+<section id="id16">
+<h2>Returns<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe similar to the original dataframe with the the deviation as an additional column. Values outside the depth range in these columns are NaN.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.corr_mapr_depth">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">corr_mapr_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#corr_mapr_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.corr_mapr_depth" title="Link to this definition">#</a></dt>
+<dd><p>Calculates a corrected depth based on the 200 first pressure values larger then 5 dbar which are assumed as measured before deploying. The new, corrected depth is calculated with Gibbs Seawater Toolbox (gsw.conversions.z_from_p()) with the pressure corrected by the mean of the pre-deployment values and written to the dataframe as a new column. If there are less then 10 pre-deployment values, no correction is applied and the original Depth is copied to the new column.</p>
+<section id="id17">
+<h2>Parameters<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Data of one station of one MAPR as a pandas dataframe.</p>
+</dd>
+<dt>lat<span class="classifier">interger or float</span></dt><dd><p>Latitude where the measurement was taken to calculate the depth from pressure.</p>
+</dd>
+</dl>
+</section>
+<section id="id18">
+<h2>Returns<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>depth_corr<span class="classifier">pandas series</span></dt><dd><p>Column containining the corrected depth.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.derive_CTD">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">derive_CTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_sigma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[0,</span> <span class="pre">3]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#derive_CTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.derive_CTD" title="Link to this definition">#</a></dt>
+<dd><p>This function calculates the derived properties absolute salinity, conservative temperature, density and density anomaly of CTD data with the Gibbs Seawater Toolbox and appends them as columns.</p>
+<section id="id19">
+<h2>Parameters<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Dataset as one dataframe or a dictonary with dataframes as values. Must contain practical salinity (“PSAL”), pressure (“PRES”), longitude (“LONGITUDE”), latitude (“LATITUDE”) and potential temperature (“potemperature”)</p>
+</dd>
+<dt>ref_sigma<span class="classifier">int or list of ints, optional</span></dt><dd><p>Reference level for the potential temperature anomaly calulation, where 0 gives sigma0, 1 gives sigma1, etc up to sigma 4. Default is [0,3]</p>
+</dd>
+</dl>
+</section>
+<section id="id20">
+<h2>Returns<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe or dictionary</span></dt><dd><p>Data with the derived properties as additonal columns.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.derive_mapr">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">derive_mapr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_for_mean</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#derive_mapr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.derive_mapr" title="Link to this definition">#</a></dt>
+<dd><p>This function calculates derived physical properties with the Gibbs Seawater Toolbox for a dataset (usually MAPR) without salinity measurements. The salinity values are calculated as a mean over the stations given from a second dataset (usually CTD stations).</p>
+<section id="id21">
+<h2>Parameters<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data without salinity values of one or multiple CTD stations or MAPR operations with variables as columns.</p>
+</dd>
+<dt>data_for_mean<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data with salinity values of one or multiple CTD stations with variables as columns. One column has to be the station designation. The salinity variable is assumed to be called “PSAL” and be in Practical Salinity units.</p>
+</dd>
+<dt>station_list<span class="classifier">list of strings</span></dt><dd><p>List of station designations, over which the mean for salinity should be calculated.</p>
+</dd>
+</dl>
+</section>
+<section id="id22">
+<h2>Returns<a class="headerlink" href="#id22" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data_der<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the original data and the derived properties.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.get_bg_polyfit">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">get_bg_polyfit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#get_bg_polyfit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.get_bg_polyfit" title="Link to this definition">#</a></dt>
+<dd><p>This funtions fits a polynomial (np.polyfit) to a variable of a profile (usually to create a smooth background profile), with depth of the main dataset as x values for the fit.</p>
+<section id="id23">
+<h2>Parameters<a class="headerlink" href="#id23" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>bg<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>dep_vec: pandas datafame</dt><dd><p>Dataframe with one column (“DEPTH”) containing the depth coordinates from the main dataset.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int or float</span></dt><dd><p>Minimum depth for the fit’s depth range.</p>
+</dd>
+</dl>
+<p>max_dep : int or float
+fit_order : int or float, optional</p>
+<blockquote>
+<div><p>Order of the polynomial fit. The default is 10.</p>
+</div></blockquote>
+</section>
+<section id="id24">
+<h2>Returns<a class="headerlink" href="#id24" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>df_fit<span class="classifier">pandas dataframe</span></dt><dd><p>Datframe containing the depth and the fit result.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.get_bg_unifit">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">get_bg_unifit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bg</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep_vec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.005</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#get_bg_unifit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.get_bg_unifit" title="Link to this definition">#</a></dt>
+<dd><p>This funtions fits a univariate spline (scipy.interpolate.UnivariateSpline) to a variable of a profile (usually to create a smooth background profile), with depth of the main dataset as x values for the fit.</p>
+<section id="id25">
+<h2>Parameters<a class="headerlink" href="#id25" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>bg<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset which should be used as background.</p>
+</dd>
+<dt>dep_vec: pandas datafame</dt><dd><p>Dataframe with one column (“DEPTH”) containing the depth coordinates from the main dataset.</p>
+</dd>
+<dt>var<span class="classifier">string</span></dt><dd><p>Variable, where the deviation should be calculated.</p>
+</dd>
+<dt>min_dep<span class="classifier">int or float</span></dt><dd><p>Minimum depth for the fit’s depth range.</p>
+</dd>
+<dt>max_dep<span class="classifier">int or float</span></dt><dd><p>Maximum depth for the fit’s depth range.</p>
+</dd>
+<dt>k<span class="classifier">int or float, optional</span></dt><dd><p>Degree of the smoothing spline. The default is None.</p>
+</dd>
+<dt>s<span class="classifier">int or float, optional</span></dt><dd><p>Smoothing paramter used to construct the spline function. The default is 0.005.</p>
+</dd>
+</dl>
+</section>
+<section id="id26">
+<h2>Returns<a class="headerlink" href="#id26" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>df_fit<span class="classifier">pandas dataframe</span></dt><dd><p>Datframe containing the depth and the fit result.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.get_fit_cast">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">get_fit_cast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_fit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dens_var</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#get_fit_cast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.get_fit_cast" title="Link to this definition">#</a></dt>
+<dd><p>This function returns a list of all up- and down cast</p>
+<section id="id27">
+<h2>Parameters<a class="headerlink" href="#id27" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data_fit<span class="classifier">TYPE</span></dt><dd><p>DESCRIPTION.</p>
+</dd>
+<dt>dens_var<span class="classifier">TYPE</span></dt><dd><p>DESCRIPTION.</p>
+</dd>
+<dt>min_dep<span class="classifier">TYPE</span></dt><dd><p>DESCRIPTION.</p>
+</dd>
+<dt>control_plot<span class="classifier">TYPE, optional</span></dt><dd><p>DESCRIPTION. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id28">
+<h2>Returns<a class="headerlink" href="#id28" title="Link to this heading">#</a></h2>
+<p>None.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.process_CTD">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">process_CTD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_dORP</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'upoly0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_Turb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'seaTurbMtr'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iqr_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_plots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#process_CTD"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.process_CTD" title="Link to this definition">#</a></dt>
+<dd><p>This functions processes CTD data in terms of turbidity and OPR measurements. Turbidity (column name: “seaTurbMtr”) is removed above 100m to avoid the surface layer. Then outliers are removed by the IQR method and the data is smoothed with a savgol filter. For ORP the raw CTD voltage (column name: “ORP_raw_v6”) is used to calculate the gradient per second over 30 seconds averaged. It also cuts unuseful data before and after the deplyoments, based on a reference pressure using the function cut_prepost_deploy.</p>
+<section id="id29">
+<h2>Parameters<a class="headerlink" href="#id29" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe of one or multiple CTD operations with variables as columns. Need columns with station designation.</p>
+</dd>
+<dt>var_dORP: list of strings, optional</dt><dd><p>Variable (or multiple variables if multiple sensors were used) for calculating dORP. Consider that the resulting unit is directly dependent on the unit of the input variables. Default is “upoly0”.</p>
+</dd>
+<dt>var_Turb: list of strings, optional</dt><dd><p>Variable (or multiple variables if multiple sensors were used) for calculating the processed turbidity. Default is “seaTTurbMtr” for the Seapint Turbidity Meter.</p>
+</dd>
+<dt>iqr_threshold<span class="classifier">float, optional</span></dt><dd><p>Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 10.</p>
+</dd>
+<dt>box_plots<span class="classifier">boolean, optional</span></dt><dd><p>Boolian which controlles if box plots for the IQR outlier removal are produced or not. Default is False</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>Boolian which controlles if control plots for turbidity processing are produced or not. Default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id30">
+<h2>Returns<a class="headerlink" href="#id30" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the processed data</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.process_MAPR">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">process_MAPR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neg_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">despike_window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">despike_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">orp_window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iqr_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savgol_window_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">savgol_polyorder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resample</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'s'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#process_MAPR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.process_MAPR" title="Link to this definition">#</a></dt>
+<dd><p>The function removes outliers (“Neph_outl(volts)”) and additionally smoothes the turbdity data (“Neph_smoo(volts)”). Optionally the data is resampled to a different time interval.</p>
+<section id="id31">
+<h2>Parameters<a class="headerlink" href="#id31" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe of one or multiple MAPR operations with variables as columns. Need columns with station and serial number designation.</p>
+</dd>
+<dt>lat<span class="classifier">float</span></dt><dd><p>Approximate latitude of the measurement for correcting the depth calculation.</p>
+</dd>
+<dt>fs<span class="classifier">float, optional</span></dt><dd><p>Sample frequency of the MAPR in Hz. Default is 1/5.</p>
+</dd>
+<dt>neg_threshold<span class="classifier">flaot, optional</span></dt><dd><p>Pressure values below that threshold are set to NaN. Default is -30 assuming the unit as decibar.</p>
+</dd>
+<dt>despike_window_size<span class="classifier">int, optional</span></dt><dd><p>Size for the rolling median filter to despike the pressure data. Default is 15.</p>
+</dd>
+<dt>despike_threshold<span class="classifier">float, optional</span></dt><dd><p>Threshold for the rolling median filter to despike the pressure data. Defaul is 15.</p>
+</dd>
+<dt>orp_window_size<span class="classifier">int, optional</span></dt><dd><p>Size for the sliding window over which the gradient for dORP is computed in seconds. For a size of 30s and fs=1/5Hz size results in 6 measurements. Default is 30.</p>
+</dd>
+<dt>iqr_threshold: float, optional</dt><dd><p>Threshold of the outlier removal in qc_IQR utilizing the interquartile range test. The threshold defines the upper and lower bounds. Default is 5.</p>
+</dd>
+<dt>savgol_window_length<span class="classifier">int, optional</span></dt><dd><p>The length of the filter window (i.e., the number of coefficients) for the savgol_filter function. If mode is ‘interp’, window_length must be less than or equal to the size of x. Default is 70.</p>
+</dd>
+<dt>savgol_polyorder<span class="classifier">int, optional</span></dt><dd><p>The order of the polynomial used to fit the samples in the savgol_filter funcion. polyorder must be less than window_length. Default is 3.</p>
+</dd>
+<dt>resample<span class="classifier">string, optional</span></dt><dd><p>String which is used in the pandas resample function to resample the time resolution. Normally should be None for no resampling or ‘S’ for resampling to 1 second intervals. Default is ‘S’.</p>
+</dd>
+</dl>
+</section>
+<section id="id32">
+<h2>Returns<a class="headerlink" href="#id32" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the processed data</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.sel_bg_cast">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">sel_bg_cast</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#sel_bg_cast"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.sel_bg_cast" title="Link to this definition">#</a></dt>
+<dd><p>This function subsets all data until the deepest measurement which is expected to be the first downcast. This can be used as a background or standard profile.</p>
+<section id="id33">
+<h2>Parameters<a class="headerlink" href="#id33" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data of one station. Must contain a column “DEPTH” with depth values.</p>
+</dd>
+</dl>
+</section>
+<section id="id34">
+<h2>Returns<a class="headerlink" href="#id34" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data until the deepest value.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.sep_casts">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">sep_casts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#sep_casts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.sep_casts" title="Link to this definition">#</a></dt>
+<dd><p>This function separates a station into up and down casts by local extrema.</p>
+<section id="id35">
+<h2>Parameters<a class="headerlink" href="#id35" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataframe with the data of one station.</p>
+</dd>
+<dt>window_size<span class="classifier">TYPE, optional</span></dt><dd><p>Size of the rolling window, to find local extrema within. The optimal size is dependent on the number of measurements per up or down cast. The default is 1000.</p>
+</dd>
+</dl>
+</section>
+<section id="id36">
+<h2>Returns<a class="headerlink" href="#id36" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>casts<span class="classifier">list of pandas dataframes</span></dt><dd><p>A list were each entry is a dataframe with the data of the consecutive up and down casts.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="processing.zmax_theta">
+<span class="sig-prename descclassname"><span class="pre">processing.</span></span><span class="sig-name descname"><span class="pre">zmax_theta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vent_depth</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uncert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">control_plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/processing.html#zmax_theta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#processing.zmax_theta" title="Link to this definition">#</a></dt>
+<dd><p>This function finds the maximum rise height of a plume based on the potential temperature anomaly. That is the vent’s depth minus the minimal depth below a limit (“min_dep”) where the anomaly is higher then 0 + a threshold (“uncert”). Optionally a control plot is printed, which shows the profile and and zmax.</p>
+<section id="id37">
+<h2>Parameters<a class="headerlink" href="#id37" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>data<span class="classifier">pandas dataframe</span></dt><dd><p>Dataset of one or several profiles. Must contain the potential temperature anomaly (“Delta_potemperature”) and depth (“DEPTH”).</p>
+</dd>
+<dt>min_dep<span class="classifier">int</span></dt><dd><p>Minimum depth below which data is exmained for zmax.</p>
+</dd>
+<dt>vent_depth<span class="classifier">int</span></dt><dd><p>Depth of the hydrothermal vent or the seafloor.</p>
+</dd>
+<dt>thres: float</dt><dd><p>Threshold of the potential temperature which is added to zero. This defines the threshold a value has to pass to be considered for zmax.</p>
+</dd>
+<dt>control_plot<span class="classifier">boolean, optional</span></dt><dd><p>Boolian which controlles if control plots are produced or not. The default is False.</p>
+</dd>
+</dl>
+</section>
+<section id="id38">
+<h2>Returns<a class="headerlink" href="#id38" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>zmax<span class="classifier">float</span></dt><dd><p>The maximum rise height of the plume above the vent depth.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">hy-vent documentation</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calcTempAnomaly"><code class="docutils literal notranslate"><span class="pre">calcTempAnomaly()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calcTempAnomalyPress"><code class="docutils literal notranslate"><span class="pre">calcTempAnomalyPress()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_delta_by_bgfit"><code class="docutils literal notranslate"><span class="pre">calc_delta_by_bgfit()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_delta_by_dens"><code class="docutils literal notranslate"><span class="pre">calc_delta_by_dens()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_delta_stafit"><code class="docutils literal notranslate"><span class="pre">calc_delta_stafit()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_flux"><code class="docutils literal notranslate"><span class="pre">calc_flux()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_helium_delta"><code class="docutils literal notranslate"><span class="pre">calc_helium_delta()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_mean_profile"><code class="docutils literal notranslate"><span class="pre">calc_mean_profile()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.calc_turb_delta"><code class="docutils literal notranslate"><span class="pre">calc_turb_delta()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.corr_mapr_depth"><code class="docutils literal notranslate"><span class="pre">corr_mapr_depth()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.derive_CTD"><code class="docutils literal notranslate"><span class="pre">derive_CTD()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.derive_mapr"><code class="docutils literal notranslate"><span class="pre">derive_mapr()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.get_bg_polyfit"><code class="docutils literal notranslate"><span class="pre">get_bg_polyfit()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.get_bg_unifit"><code class="docutils literal notranslate"><span class="pre">get_bg_unifit()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.get_fit_cast"><code class="docutils literal notranslate"><span class="pre">get_fit_cast()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.process_CTD"><code class="docutils literal notranslate"><span class="pre">process_CTD()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.process_MAPR"><code class="docutils literal notranslate"><span class="pre">process_MAPR()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.sel_bg_cast"><code class="docutils literal notranslate"><span class="pre">sel_bg_cast()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.sep_casts"><code class="docutils literal notranslate"><span class="pre">sep_casts()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#processing.zmax_theta"><code class="docutils literal notranslate"><span class="pre">zmax_theta()</span></code></a></li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="_sources/processing.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=55c26ed414f5f8a31ebb"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=55c26ed414f5f8a31ebb"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, Jonathan Mette.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 9.1.0.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.17.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
