@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "hy-vent"
+dynamic = ["version"]
+description = 'Python package to analyse CTD Data of hydrothermal venting.'
+readme = "README.rst"
+requires-python = ">=3.12.12"
+license = "GPL-3.0"
+keywords = ["python","oceanography","CTD","hydrothermal venting"]
+authors = [
+  { name = "Jonathan Mette", email = "j.mette@posteo.de" },
+]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Private :: Do Not Upload",
+]
+dependencies = [
+  'numpy',
+  'pandas',
+  'datetime',
+  'seabird',
+  'matplotlib',
+  'lat_lon_parser',
+  'gsw',
+]
+
+[project.urls]
+Documentation = "https://github.com/Jonathan Mette/hy-vent#readme"
+Issues = "https://github.com/Jonathan Mette/hy-vent/issues"
+Source = "https://github.com/Jonathan Mette/hy-vent"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/hy-vent"]
+
+[tool.hatch.build]
+include = [
+  "src/hy-vent/*.yaml"
+]
+
+[tool.hatch.version]
+path = "src/hy-vent/__about__.py"
