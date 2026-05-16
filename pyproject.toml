@@ -33,6 +33,13 @@ dependencies = [
   'lat_lon_parser',
   'gsw',
 ]
+#for building the docs on readthedocs
+[project.optional-dependencies]
+docs = [
+  "sphinx",
+  "furo",
+]
+
 
 [project.urls]
 Documentation = "https://github.com/Jonathan Mette/hy-vent#readme"
