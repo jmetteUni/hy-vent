@@ -37,7 +37,7 @@ dependencies = [
 [project.optional-dependencies]
 docs = [
   "sphinx",
-  "furo",
+  "pydata_sphinx_theme",
 ]
 
 

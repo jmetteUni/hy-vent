@@ -20,6 +20,8 @@ sphinx:
 # python:
 #    install:
 #    - requirements: docs/requirements.txt
+
+# Using the toml file instead
 python:
   install:
     - method: pip
