@@ -1,5 +1,6 @@
 Hy-Vent
 =======
+![Read the Docs](https://img.shields.io/readthedocs/https%3A%2F%2Fhy-vent.readthedocs.io%2Fen%2Flatest%2F)
 
 A package wich aims to provide functions for analyzing CTD Data from hydrothermal vents. Is the basis for the [analysis scripts](https://github.com/jmetteUni/aurora-plume-dispersal-figures) used in the master thesis [Mette, 2025](https://media.suub.uni-bremen.de/handle/elib/22668).
 
