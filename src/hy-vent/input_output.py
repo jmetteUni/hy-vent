@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Apr 23 18:10:45 2024
-
-@author: jmette@uni-bremen.de
-"""
+# Created on Tue Apr 23 18:10:45 2024
+# @author: jmette@uni-bremen.de
 
 
 def read_cnv(path,suffix=None):

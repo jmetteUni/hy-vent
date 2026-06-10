@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 14 15:03:01 2024
-
-@author: jmette@uni-bremen.de
-"""
+# Created on Wed Aug 14 15:03:01 2024
+# @author: jmette@uni-bremen.de
 
 def qc_lat_lon_IQR(profile, vars_to_qc, threshold=1.5, boxplots=False):        #qc on no of lat lon in a profile with the IQR method #threshold example =1.5
     """

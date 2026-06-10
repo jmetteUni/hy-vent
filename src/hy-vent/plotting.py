@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Aug 14 16:25:58 2024
-
-@author: jonathan
-"""
+# Created on Wed Aug 14 16:25:58 2024
+# @author: jonathan
 
 def plot_hist_he(data,depth_max,depth_min,bins,path_save='None'):
     """

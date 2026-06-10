@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 25 13:27:30 2024
-
-@author: jmette@uni-bremen.de
-"""
+# Created on Thu Jul 25 13:27:30 2024
+# @author: jmette@uni-bremen.de
 
 def plot_map(profile_data, btl_data, bathy, tracer_type='None', path_save='None'):
     """

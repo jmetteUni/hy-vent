@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Jul 26 10:59:34 2024
 
-@author: jmette@uni-bremen.de
-"""
+# Created on Fri Jul 26 10:59:34 2024
+
+# @author: jmette@uni-bremen.de
+
 import os
 working_dir = '/home/jonathan/Dokumente/Masterarbeit/python/hy-vent/hyvent/'
 os.chdir(working_dir)

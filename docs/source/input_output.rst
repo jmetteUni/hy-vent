@@ -1,5 +1,5 @@
 Input and Output
-===============
+================
 
-.. automodule:: io
+.. automodule:: input_output
    :members:

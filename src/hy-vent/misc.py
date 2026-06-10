@@ -1,10 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Fri Aug 16 13:30:29 2024
-
-@author: jmette@uni-bremen.de
-"""
+# Created on Fri Aug 16 13:30:29 2024
+# @author: jmette@uni-bremen.de
 
 def keys_to_data(data,datatype,project_name=None):
     """

@@ -6,17 +6,14 @@
 hy-vent documentation
 =====================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
-
+The package contains various functions for processing, analysis and plotting. They are roughly sorted into the different modules. Some of them are more specific, some of them are more broader in scope, because the package was created specifically for the master thesis `Mette, 2025 <https://media.suub.uni-bremen.de/handle/elib/22668)>`__.
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    processing
-   io
+   input_output
    misc
    plotting_maps
    plotting

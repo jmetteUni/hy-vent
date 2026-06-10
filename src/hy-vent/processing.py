@@ -1,11 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Wed Sep 11 12:52:37 2024
-
-@author: jmette@uni-bremen.de
-"""
-
+# Created on Wed Sep 11 12:52:37 2024
+# @author: jmette@uni-bremen.de
 
 def corr_mapr_depth(data, lat):
     """
@@ -724,6 +720,7 @@ def get_bg_polyfit(bg, dep_vec, var, min_dep, max_dep, fit_order=10):
     min_dep : int or float
         Minimum depth for the fit's depth range.
     max_dep : int or float
+        Maximum depth for the fit's depth range.'
     fit_order : int or float, optional
         Order of the polynomial fit. The default is 10.
 
