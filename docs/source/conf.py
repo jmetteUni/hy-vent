@@ -9,7 +9,7 @@
 project = 'hy-vent'
 copyright = '2026, Jonathan Mette'
 author = 'Jonathan Mette'
-release = '1.0.0'
+release = '1.1.0'
 
 # -- Point to python code ---------------------------------------------------
 
