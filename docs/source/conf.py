@@ -6,7 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'hy-vent'
+project = 'hyvent'
 copyright = '2026, Jonathan Mette'
 author = 'Jonathan Mette'
 release = '1.1.0'
@@ -16,7 +16,7 @@ release = '1.1.0'
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path('..', '..', 'src', 'hy-vent').resolve()))
+sys.path.insert(0, str(Path('..', '..', 'src', 'hyvent').resolve()))
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

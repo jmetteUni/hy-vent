@@ -1,4 +1,4 @@
-Hy-Vent
+HyVent
 =======
 [![Static Badge](https://img.shields.io/badge/DOI-%2010.5281%2Fzenodo.15420189-blue?labelColor=grey)](https://doi.org/10.5281/zenodo.15420189)
 [![Static Badge](https://img.shields.io/badge/docs-blue?logo=readthedocs)](https://hy-vent.readthedocs.io/en/latest/)
